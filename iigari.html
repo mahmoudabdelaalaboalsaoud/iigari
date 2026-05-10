@@ -293,8 +293,10 @@ select option{background:var(--bg3)}
 <script>
 const SB_URL='https://ptimioffmszhmpxxuqha.supabase.co';
 const SB_KEY='sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
-const ADMIN='mahmoudabdelaalaboalsaoud@gmail.com';
-const {createClient}=supabase;
+async function handleUser(user){
+  CU=user; isAdm=user.email===ADMIN;
+  enterApp(user);
+}const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
 let CU=null,isAdm=false,AU=[],AT=[],AC=[],AP=[],USERS=[];
 

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إيجاري — منصة إدارة الوحدات والإيجارات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3348;--accent:#3b82f6;--accent2:#1d4ed8;--text:#e8edf5;--text2:#8b95a8;--text3:#5a6478;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--radius:12px;--rsm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 40%,#1a2540 0%,#0f1117 70%)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:380px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.login-logo{font-size:28px;font-weight:700;margin-bottom:6px}.login-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:var(--rsm);background:#fff;color:#333;font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;border:none;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.btn-google:hover{background:#f1f1f1;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.btn-google svg{width:20px;height:20px;flex-shrink:0}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text3);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.admin-link{font-size:12px;color:var(--accent);cursor:pointer;margin-top:12px;display:block}
+.admin-form{display:none;margin-top:16px;text-align:right}
+.admin-form.show{display:block}
+.ai{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;margin-bottom:8px}
+.ai:focus{border-color:var(--accent)}
+.btn-adm{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);padding:10px;font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer}
+.btn-adm:hover{background:var(--accent2)}
+.login-note{font-size:11px;color:var(--text3);margin-top:20px;line-height:1.6}
+/* APP */
+.app{display:none}.app.show{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;right:0;height:100vh;z-index:100}
+.main{flex:1;margin-right:220px;padding:24px}
+.s-logo{padding:20px 16px;border-bottom:1px solid var(--border)}
+.logo-name{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.s-nav{padding:12px 8px;flex:1;overflow-y:auto}
+.nav-lbl{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.08em;padding:0 8px;margin:16px 0 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rsm);font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,.15);color:var(--accent);font-weight:600}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.s-foot{padding:12px 16px;border-top:1px solid var(--border)}
+.u-info{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
+.u-av img{width:100%;height:100%;object-fit:cover}
+.u-name{font-size:12px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u-role{font-size:10px;color:var(--accent)}
+.btn-lo{width:100%;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:6px;font-size:12px;color:var(--text3);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .15s}
+.btn-lo:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
+/* PAGES */
+.page{display:none}.page.active{display:block}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.breadcrumb{font-size:12px;color:var(--text3);margin-bottom:4px}
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.metric-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;margin-bottom:8px}
+.metric-val{font-size:26px;font-weight:700;line-height:1}
+.metric-sub{font-size:12px;margin-top:6px}
+.up{color:var(--green)}.down{color:var(--red)}.neutral{color:var(--text3)}
+/* CARDS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:600}
+.card-link{font-size:12px;color:var(--accent);cursor:pointer}
+/* TABLE */
+.twrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;padding:10px 16px;text-align:right;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+td{font-size:13px;color:var(--text2);padding:12px 16px;border-bottom:1px solid rgba(42,51,72,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tdm{color:var(--text);font-weight:500}
+/* PILLS */
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pg{background:rgba(34,197,94,.12);color:var(--green)}.pr{background:rgba(239,68,68,.12);color:var(--red)}
+.pa{background:rgba(245,158,11,.12);color:var(--amber)}.pb{background:rgba(59,130,246,.12);color:var(--accent)}
+.pp{background:rgba(168,85,247,.15);color:#a855f7}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--rsm);font-size:13px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:600;border:none;transition:all .15s}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
+.btn-g{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:20px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgi{display:flex;flex-direction:column;gap:6px}
+.fgi.full{grid-column:1/-1}
+label{font-size:12px;color:var(--text3);font-weight:600}
+input,select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:9px 12px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;transition:border .15s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--bg3)}
+.fa{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+/* MISC */
+.sbar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;width:220px}
+.sbar:focus{border-color:var(--accent)}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text3);font-size:13px;gap:8px}
+.spin{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px;color:var(--text3)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.toast{position:fixed;bottom:24px;left:24px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:12px 16px;font-size:13px;z-index:999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{display:block;animation:su .2s ease}
+@keyframes su{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.mrow:last-child{border-bottom:none}
+.abtn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text3);cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif;transition:all .15s}
+.abtn:hover{background:var(--bg3);color:var(--text)}
+.abtn.del:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
+.adm-banner{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);border-radius:var(--rsm);padding:8px 14px;font-size:12px;color:#a855f7;margin-bottom:16px;display:none}
+.adm-banner.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="login-page">
+  <div class="login-box">
+    <div class="login-logo">● إيجاري</div>
+    <div class="login-sub">منصة إدارة الوحدات والإيجارات</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8.9 20-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C40.8 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
+      تسجيل الدخول بـ Google
+    </button>
+    <div class="divider">أو</div>
+    <span class="admin-link" onclick="document.getElementById('adm-form').classList.toggle('show')">دخول Admin بكلمة مرور</span>
+    <div class="admin-form" id="adm-form">
+      <input class="ai" type="email" id="adm-email" placeholder="البريد الإلكتروني">
+      <input class="ai" type="password" id="adm-pass" placeholder="كلمة المرور">
+      <button class="btn-adm" onclick="loginAdmin()">دخول</button>
+    </div>
+    <div class="login-note">بتسجيل دخولك توافق على شروط الاستخدام</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="s-logo">
+      <div class="logo-name"><span class="logo-dot"></span> إيجاري</div>
+      <div class="logo-sub">منصة إدارة الوحدات</div>
+    </div>
+    <div class="s-nav">
+      <div class="nav-lbl">القائمة</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>الرئيسية</div>
+      <div class="nav-item" onclick="showPage('units',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>الوحدات</div>
+      <div class="nav-item" onclick="showPage('tenants',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>المستأجرون</div>
+      <div class="nav-item" onclick="showPage('contracts',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
+      <div class="nav-item" onclick="showPage('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
+    </div>
+    <div class="s-foot">
+      <div class="u-info">
+        <div class="u-av" id="u-av">م</div>
+        <div><div class="u-name" id="u-name">...</div><div class="u-role" id="u-role">عضو</div></div>
+      </div>
+      <button class="btn-lo" onclick="logout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="adm-banner" id="adm-banner">⚡ أنت مسجل كـ Admin — تشوف كل البيانات</div>
+      <div class="topbar"><div><div class="page-title">لوحة التحكم</div><div class="page-sub" id="today-date"></div></div></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">إجمالي الوحدات</div><div class="metric-val" id="m-total">—</div><div class="metric-sub neutral">في قاعدة البيانات</div></div>
+        <div class="metric"><div class="metric-label">وحدات مؤجرة</div><div class="metric-val" id="m-rented">—</div><div class="metric-sub up" id="m-occ">—</div></div>
+        <div class="metric"><div class="metric-label">وحدات فارغة</div><div class="metric-val" id="m-vacant">—</div><div class="metric-sub neutral">متاحة للإيجار</div></div>
+        <div class="metric"><div class="metric-label">المستأجرون</div><div class="metric-val" id="m-tenants">—</div><div class="metric-sub neutral">مستأجر</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-hdr"><div class="card-title">آخر الوحدات</div><span class="card-link" onclick="showPage('units',document.querySelectorAll('.nav-item')[1])">عرض الكل</span></div><div id="dash-units"><div class="loading"><div class="spin"></div></div></div></div>
+        <div class="card"><div class="card-hdr"><div class="card-title">آخر المستأجرين</div><span class="card-link" onclick="showPage('tenants',document.querySelectorAll('.nav-item')[2])">عرض الكل</span></div><div id="dash-tenants"><div class="loading"><div class="spin"></div></div></div></div>
+      </div>
+    </div>
+    <!-- Units -->
+    <div class="page" id="page-units">
+      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">الوحدات</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="u-search" oninput="filterUnits()"><button class="btn btn-p" onclick="openModal('modal-unit')">+ إضافة وحدة</button></div></div>
+      <div class="twrap"><table><thead><tr><th>رقم الوحدة</th><th>الطابق</th><th>المساحة</th><th>الإيجار</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="units-tb"><tr><td colspan="6"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
+    </div>
+    <!-- Tenants -->
+    <div class="page" id="page-tenants">
+      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">المستأجرون</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="t-search" oninput="filterTenants()"><button class="btn btn-p" onclick="openModal('modal-tenant')">+ إضافة مستأجر</button></div></div>
+      <div class="twrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الرقم القومي</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead><tbody id="tenants-tb"><tr><td colspan="5"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
+    </div>
+    <!-- Contracts -->
+    <div class="page" id="page-contracts">
+      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">العقود</div></div><button class="btn btn-p" onclick="fillCS();openModal('modal-contract')">+ إضافة عقد</button></div>
+      <div class="twrap"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="contracts-tb"><tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
+    </div>
+    <!-- Payments -->
+    <div class="page" id="page-payments">
+      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">التحصيل</div></div><button class="btn btn-p" onclick="fillPS();openModal('modal-payment')">+ تسجيل دفعة</button></div>
+      <div class="twrap"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="payments-tb"><tr><td colspan="5"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-unit"><div class="modal"><div class="modal-title">إضافة وحدة جديدة</div><div class="fg"><div class="fgi"><label>رقم الوحدة *</label><input id="u-num" placeholder="301"></div><div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="3"></div><div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number" placeholder="85"></div><div class="fgi"><label>الإيجار (ج/شهر)</label><input id="u-rn" type="number" placeholder="5000"></div><div class="fgi full"><label>الحالة</label><select id="u-st"><option value="vacant">فارغة</option><option value="rented">مؤجرة</option><option value="maintenance">صيانة</option></select></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-unit')">إلغاء</button><button class="btn btn-p" onclick="addUnit()">حفظ</button></div></div></div>
+
+<div class="overlay" id="modal-tenant"><div class="modal"><div class="modal-title">إضافة مستأجر</div><div class="fg"><div class="fgi full"><label>الاسم *</label><input id="t-nm" placeholder="محمد أحمد علي"></div><div class="fgi"><label>الهاتف</label><input id="t-ph" placeholder="01012345678"></div><div class="fgi"><label>الرقم القومي</label><input id="t-ni" placeholder="29001011234567"></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-tenant')">إلغاء</button><button class="btn btn-p" onclick="addTenant()">حفظ</button></div></div></div>
+
+<div class="overlay" id="modal-contract"><div class="modal"><div class="modal-title">إضافة عقد</div><div class="fg"><div class="fgi full"><label>المستأجر *</label><select id="c-tn"><option value="">اختر...</option></select></div><div class="fgi full"><label>الوحدة *</label><select id="c-un"><option value="">اختر...</option></select></div><div class="fgi"><label>الإيجار (ج) *</label><input id="c-rn" type="number"></div><div class="fgi"><label>الحالة</label><select id="c-st"><option value="active">نشط</option><option value="expired">منتهي</option><option value="cancelled">ملغي</option></select></div><div class="fgi"><label>تاريخ البداية *</label><input id="c-sd" type="date"></div><div class="fgi"><label>تاريخ النهاية *</label><input id="c-ed" type="date"></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-contract')">إلغاء</button><button class="btn btn-p" onclick="addContract()">حفظ</button></div></div></div>
+
+<div class="overlay" id="modal-payment"><div class="modal"><div class="modal-title">تسجيل دفعة</div><div class="fg"><div class="fgi full"><label>العقد *</label><select id="p-ct"><option value="">اختر...</option></select></div><div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number"></div><div class="fgi"><label>تاريخ الدفع *</label><input id="p-dt" type="date"></div><div class="fgi full"><label>الحالة</label><select id="p-st"><option value="paid">مدفوع</option><option value="pending">معلق</option><option value="late">متأخر</option></select></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-payment')">إلغاء</button><button class="btn btn-p" onclick="addPayment()">حفظ</button></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://ptimioffmszhmpxxuqha.supabase.co';
+const SB_KEY='sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
+const ADMIN='mahmoudabdelaalaboalsaoud@gmail.com';
+const {createClient}=supabase;
+const db=createClient(SB_URL,SB_KEY);
+let CU=null,isAdm=false,AU=[],AT=[],AC=[],AP=[];
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const {data:{session}}=await db.auth.getSession();
+  if(session) enterApp(session.user);
+  db.auth.onAuthStateChange((ev,sess)=>{
+    if(ev==='SIGNED_IN'&&sess) enterApp(sess.user);
+    if(ev==='SIGNED_OUT') showLogin();
+  });
+});
+
+function enterApp(user){
+  CU=user; isAdm=user.email===ADMIN;
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').classList.add('show');
+  const name=user.user_metadata?.full_name||user.email?.split('@')[0]||'مستخدم';
+  document.getElementById('u-name').textContent=name;
+  document.getElementById('u-role').textContent=isAdm?'Admin ⚡':'عضو';
+  const av=document.getElementById('u-av');
+  if(user.user_metadata?.avatar_url) av.innerHTML=`<img src="${user.user_metadata.avatar_url}" alt="av">`;
+  else av.textContent=name.charAt(0).toUpperCase();
+  if(isAdm) document.getElementById('adm-banner').classList.add('show');
+  loadAll();
+}
+function showLogin(){CU=null;isAdm=false;document.getElementById('login-page').style.display='flex';document.getElementById('app').classList.remove('show');}
+
+async function loginGoogle(){
+  const{error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  if(error) toast('خطأ: '+error.message,true);
+}
+async function loginAdmin(){
+  const e=document.getElementById('adm-email').value,p=document.getElementById('adm-pass').value;
+  if(!e||!p){toast('أدخل البريد وكلمة المرور',true);return;}
+  const{error}=await db.auth.signInWithPassword({email:e,password:p});
+  if(error) toast('خطأ: '+error.message,true);
+}
+async function logout(){await db.auth.signOut();showLogin();}
+
+function showPage(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+}
+function toast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.borderColor=err?'rgba(239,68,68,.5)':'rgba(34,197,94,.5)';
+  t.style.color=err?'var(--red)':'var(--green)';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+
+function sl(s){
+  const m={rented:'مؤجرة',vacant:'فارغة',maintenance:'صيانة',active:'نشط',expired:'منتهي',cancelled:'ملغي',paid:'مدفوع',pending:'معلق',late:'متأخر'};
+  const c={rented:'g',active:'g',paid:'g',vacant:'b',pending:'a',maintenance:'a',expired:'r',cancelled:'r',late:'r'};
+  return`<span class="pill p${c[s]||'b'}">${m[s]||s}</span>`;
+}
+
+async function loadAll(){await Promise.all([loadUnits(),loadTenants(),loadContracts(),loadPayments()]);loadDash();}
+
+async function loadUnits(){
+  let q=db.from('units').select('*').order('created_at',{ascending:false});
+  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
+  const{data}=await q; AU=data||[]; renderUnits(AU);
+}
+function renderUnits(u){
+  const tb=document.getElementById('units-tb');
+  if(!u.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">🏠</div><div class="empty-text">لا توجد وحدات</div></div></td></tr>';return;}
+  tb.innerHTML=u.map(x=>`<tr><td class="tdm">${x.unit_number}</td><td>${x.floor||'—'}</td><td>${x.area_sqm?x.area_sqm+'م²':'—'}</td><td>${x.rent_price?Number(x.rent_price).toLocaleString('ar-EG')+' ج':'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delUnit('${x.id}')">حذف</button></td></tr>`).join('');
+}
+function filterUnits(){const q=document.getElementById('u-search').value.toLowerCase();renderUnits(AU.filter(u=>u.unit_number.toLowerCase().includes(q)));}
+async function addUnit(){
+  const num=document.getElementById('u-num').value.trim();
+  if(!num){toast('رقم الوحدة مطلوب',true);return;}
+  const{error}=await db.from('units').insert({unit_number:num,floor:document.getElementById('u-fl').value||null,area_sqm:document.getElementById('u-ar').value||null,rent_price:document.getElementById('u-rn').value||null,status:document.getElementById('u-st').value,user_id:CU.id});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('✓ تمت إضافة الوحدة');closeModal('modal-unit');
+  ['u-num','u-fl','u-ar','u-rn'].forEach(id=>document.getElementById(id).value='');
+  await loadUnits();loadDash();
+}
+async function delUnit(id){if(!confirm('حذف الوحدة؟'))return;await db.from('units').delete().eq('id',id);toast('تم الحذف');await loadUnits();loadDash();}
+
+async function loadTenants(){
+  let q=db.from('tenants').select('*').order('created_at',{ascending:false});
+  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
+  const{data}=await q; AT=data||[]; renderTenants(AT);
+}
+function renderTenants(t){
+  const tb=document.getElementById('tenants-tb');
+  if(!t.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد مستأجرون</div></div></td></tr>';return;}
+  tb.innerHTML=t.map(x=>`<tr><td class="tdm">${x.name}</td><td>${x.phone||'—'}</td><td>${x.national_id||'—'}</td><td>${new Date(x.created_at).toLocaleDateString('ar-EG')}</td><td><button class="abtn del" onclick="delTenant('${x.id}')">حذف</button></td></tr>`).join('');
+}
+function filterTenants(){const q=document.getElementById('t-search').value.toLowerCase();renderTenants(AT.filter(t=>t.name.toLowerCase().includes(q)||(t.phone||'').includes(q)));}
+async function addTenant(){
+  const name=document.getElementById('t-nm').value.trim();
+  if(!name){toast('الاسم مطلوب',true);return;}
+  const{error}=await db.from('tenants').insert({name,phone:document.getElementById('t-ph').value||null,national_id:document.getElementById('t-ni').value||null,user_id:CU.id});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('✓ تمت الإضافة');closeModal('modal-tenant');
+  ['t-nm','t-ph','t-ni'].forEach(id=>document.getElementById(id).value='');
+  await loadTenants();loadDash();
+}
+async function delTenant(id){if(!confirm('حذف المستأجر؟'))return;await db.from('tenants').delete().eq('id',id);toast('تم الحذف');await loadTenants();}
+
+async function loadContracts(){
+  const{data}=await db.from('contracts').select('*,units(unit_number),tenants(name)').order('created_at',{ascending:false});
+  AC=data||[];renderContracts(AC);
+}
+function renderContracts(c){
+  const tb=document.getElementById('contracts-tb');
+  if(!c.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📄</div><div class="empty-text">لا توجد عقود</div></div></td></tr>';return;}
+  tb.innerHTML=c.map(x=>`<tr><td class="tdm">${x.tenants?.name||'—'}</td><td>${x.units?.unit_number||'—'}</td><td>${x.monthly_rent?Number(x.monthly_rent).toLocaleString('ar-EG')+' ج':'—'}</td><td>${x.start_date?new Date(x.start_date).toLocaleDateString('ar-EG'):'—'}</td><td>${x.end_date?new Date(x.end_date).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delContract('${x.id}')">حذف</button></td></tr>`).join('');
+}
+function fillCS(){
+  document.getElementById('c-tn').innerHTML='<option value="">اختر مستأجر...</option>'+AT.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  document.getElementById('c-un').innerHTML='<option value="">اختر وحدة...</option>'+AU.filter(u=>u.status==='vacant').map(u=>`<option value="${u.id}">${u.unit_number}</option>`).join('');
+}
+async function addContract(){
+  const tid=document.getElementById('c-tn').value,uid=document.getElementById('c-un').value,rent=document.getElementById('c-rn').value,sd=document.getElementById('c-sd').value,ed=document.getElementById('c-ed').value;
+  if(!tid||!uid||!rent||!sd||!ed){toast('أكمل جميع الحقول',true);return;}
+  const{error}=await db.from('contracts').insert({tenant_id:tid,unit_id:uid,monthly_rent:rent,start_date:sd,end_date:ed,status:document.getElementById('c-st').value});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  await db.from('units').update({status:'rented'}).eq('id',uid);
+  toast('✓ تمت إضافة العقد');closeModal('modal-contract');
+  await Promise.all([loadContracts(),loadUnits()]);loadDash();
+}
+async function delContract(id){if(!confirm('حذف العقد؟'))return;await db.from('contracts').delete().eq('id',id);toast('تم الحذف');await loadContracts();}
+
+async function loadPayments(){
+  const{data}=await db.from('payments').select('*,contracts(monthly_rent,tenants(name))').order('created_at',{ascending:false});
+  AP=data||[];renderPayments(AP);
+}
+function renderPayments(p){
+  const tb=document.getElementById('payments-tb');
+  if(!p.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">لا توجد مدفوعات</div></div></td></tr>';return;}
+  tb.innerHTML=p.map(x=>`<tr><td class="tdm">${x.contracts?.tenants?.name||'—'}</td><td>${x.amount?Number(x.amount).toLocaleString('ar-EG')+' ج':'—'}</td><td>${x.paid_at?new Date(x.paid_at).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delPayment('${x.id}')">حذف</button></td></tr>`).join('');
+}
+function fillPS(){
+  document.getElementById('p-ct').innerHTML='<option value="">اختر عقد...</option>'+AC.map(c=>`<option value="${c.id}">${c.tenants?.name||'عقد'} — ${c.units?.unit_number||''}</option>`).join('');
+}
+async function addPayment(){
+  const cid=document.getElementById('p-ct').value,am=document.getElementById('p-am').value,dt=document.getElementById('p-dt').value;
+  if(!cid||!am||!dt){toast('أكمل جميع الحقول',true);return;}
+  const{error}=await db.from('payments').insert({contract_id:cid,amount:am,paid_at:dt,status:document.getElementById('p-st').value});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('✓ تم تسجيل الدفعة');closeModal('modal-payment');await loadPayments();
+}
+async function delPayment(id){if(!confirm('حذف الدفعة؟'))return;await db.from('payments').delete().eq('id',id);toast('تم الحذف');await loadPayments();}
+
+function loadDash(){
+  const tot=AU.length,ren=AU.filter(u=>u.status==='rented').length,vac=AU.filter(u=>u.status==='vacant').length;
+  document.getElementById('m-total').textContent=tot;
+  document.getElementById('m-rented').textContent=ren;
+  document.getElementById('m-vacant').textContent=vac;
+  document.getElementById('m-tenants').textContent=AT.length;
+  document.getElementById('m-occ').textContent=tot?`نسبة الإشغال ${Math.round(ren/tot*100)}%`:'0%';
+  document.getElementById('dash-units').innerHTML=AU.length?AU.slice(0,5).map(u=>`<div class="mrow"><span>${u.unit_number}</span>${sl(u.status)}</div>`).join(''):'<div class="empty"><div class="empty-icon">🏠</div><div class="empty-text">لا توجد وحدات</div></div>';
+  document.getElementById('dash-tenants').innerHTML=AT.length?AT.slice(0,5).map(t=>`<div class="mrow"><span>${t.name}</span><span style="font-size:12px;color:var(--text3)">${t.phone||'—'}</span></div>`).join(''):'<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد مستأجرون</div></div>';
+}
+</script>
+</body>
+</html>

@@ -348,7 +348,7 @@ function enterApp(user){
 
 // ── AUTH ──
 async function loginGoogle(){
-  const{error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  const{error}=await db.auth.signInWithOAuth({provider:'google',options: { redirectTo: 'https://iigari.vercel.app/iigari.html' });
   if(error) toast('خطأ: '+error.message,true);
 }
 async function loginAdmin(){

@@ -10,40 +10,38 @@
 :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3348;--accent:#3b82f6;--accent2:#1d4ed8;--text:#e8edf5;--text2:#8b95a8;--text3:#5a6478;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--purple:#a855f7;--radius:12px;--rsm:8px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-
-/* ── SCREENS ── */
 .screen{display:none;min-height:100vh}
 .screen.show{display:flex}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #screen-login{align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 40%,#1a2540 0%,#0f1117 70%)}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:380px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:400px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .login-logo{font-size:28px;font-weight:700;margin-bottom:6px}
-.login-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:var(--rsm);background:#fff;color:#333;font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;border:none;cursor:pointer;transition:all .15s}
-.btn-google:hover{background:#f1f1f1;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.btn-google svg{width:20px;height:20px;flex-shrink:0}
-.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text3);font-size:12px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.admin-link{font-size:12px;color:var(--accent);cursor:pointer;display:block;margin-bottom:8px}
-.adm-form{display:none;text-align:right}
-.adm-form.show{display:block}
-.ai{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;margin-bottom:8px}
-.ai:focus{border-color:var(--accent)}
-.btn-adm{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);padding:10px;font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer}
-.login-note{font-size:11px;color:var(--text3);margin-top:20px;line-height:1.6}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.tabs{display:flex;background:var(--bg3);border-radius:var(--rsm);padding:4px;margin-bottom:24px;gap:4px}
+.tab{flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text2);font-family:'Cairo',sans-serif;transition:all .15s}
+.tab.active{background:var(--accent);color:#fff}
+.form-panel{display:none}.form-panel.active{display:block}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:11px 14px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;margin-bottom:10px;transition:border .15s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text3)}
+.btn-main{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);padding:12px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all .15s}
+.btn-main:hover{background:var(--accent2)}
+.login-note{font-size:11px;color:var(--text3);margin-top:16px;line-height:1.6}
+.err-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--rsm);padding:10px;font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+.err-msg.show{display:block}
+.ok-msg{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:var(--rsm);padding:10px;font-size:12px;color:var(--green);margin-bottom:12px;display:none}
+.ok-msg.show{display:block}
 
-/* ── PENDING ── */
+/* PENDING */
 #screen-pending{align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 40%,#1a2540 0%,#0f1117 70%)}
-.pending-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:420px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.pending-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:420px;text-align:center}
 .pending-icon{font-size:48px;margin-bottom:16px}
 .pending-title{font-size:20px;font-weight:700;margin-bottom:8px}
-.pending-sub{font-size:13px;color:var(--text3);line-height:1.7;margin-bottom:24px}
-.pending-email{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 14px;font-size:13px;color:var(--accent);margin-bottom:20px}
+.pending-sub{font-size:13px;color:var(--text3);line-height:1.7;margin-bottom:20px}
 .btn-lo2{background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:8px 20px;font-size:13px;color:var(--text3);cursor:pointer;font-family:'Cairo',sans-serif}
-.btn-lo2:hover{color:var(--red);border-color:rgba(239,68,68,.4)}
 
-/* ── APP ── */
+/* APP */
 #screen-app{flex-direction:row}
 .sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;right:0;height:100vh;z-index:100}
 .main{flex:1;margin-right:220px;padding:24px}
@@ -59,36 +57,29 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .nav-item svg{width:16px;height:16px;flex-shrink:0}
 .s-foot{padding:12px 16px;border-top:1px solid var(--border)}
 .u-info{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.u-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
-.u-av img{width:100%;height:100%;object-fit:cover}
+.u-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
 .u-name{font-size:12px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .u-role{font-size:10px;color:var(--accent)}
 .btn-lo{width:100%;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:7px;font-size:12px;color:var(--text3);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .15s}
 .btn-lo:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
 
-/* ── PAGES ── */
+/* PAGES */
 .page{display:none}.page.active{display:block}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .page-title{font-size:20px;font-weight:700}
 .page-sub{font-size:13px;color:var(--text2);margin-top:2px}
 .breadcrumb{font-size:12px;color:var(--text3);margin-bottom:4px}
-
-/* ── METRICS ── */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .metric-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;margin-bottom:8px}
 .metric-val{font-size:26px;font-weight:700;line-height:1}
 .metric-sub{font-size:12px;margin-top:6px}
-.up{color:var(--green)}.down{color:var(--red)}.neutral{color:var(--text3)}
-
-/* ── CARDS ── */
+.up{color:var(--green)}.neutral{color:var(--text3)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .card-title{font-size:13px;font-weight:600}
 .card-link{font-size:12px;color:var(--accent);cursor:pointer}
-
-/* ── TABLE ── */
 .twrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
 table{width:100%;border-collapse:collapse}
 th{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;padding:10px 16px;text-align:right;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
@@ -96,23 +87,17 @@ td{font-size:13px;color:var(--text2);padding:12px 16px;border-bottom:1px solid r
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.02)}
 .tdm{color:var(--text);font-weight:500}
-
-/* ── PILLS ── */
 .pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
 .pg{background:rgba(34,197,94,.12);color:var(--green)}
 .pr{background:rgba(239,68,68,.12);color:var(--red)}
 .pa{background:rgba(245,158,11,.12);color:var(--amber)}
 .pb{background:rgba(59,130,246,.12);color:var(--accent)}
 .pp{background:rgba(168,85,247,.15);color:var(--purple)}
-
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--rsm);font-size:13px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:600;border:none;transition:all .15s}
 .btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
 .btn-g{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
 .btn-success{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);border-radius:var(--rsm);padding:5px 12px;font-size:12px;font-family:'Cairo',sans-serif;cursor:pointer}
 .btn-reject{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3);border-radius:var(--rsm);padding:5px 12px;font-size:12px;font-family:'Cairo',sans-serif;cursor:pointer}
-
-/* ── MODAL ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
 .overlay.show{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
@@ -125,10 +110,7 @@ input,select{background:var(--bg3);border:1px solid var(--border);border-radius:
 input:focus,select:focus{border-color:var(--accent)}
 select option{background:var(--bg3)}
 .fa{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-
-/* ── MISC ── */
 .sbar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;width:220px}
-.sbar:focus{border-color:var(--accent)}
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text3);font-size:13px;gap:8px}
 .spin{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -140,63 +122,89 @@ select option{background:var(--bg3)}
 .mrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
 .mrow:last-child{border-bottom:none}
 .abtn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text3);cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif;transition:all .15s}
-.abtn:hover{background:var(--bg3);color:var(--text)}
 .abtn.del:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
-.adm-banner{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);border-radius:var(--rsm);padding:8px 14px;font-size:12px;color:var(--purple);margin-bottom:16px;display:none}
-.adm-banner.show{display:block}
-
-/* ── USERS PAGE ── */
+.rpt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.rpt-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.rpt-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;margin-bottom:8px}
+.rpt-val{font-size:24px;font-weight:700;line-height:1}
+.rpt-sub{font-size:12px;margin-top:6px}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.chart-title{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.bar{width:100%;border-radius:6px 6px 0 0;background:var(--accent);opacity:.85;transition:opacity .2s;min-height:4px}
+.bar:hover{opacity:1}
+.bar-lbl{font-size:10px;color:var(--text3);text-align:center;white-space:nowrap}
+.bar-val{font-size:10px;color:var(--text2);font-weight:600}
+.rpt-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.donut-wrap{position:relative;width:120px;height:120px;margin:0 auto 12px}
+.donut-svg{transform:rotate(-90deg)}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.donut-pct{font-size:20px;font-weight:700;color:var(--text)}
+.donut-lbl{font-size:10px;color:var(--text3)}
+.late-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.late-row:last-child{border-bottom:none}
+.late-name{color:var(--text);font-weight:500}
+.late-amt{color:var(--red);font-weight:600}
 .user-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.user-card-av{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
-.user-card-av img{width:100%;height:100%;object-fit:cover}
+.user-card-av{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
 .user-card-info{flex:1}
 .user-card-name{font-size:13px;font-weight:600;color:var(--text)}
 .user-card-email{font-size:12px;color:var(--text3)}
-.user-card-date{font-size:11px;color:var(--text3);margin-top:2px}
 .user-card-actions{display:flex;gap:6px;align-items:center}
 .badge-pending{background:rgba(245,158,11,.12);color:var(--amber);font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
 .badge-approved{background:rgba(34,197,94,.12);color:var(--green);font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
 .badge-rejected{background:rgba(239,68,68,.12);color:var(--red);font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
 .users-filter{display:flex;gap:8px;margin-bottom:16px}
-.filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .15s}
+.filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif}
 .filter-btn.active{background:rgba(59,130,246,.15);color:var(--accent);border-color:rgba(59,130,246,.3)}
-.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;margin-right:4px}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div class="screen" id="screen-login">
   <div class="login-box">
     <div class="login-logo">● إيجاري</div>
     <div class="login-sub">منصة إدارة الوحدات والإيجارات</div>
-    <button class="btn-google" onclick="loginGoogle()">
-      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8.9 20-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C40.8 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
-      تسجيل الدخول بـ Google
-    </button>
-    <div class="divider">أو</div>
-    <span class="admin-link" onclick="document.getElementById('adm-form').classList.toggle('show')">دخول Admin بكلمة مرور</span>
-    <div class="adm-form" id="adm-form">
-      <input class="ai" type="email" id="adm-email" placeholder="البريد الإلكتروني">
-      <input class="ai" type="password" id="adm-pass" placeholder="كلمة المرور">
-      <button class="btn-adm" onclick="loginAdmin()">دخول</button>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">تسجيل الدخول</button>
+      <button class="tab" onclick="switchTab('register')">حساب جديد</button>
     </div>
+
+    <!-- Login Form -->
+    <div class="form-panel active" id="panel-login">
+      <div class="err-msg" id="login-err"></div>
+      <input class="fi" type="email" id="l-email" placeholder="البريد الإلكتروني">
+      <input class="fi" type="password" id="l-pass" placeholder="كلمة المرور">
+      <button class="btn-main" onclick="loginEmail()">دخول</button>
+    </div>
+
+    <!-- Register Form -->
+    <div class="form-panel" id="panel-register">
+      <div class="err-msg" id="reg-err"></div>
+      <div class="ok-msg" id="reg-ok">تم إنشاء الحساب! انتظر موافقة المسؤول للدخول.</div>
+      <input class="fi" type="text" id="r-name" placeholder="الاسم الكامل">
+      <input class="fi" type="email" id="r-email" placeholder="البريد الإلكتروني">
+      <input class="fi" type="password" id="r-pass" placeholder="كلمة المرور (8 أحرف على الأقل)">
+      <button class="btn-main" onclick="registerEmail()">إنشاء حساب</button>
+    </div>
+
     <div class="login-note">بتسجيل دخولك توافق على شروط الاستخدام</div>
   </div>
 </div>
 
-<!-- ══ PENDING APPROVAL ══ -->
+<!-- PENDING -->
 <div class="screen" id="screen-pending">
   <div class="pending-box">
     <div class="pending-icon">⏳</div>
     <div class="pending-title">حسابك قيد المراجعة</div>
-    <div class="pending-sub">شكراً على تسجيلك في إيجاري! طلبك وصل للمسؤول وهيتم مراجعته في أقرب وقت. هتوصلك إشعار بالموافقة على إيميلك.</div>
-    <div class="pending-email" id="pending-email-show">...</div>
+    <div class="pending-sub">شكراً على تسجيلك! طلبك وصل للمسؤول وهيتم مراجعته قريباً.</div>
     <button class="btn-lo2" onclick="logout()">تسجيل الخروج</button>
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- APP -->
 <div class="screen" id="screen-app">
   <div class="sidebar">
     <div class="s-logo">
@@ -210,10 +218,8 @@ select option{background:var(--bg3)}
       <div class="nav-item" onclick="showPage('tenants',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>المستأجرون</div>
       <div class="nav-item" onclick="showPage('contracts',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
       <div class="nav-item" onclick="showPage('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
-      <div class="nav-item" id="nav-users" style="display:none" onclick="showPage('users',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        <span id="nav-users-label">المستخدمون</span>
-      </div>
+      <div class="nav-item" onclick="showPage('reports',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>التقارير</div>
+      <div class="nav-item" id="nav-users" style="display:none" onclick="showPage('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span id="nav-users-txt">المستخدمون</span></div>
     </div>
     <div class="s-foot">
       <div class="u-info">
@@ -225,9 +231,8 @@ select option{background:var(--bg3)}
   </div>
 
   <div class="main">
-    <!-- Dashboard -->
     <div class="page active" id="page-dashboard">
-      <div class="adm-banner" id="adm-banner">⚡ أنت مسجل كـ Admin — تشوف وتدير كل البيانات</div>
+      <div class="adm-banner" id="adm-banner">⚡ أنت مسجل كـ Admin</div>
       <div class="topbar"><div><div class="page-title">لوحة التحكم</div><div class="page-sub" id="today-date"></div></div></div>
       <div class="metrics">
         <div class="metric"><div class="metric-label">إجمالي الوحدات</div><div class="metric-val" id="m-total">—</div><div class="metric-sub neutral">في قاعدة البيانات</div></div>
@@ -241,48 +246,94 @@ select option{background:var(--bg3)}
       </div>
     </div>
 
-    <!-- Units -->
     <div class="page" id="page-units">
       <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">الوحدات</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="u-search" oninput="filterUnits()"><button class="btn btn-p" onclick="openModal('modal-unit')">+ إضافة وحدة</button></div></div>
       <div class="twrap"><table><thead><tr><th>رقم الوحدة</th><th>الطابق</th><th>المساحة</th><th>الإيجار</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="units-tb"><tr><td colspan="6"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Tenants -->
     <div class="page" id="page-tenants">
       <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">المستأجرون</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="t-search" oninput="filterTenants()"><button class="btn btn-p" onclick="openModal('modal-tenant')">+ إضافة مستأجر</button></div></div>
       <div class="twrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الرقم القومي</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead><tbody id="tenants-tb"><tr><td colspan="5"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Contracts -->
     <div class="page" id="page-contracts">
       <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">العقود</div></div><button class="btn btn-p" onclick="fillCS();openModal('modal-contract')">+ إضافة عقد</button></div>
       <div class="twrap"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="contracts-tb"><tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Payments -->
     <div class="page" id="page-payments">
       <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">التحصيل</div></div><button class="btn btn-p" onclick="fillPS();openModal('modal-payment')">+ تسجيل دفعة</button></div>
       <div class="twrap"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="payments-tb"><tr><td colspan="5"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Users (Admin only) -->
+    <div class="page" id="page-reports">
+      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">التقارير والإحصائيات</div></div><button class="btn btn-g" onclick="loadReports()">↻ تحديث</button></div>
+
+      <!-- KPIs -->
+      <div class="rpt-grid">
+        <div class="rpt-card"><div class="rpt-label">إجمالي الإيرادات</div><div class="rpt-val" id="r-revenue">—</div><div class="rpt-sub neutral">جنيه مصري</div></div>
+        <div class="rpt-card"><div class="rpt-label">المدفوعات هذا الشهر</div><div class="rpt-val" id="r-month">—</div><div class="rpt-sub up" id="r-month-count">—</div></div>
+        <div class="rpt-card"><div class="rpt-label">المتأخرات</div><div class="rpt-val" id="r-late" style="color:var(--red)">—</div><div class="rpt-sub" style="color:var(--red)" id="r-late-count">—</div></div>
+        <div class="rpt-card"><div class="rpt-label">نسبة التحصيل</div><div class="rpt-val" id="r-collect">—</div><div class="rpt-sub neutral">من إجمالي المدفوعات</div></div>
+      </div>
+
+      <div class="rpt-row2">
+        <!-- Bar Chart -->
+        <div class="chart-wrap">
+          <div class="chart-title">المدفوعات آخر 6 أشهر (جنيه)</div>
+          <div class="bar-chart" id="bar-chart"></div>
+        </div>
+
+        <!-- Donut -->
+        <div class="chart-wrap" style="text-align:center">
+          <div class="chart-title">حالة الوحدات</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="14"/>
+              <circle id="donut-rented" cx="60" cy="60" r="50" fill="none" stroke="var(--green)" stroke-width="14" stroke-dasharray="0 314" stroke-linecap="round"/>
+              <circle id="donut-vacant" cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="14" stroke-dasharray="0 314" stroke-linecap="round" style="opacity:.5"/>
+              <circle id="donut-maint" cx="60" cy="60" r="50" fill="none" stroke="var(--amber)" stroke-width="14" stroke-dasharray="0 314" stroke-linecap="round" style="opacity:.7"/>
+            </svg>
+            <div class="donut-center"><div class="donut-pct" id="donut-pct">—</div><div class="donut-lbl">إشغال</div></div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--text2)">
+            <span><span style="color:var(--green)">●</span> مؤجرة (<span id="d-rented">0</span>)</span>
+            <span><span style="color:var(--accent)">●</span> فارغة (<span id="d-vacant">0</span>)</span>
+            <span><span style="color:var(--amber)">●</span> صيانة (<span id="d-maint">0</span>)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Late Payments -->
+      <div class="chart-wrap">
+        <div class="chart-title">المتأخرون في الدفع</div>
+        <div id="late-list"><div class="loading"><div class="spin"></div></div></div>
+      </div>
+
+      <!-- Top Units -->
+      <div class="chart-wrap">
+        <div class="chart-title">الوحدات الأعلى إيراداً</div>
+        <div id="top-units"><div class="loading"><div class="spin"></div></div></div>
+      </div>
+    </div>
+
     <div class="page" id="page-users">
-      <div class="topbar"><div><div class="breadcrumb">الرئيسية</div><div class="page-title">إدارة المستخدمين <span class="pill pp">Admin</span></div></div></div>
+      <div class="topbar"><div><div class="page-title">إدارة المستخدمين <span class="pill pp">Admin</span></div></div></div>
       <div class="users-filter">
         <button class="filter-btn active" onclick="filterUsers('all',this)">الكل</button>
-        <button class="filter-btn" onclick="filterUsers('pending',this)"><span class="notif-dot" id="pending-dot" style="display:none"></span>بانتظار الموافقة</button>
+        <button class="filter-btn" onclick="filterUsers('pending',this)">بانتظار الموافقة</button>
         <button class="filter-btn" onclick="filterUsers('approved',this)">موافق عليهم</button>
         <button class="filter-btn" onclick="filterUsers('rejected',this)">مرفوضون</button>
       </div>
-      <div id="users-list"><div class="loading"><div class="spin"></div> جاري التحميل...</div></div>
+      <div id="users-list"><div class="loading"><div class="spin"></div></div></div>
     </div>
   </div>
 </div>
 
 <!-- MODALS -->
-<div class="overlay" id="modal-unit"><div class="modal"><div class="modal-title">إضافة وحدة جديدة</div><div class="fg"><div class="fgi"><label>رقم الوحدة *</label><input id="u-num" placeholder="301"></div><div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="3"></div><div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number" placeholder="85"></div><div class="fgi"><label>الإيجار (ج/شهر)</label><input id="u-rn" type="number" placeholder="5000"></div><div class="fgi full"><label>الحالة</label><select id="u-st"><option value="vacant">فارغة</option><option value="rented">مؤجرة</option><option value="maintenance">صيانة</option></select></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-unit')">إلغاء</button><button class="btn btn-p" onclick="addUnit()">حفظ</button></div></div></div>
+<div class="overlay" id="modal-unit"><div class="modal"><div class="modal-title">إضافة وحدة جديدة</div><div class="fg"><div class="fgi"><label>رقم الوحدة *</label><input id="u-num" placeholder="301"></div><div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="3"></div><div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number"></div><div class="fgi"><label>الإيجار (ج/شهر)</label><input id="u-rn" type="number"></div><div class="fgi full"><label>الحالة</label><select id="u-st"><option value="vacant">فارغة</option><option value="rented">مؤجرة</option><option value="maintenance">صيانة</option></select></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-unit')">إلغاء</button><button class="btn btn-p" onclick="addUnit()">حفظ</button></div></div></div>
 
-<div class="overlay" id="modal-tenant"><div class="modal"><div class="modal-title">إضافة مستأجر</div><div class="fg"><div class="fgi full"><label>الاسم *</label><input id="t-nm" placeholder="محمد أحمد علي"></div><div class="fgi"><label>الهاتف</label><input id="t-ph" placeholder="01012345678"></div><div class="fgi"><label>الرقم القومي</label><input id="t-ni" placeholder="29001011234567"></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-tenant')">إلغاء</button><button class="btn btn-p" onclick="addTenant()">حفظ</button></div></div></div>
+<div class="overlay" id="modal-tenant"><div class="modal"><div class="modal-title">إضافة مستأجر</div><div class="fg"><div class="fgi full"><label>الاسم *</label><input id="t-nm" placeholder="محمد أحمد علي"></div><div class="fgi"><label>الهاتف</label><input id="t-ph" placeholder="01012345678"></div><div class="fgi"><label>الرقم القومي</label><input id="t-ni"></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-tenant')">إلغاء</button><button class="btn btn-p" onclick="addTenant()">حفظ</button></div></div></div>
 
 <div class="overlay" id="modal-contract"><div class="modal"><div class="modal-title">إضافة عقد</div><div class="fg"><div class="fgi full"><label>المستأجر *</label><select id="c-tn"><option value="">اختر...</option></select></div><div class="fgi full"><label>الوحدة *</label><select id="c-un"><option value="">اختر...</option></select></div><div class="fgi"><label>الإيجار (ج) *</label><input id="c-rn" type="number"></div><div class="fgi"><label>الحالة</label><select id="c-st"><option value="active">نشط</option><option value="expired">منتهي</option><option value="cancelled">ملغي</option></select></div><div class="fgi"><label>تاريخ البداية *</label><input id="c-sd" type="date"></div><div class="fgi"><label>تاريخ النهاية *</label><input id="c-ed" type="date"></div></div><div class="fa"><button class="btn btn-g" onclick="closeModal('modal-contract')">إلغاء</button><button class="btn btn-p" onclick="addContract()">حفظ</button></div></div></div>
 
@@ -293,17 +344,14 @@ select option{background:var(--bg3)}
 <script>
 const SB_URL='https://ptimioffmszhmpxxuqha.supabase.co';
 const SB_KEY='sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
-async function handleUser(user){
-  CU=user; isAdm=user.email===ADMIN;
-  enterApp(user);
-}const {createClient}=supabase;
+const ADMIN='mahmoudabdelaalaboalsaoud@gmail.com';
+const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
-let CU=null,isAdm=false,AU=[],AT=[],AC=[],AP=[],USERS=[];
+let CU=null,isAdm=false,AU=[],AT=[],AC=[],AP=[],USERS=[],curFilter='all';
 
-// ── INIT ──
 document.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const {data:{session}}=await db.auth.getSession();
+  const{data:{session}}=await db.auth.getSession();
   if(session) await handleUser(session.user);
   db.auth.onAuthStateChange(async(ev,sess)=>{
     if(ev==='SIGNED_IN'&&sess) await handleUser(sess.user);
@@ -313,19 +361,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
 async function handleUser(user){
   CU=user; isAdm=user.email===ADMIN;
-  if(isAdm){ enterApp(user); return; }
-  // Check approval status
-  const {data:profile}=await db.from('user_profiles').select('status').eq('id',user.id).single();
-  if(!profile||profile.status==='pending'){
-    document.getElementById('pending-email-show').textContent=user.email;
-    showScreen('pending');
-  } else if(profile.status==='approved'){
-    enterApp(user);
-  } else {
-    toast('تم رفض حسابك — تواصل مع المسؤول',true);
-    await db.auth.signOut();
-    showScreen('login');
-  }
+  if(isAdm){enterApp(user);return;}
+  const{data:p}=await db.from('user_profiles').select('status').eq('id',user.id).single();
+  if(!p||p.status==='pending') showScreen('pending');
+  else if(p.status==='approved') enterApp(user);
+  else{toast('تم رفض حسابك',true);await db.auth.signOut();showScreen('login');}
 }
 
 function showScreen(s){
@@ -336,32 +376,54 @@ function showScreen(s){
 function enterApp(user){
   showScreen('app');
   const name=user.user_metadata?.full_name||user.email?.split('@')[0]||'مستخدم';
-  document.getElementById('u-name').textContent=name;
+  document.getElementById('u-name').textContent=user.email;
   document.getElementById('u-role').textContent=isAdm?'Admin ⚡':'عضو';
-  const av=document.getElementById('u-av');
-  if(user.user_metadata?.avatar_url) av.innerHTML=`<img src="${user.user_metadata.avatar_url}" alt="">`;
-  else av.textContent=name.charAt(0).toUpperCase();
-  if(isAdm){
-    document.getElementById('adm-banner').classList.add('show');
-    document.getElementById('nav-users').style.display='flex';
-  }
+  document.getElementById('u-av').textContent=name.charAt(0).toUpperCase();
+  if(isAdm){document.getElementById('adm-banner').classList.add('show');document.getElementById('nav-users').style.display='flex';}
   loadAll();
 }
 
-// ── AUTH ──
-async function loginGoogle(){
-  const{error}=await db.auth.signInWithOAuth({provider:'google',options: { redirectTo: 'https://iigari.vercel.app/iigari.html' });
-  if(error) toast('خطأ: '+error.message,true);
+// AUTH
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  event.target.classList.add('active');
 }
-async function loginAdmin(){
-  const e=document.getElementById('adm-email').value,p=document.getElementById('adm-pass').value;
-  if(!e||!p){toast('أدخل البريد وكلمة المرور',true);return;}
+
+async function loginEmail(){
+  const e=document.getElementById('l-email').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const err=document.getElementById('login-err');
+  err.classList.remove('show');
+  if(!e||!p){err.textContent='أدخل البريد وكلمة المرور';err.classList.add('show');return;}
   const{error}=await db.auth.signInWithPassword({email:e,password:p});
-  if(error) toast('خطأ: '+error.message,true);
+  if(error){err.textContent='بيانات غير صحيحة — تحقق من البريد وكلمة المرور';err.classList.add('show');}
 }
+
+async function registerEmail(){
+  const name=document.getElementById('r-name').value.trim();
+  const e=document.getElementById('r-email').value.trim();
+  const p=document.getElementById('r-pass').value;
+  const err=document.getElementById('reg-err');
+  const ok=document.getElementById('reg-ok');
+  err.classList.remove('show');ok.classList.remove('show');
+  if(!name||!e||!p){err.textContent='أكمل جميع الحقول';err.classList.add('show');return;}
+  if(p.length<8){err.textContent='كلمة المرور 8 أحرف على الأقل';err.classList.add('show');return;}
+  const{data,error}=await db.auth.signUp({email:e,password:p,options:{data:{full_name:name}}});
+  if(error){err.textContent='خطأ: '+error.message;err.classList.add('show');return;}
+  // Add to user_profiles manually
+  if(data.user){
+    await db.from('user_profiles').upsert({id:data.user.id,email:e,full_name:name,status:'pending'});
+  }
+  ok.classList.add('show');
+  document.getElementById('r-name').value='';
+  document.getElementById('r-email').value='';
+  document.getElementById('r-pass').value='';
+}
+
 async function logout(){await db.auth.signOut();showScreen('login');}
 
-// ── NAV ──
 function showPage(page,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -370,7 +432,6 @@ function showPage(page,el){
   if(page==='users') loadUsers();
 }
 
-// ── TOAST / MODAL ──
 function toast(msg,err=false){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.borderColor=err?'rgba(239,68,68,.5)':'rgba(34,197,94,.5)';
@@ -381,21 +442,18 @@ function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
 
-// ── STATUS LABELS ──
 function sl(s){
   const m={rented:'مؤجرة',vacant:'فارغة',maintenance:'صيانة',active:'نشط',expired:'منتهي',cancelled:'ملغي',paid:'مدفوع',pending:'معلق',late:'متأخر'};
   const c={rented:'g',active:'g',paid:'g',vacant:'b',pending:'a',maintenance:'a',expired:'r',cancelled:'r',late:'r'};
   return`<span class="pill p${c[s]||'b'}">${m[s]||s}</span>`;
 }
 
-// ── LOAD ALL ──
 async function loadAll(){await Promise.all([loadUnits(),loadTenants(),loadContracts(),loadPayments()]);loadDash();}
 
-// ── UNITS ──
 async function loadUnits(){
   let q=db.from('units').select('*').order('created_at',{ascending:false});
   if(!isAdm&&CU) q=q.eq('user_id',CU.id);
-  const{data}=await q; AU=data||[]; renderUnits(AU);
+  const{data}=await q;AU=data||[];renderUnits(AU);
 }
 function renderUnits(u){
   const tb=document.getElementById('units-tb');
@@ -414,11 +472,10 @@ async function addUnit(){
 }
 async function delUnit(id){if(!confirm('حذف الوحدة؟'))return;await db.from('units').delete().eq('id',id);toast('تم الحذف');await loadUnits();loadDash();}
 
-// ── TENANTS ──
 async function loadTenants(){
   let q=db.from('tenants').select('*').order('created_at',{ascending:false});
   if(!isAdm&&CU) q=q.eq('user_id',CU.id);
-  const{data}=await q; AT=data||[]; renderTenants(AT);
+  const{data}=await q;AT=data||[];renderTenants(AT);
 }
 function renderTenants(t){
   const tb=document.getElementById('tenants-tb');
@@ -437,7 +494,6 @@ async function addTenant(){
 }
 async function delTenant(id){if(!confirm('حذف المستأجر؟'))return;await db.from('tenants').delete().eq('id',id);toast('تم الحذف');await loadTenants();}
 
-// ── CONTRACTS ──
 async function loadContracts(){
   const{data}=await db.from('contracts').select('*,units(unit_number),tenants(name)').order('created_at',{ascending:false});
   AC=data||[];renderContracts(AC);
@@ -462,7 +518,6 @@ async function addContract(){
 }
 async function delContract(id){if(!confirm('حذف العقد؟'))return;await db.from('contracts').delete().eq('id',id);toast('تم الحذف');await loadContracts();}
 
-// ── PAYMENTS ──
 async function loadPayments(){
   const{data}=await db.from('payments').select('*,contracts(monthly_rent,tenants(name))').order('created_at',{ascending:false});
   AP=data||[];renderPayments(AP);
@@ -484,60 +539,37 @@ async function addPayment(){
 }
 async function delPayment(id){if(!confirm('حذف الدفعة؟'))return;await db.from('payments').delete().eq('id',id);toast('تم الحذف');await loadPayments();}
 
-// ── USERS (Admin) ──
 async function loadUsers(){
   const{data}=await db.from('user_profiles').select('*').order('created_at',{ascending:false});
   USERS=data||[];
   const pending=USERS.filter(u=>u.status==='pending').length;
-  const dot=document.getElementById('pending-dot');
-  if(dot) dot.style.display=pending>0?'inline-block':'none';
-  const label=document.getElementById('nav-users-label');
-  if(label) label.textContent=pending>0?`المستخدمون (${pending} جديد)`:'المستخدمون';
+  document.getElementById('nav-users-txt').textContent=pending>0?`المستخدمون (${pending})`:'المستخدمون';
   renderUsers(USERS);
 }
-
-let currentFilter='all';
 function filterUsers(f,el){
-  currentFilter=f;
+  curFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   if(el) el.classList.add('active');
-  const filtered=f==='all'?USERS:USERS.filter(u=>u.status===f);
-  renderUsers(filtered);
+  renderUsers(f==='all'?USERS:USERS.filter(u=>u.status===f));
 }
-
 function renderUsers(users){
   const list=document.getElementById('users-list');
   if(!users.length){list.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد مستخدمون</div></div>';return;}
   list.innerHTML=users.map(u=>{
     const badge=u.status==='pending'?`<span class="badge-pending">بانتظار الموافقة</span>`:u.status==='approved'?`<span class="badge-approved">موافق عليه</span>`:`<span class="badge-rejected">مرفوض</span>`;
-    const actions=u.status==='pending'?`<button class="btn-success" onclick="approveUser('${u.id}')">✓ موافقة</button><button class="btn-reject" onclick="rejectUser('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn-reject" onclick="rejectUser('${u.id}')">إلغاء الموافقة</button>`:`<button class="btn-success" onclick="approveUser('${u.id}')">إعادة الموافقة</button>`;
-    const av=u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase();
-    return`<div class="user-card">
-      <div class="user-card-av">${av}</div>
-      <div class="user-card-info">
-        <div class="user-card-name">${u.full_name||'—'}</div>
-        <div class="user-card-email">${u.email||'—'}</div>
-        <div class="user-card-date">${new Date(u.created_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}</div>
-      </div>
-      <div class="user-card-actions">${badge} ${actions}</div>
-    </div>`;
+    const actions=u.status==='pending'?`<button class="btn-success" onclick="approveUser('${u.id}')">✓ موافقة</button><button class="btn-reject" onclick="rejectUser('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn-reject" onclick="rejectUser('${u.id}')">إلغاء</button>`:`<button class="btn-success" onclick="approveUser('${u.id}')">إعادة موافقة</button>`;
+    return`<div class="user-card"><div class="user-card-av">${(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="user-card-info"><div class="user-card-name">${u.full_name||'—'}</div><div class="user-card-email">${u.email||'—'}</div></div><div class="user-card-actions">${badge} ${actions}</div></div>`;
   }).join('');
 }
-
 async function approveUser(id){
-  const{error}=await db.from('user_profiles').update({status:'approved'}).eq('id',id);
-  if(error){toast('خطأ: '+error.message,true);return;}
-  toast('✓ تمت الموافقة على المستخدم');
-  await loadUsers();filterUsers(currentFilter,null);
+  await db.from('user_profiles').update({status:'approved'}).eq('id',id);
+  toast('✓ تمت الموافقة');await loadUsers();filterUsers(curFilter,null);
 }
 async function rejectUser(id){
-  const{error}=await db.from('user_profiles').update({status:'rejected'}).eq('id',id);
-  if(error){toast('خطأ: '+error.message,true);return;}
-  toast('تم رفض المستخدم');
-  await loadUsers();filterUsers(currentFilter,null);
+  await db.from('user_profiles').update({status:'rejected'}).eq('id',id);
+  toast('تم الرفض');await loadUsers();filterUsers(curFilter,null);
 }
 
-// ── DASHBOARD ──
 function loadDash(){
   const tot=AU.length,ren=AU.filter(u=>u.status==='rented').length,vac=AU.filter(u=>u.status==='vacant').length;
   document.getElementById('m-total').textContent=tot;

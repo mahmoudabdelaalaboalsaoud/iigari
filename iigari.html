@@ -9,17 +9,19 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Cairo', sans-serif; background: #0f1117; color: #e8edf5; min-height: 100vh; }
-
-/* ── SCREENS ── */
 .screen { display: none; min-height: 100vh; }
 .screen.active { display: flex; }
-
-/* ── LOGIN ── */
+/* LOGIN */
 #s-login { align-items: center; justify-content: center; background: radial-gradient(ellipse at 60% 40%, #1a2540, #0f1117); }
-.login-box { background: #161b27; border: 1px solid #2a3348; border-radius: 16px; padding: 40px 32px; width: 380px; text-align: center; }
+.login-box { background: #161b27; border: 1px solid #2a3348; border-radius: 16px; padding: 40px 32px; width: 400px; text-align: center; }
 .logo { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
-.logo-sub { font-size: 13px; color: #5a6478; margin-bottom: 28px; }
-.tabs { display: flex; background: #1e2535; border-radius: 8px; padding: 4px; margin-bottom: 20px; gap: 4px; }
+.logo-sub { font-size: 13px; color: #5a6478; margin-bottom: 24px; }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 8px; background: #fff; color: #333; font-size: 14px; font-weight: 600; font-family: 'Cairo', sans-serif; border: none; cursor: pointer; margin-bottom: 16px; transition: all .15s; }
+.btn-google:hover { background: #f1f1f1; transform: translateY(-1px); }
+.btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #5a6478; font-size: 12px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #2a3348; }
+.tabs { display: flex; background: #1e2535; border-radius: 8px; padding: 4px; margin-bottom: 16px; gap: 4px; }
 .tab { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: none; color: #8b95a8; font-family: 'Cairo', sans-serif; }
 .tab.on { background: #3b82f6; color: #fff; }
 .panel { display: none; }
@@ -34,16 +36,14 @@ body { font-family: 'Cairo', sans-serif; background: #0f1117; color: #e8edf5; mi
 .msg.err { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #ef4444; }
 .msg.ok { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); color: #22c55e; }
 .note { font-size: 11px; color: #5a6478; margin-top: 16px; }
-
-/* ── PENDING ── */
+/* PENDING */
 #s-pending { align-items: center; justify-content: center; background: radial-gradient(ellipse at 60% 40%, #1a2540, #0f1117); }
 .pending-box { background: #161b27; border: 1px solid #2a3348; border-radius: 16px; padding: 40px 32px; width: 400px; text-align: center; }
 .p-icon { font-size: 48px; margin-bottom: 16px; }
 .p-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
 .p-sub { font-size: 13px; color: #8b95a8; line-height: 1.7; margin-bottom: 20px; }
 .btn-out { background: none; border: 1px solid #2a3348; border-radius: 8px; padding: 8px 20px; font-size: 13px; color: #8b95a8; cursor: pointer; font-family: 'Cairo', sans-serif; }
-
-/* ── APP ── */
+/* APP */
 #s-app { flex-direction: row; }
 .sidebar { width: 220px; flex-shrink: 0; background: #161b27; border-left: 1px solid #2a3348; display: flex; flex-direction: column; position: fixed; top: 0; right: 0; height: 100vh; z-index: 100; }
 .main { flex: 1; margin-right: 220px; padding: 24px; }
@@ -59,36 +59,29 @@ body { font-family: 'Cairo', sans-serif; background: #0f1117; color: #e8edf5; mi
 .ni svg { width: 16px; height: 16px; flex-shrink: 0; }
 .sb-foot { padding: 12px 16px; border-top: 1px solid #2a3348; }
 .u-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.u-av { width: 30px; height: 30px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.u-av { width: 30px; height: 30px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden; }
+.u-av img { width: 100%; height: 100%; object-fit: cover; }
 .u-name { font-size: 12px; color: #e8edf5; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .u-role { font-size: 10px; color: #3b82f6; }
 .btn-out2 { width: 100%; background: none; border: 1px solid #2a3348; border-radius: 8px; padding: 7px; font-size: 12px; color: #8b95a8; cursor: pointer; font-family: 'Cairo', sans-serif; }
 .btn-out2:hover { background: rgba(239,68,68,.1); color: #ef4444; border-color: rgba(239,68,68,.3); }
-
-/* ── PAGES ── */
 .page { display: none; }
 .page.on { display: block; }
 .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .pg-title { font-size: 20px; font-weight: 700; }
 .pg-sub { font-size: 13px; color: #8b95a8; margin-top: 2px; }
 .bc { font-size: 12px; color: #5a6478; margin-bottom: 4px; }
-
-/* ── METRICS ── */
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
 .mc { background: #161b27; border: 1px solid #2a3348; border-radius: 12px; padding: 16px; }
 .mc-lbl { font-size: 11px; color: #5a6478; font-weight: 600; margin-bottom: 8px; }
 .mc-val { font-size: 26px; font-weight: 700; line-height: 1; }
 .mc-sub { font-size: 12px; margin-top: 6px; color: #5a6478; }
 .mc-sub.up { color: #22c55e; }
-
-/* ── GRID ── */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 .card { background: #161b27; border: 1px solid #2a3348; border-radius: 12px; padding: 16px; }
 .card-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .card-ttl { font-size: 13px; font-weight: 600; }
 .card-lnk { font-size: 12px; color: #3b82f6; cursor: pointer; }
-
-/* ── TABLE ── */
 .tw { background: #161b27; border: 1px solid #2a3348; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
 table { width: 100%; border-collapse: collapse; }
 th { font-size: 11px; color: #5a6478; font-weight: 600; padding: 10px 16px; text-align: right; border-bottom: 1px solid #2a3348; }
@@ -96,16 +89,12 @@ td { font-size: 13px; color: #8b95a8; padding: 12px 16px; border-bottom: 1px sol
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255,255,255,.02); }
 .td-m { color: #e8edf5; font-weight: 500; }
-
-/* ── PILLS ── */
 .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
 .p-g { background: rgba(34,197,94,.12); color: #22c55e; }
 .p-r { background: rgba(239,68,68,.12); color: #ef4444; }
 .p-a { background: rgba(245,158,11,.12); color: #f59e0b; }
 .p-b { background: rgba(59,130,246,.12); color: #3b82f6; }
 .p-p { background: rgba(168,85,247,.15); color: #a855f7; }
-
-/* ── BUTTONS ── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-family: 'Cairo', sans-serif; cursor: pointer; font-weight: 600; border: none; }
 .btn-p { background: #3b82f6; color: #fff; }
 .btn-p:hover { background: #1d4ed8; }
@@ -114,8 +103,6 @@ tr:hover td { background: rgba(255,255,255,.02); }
 .btn-rj { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-family: 'Cairo', sans-serif; cursor: pointer; }
 .abtn { background: none; border: 1px solid #2a3348; border-radius: 6px; padding: 4px 8px; color: #5a6478; cursor: pointer; font-size: 12px; font-family: 'Cairo', sans-serif; }
 .abtn.del:hover { background: rgba(239,68,68,.1); color: #ef4444; border-color: rgba(239,68,68,.3); }
-
-/* ── MODAL ── */
 .ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; }
 .ov.open { display: flex; }
 .modal { background: #161b27; border: 1px solid #2a3348; border-radius: 12px; padding: 24px; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
@@ -128,10 +115,7 @@ input, select { background: #1e2535; border: 1px solid #2a3348; border-radius: 8
 input:focus, select:focus { border-color: #3b82f6; }
 select option { background: #1e2535; }
 .fa { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-
-/* ── MISC ── */
 .sbar { background: #1e2535; border: 1px solid #2a3348; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #e8edf5; font-family: 'Cairo', sans-serif; outline: none; width: 220px; }
-.sbar:focus { border-color: #3b82f6; }
 .ld { display: flex; align-items: center; justify-content: center; padding: 40px; color: #5a6478; font-size: 13px; gap: 8px; }
 .sp { width: 16px; height: 16px; border: 2px solid #2a3348; border-top-color: #3b82f6; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -145,7 +129,8 @@ select option { background: #1e2535; }
 .adm-b { background: rgba(168,85,247,.1); border: 1px solid rgba(168,85,247,.3); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #a855f7; margin-bottom: 16px; display: none; }
 .adm-b.show { display: block; }
 .uc { background: #161b27; border: 1px solid #2a3348; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.uc-av { width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.uc-av { width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden; }
+.uc-av img { width: 100%; height: 100%; object-fit: cover; }
 .uc-info { flex: 1; }
 .uc-name { font-size: 13px; font-weight: 600; color: #e8edf5; }
 .uc-email { font-size: 12px; color: #5a6478; }
@@ -166,16 +151,26 @@ select option { background: #1e2535; }
   <div class="login-box">
     <div class="logo">● إيجاري</div>
     <div class="logo-sub">منصة إدارة الوحدات والإيجارات</div>
+
+    <button class="btn-google" onclick="doGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8.9 20-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C40.8 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
+      تسجيل الدخول بـ Google
+    </button>
+
+    <div class="divider">أو</div>
+
     <div class="tabs">
       <button class="tab on" onclick="swTab('login',this)">تسجيل الدخول</button>
       <button class="tab" onclick="swTab('reg',this)">حساب جديد</button>
     </div>
+
     <div class="panel on" id="p-login">
       <div class="msg err" id="le"></div>
       <input class="fi" type="email" id="l-e" placeholder="البريد الإلكتروني">
       <input class="fi" type="password" id="l-p" placeholder="كلمة المرور">
       <button class="btn-main" onclick="doLogin()">دخول</button>
     </div>
+
     <div class="panel" id="p-reg">
       <div class="msg err" id="re"></div>
       <div class="msg ok" id="rok">تم إنشاء الحساب! انتظر موافقة المسؤول.</div>
@@ -184,6 +179,7 @@ select option { background: #1e2535; }
       <input class="fi" type="password" id="r-p" placeholder="كلمة المرور (8 أحرف+)">
       <button class="btn-main" onclick="doReg()">إنشاء حساب</button>
     </div>
+
     <div class="note">بتسجيل دخولك توافق على شروط الاستخدام</div>
   </div>
 </div>
@@ -227,10 +223,8 @@ select option { background: #1e2535; }
   </div>
 
   <div class="main">
-
-    <!-- Dashboard -->
     <div class="page on" id="pg-dash">
-      <div class="adm-b" id="adm-b">⚡ أنت مسجل كـ Admin</div>
+      <div class="adm-b" id="adm-b">⚡ أنت مسجل كـ Admin — تشوف وتدير كل البيانات</div>
       <div class="topbar"><div><div class="pg-title">لوحة التحكم</div><div class="pg-sub" id="pg-date"></div></div></div>
       <div class="metrics">
         <div class="mc"><div class="mc-lbl">إجمالي الوحدات</div><div class="mc-val" id="m1">—</div><div class="mc-sub">في قاعدة البيانات</div></div>
@@ -244,31 +238,26 @@ select option { background: #1e2535; }
       </div>
     </div>
 
-    <!-- Units -->
     <div class="page" id="pg-units">
       <div class="topbar"><div><div class="bc">الرئيسية</div><div class="pg-title">الوحدات</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="u-src" oninput="fUnits()"><button class="btn btn-p" onclick="openOv('ov-unit')">+ إضافة وحدة</button></div></div>
       <div class="tw"><table><thead><tr><th>رقم الوحدة</th><th>الطابق</th><th>المساحة</th><th>الإيجار</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-units"><tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Tenants -->
     <div class="page" id="pg-tenants">
       <div class="topbar"><div><div class="bc">الرئيسية</div><div class="pg-title">المستأجرون</div></div><div style="display:flex;gap:8px;align-items:center"><input class="sbar" placeholder="بحث..." id="t-src" oninput="fTenants()"><button class="btn btn-p" onclick="openOv('ov-tenant')">+ إضافة مستأجر</button></div></div>
       <div class="tw"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الرقم القومي</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead><tbody id="tb-tenants"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Contracts -->
     <div class="page" id="pg-contracts">
       <div class="topbar"><div><div class="bc">الرئيسية</div><div class="pg-title">العقود</div></div><button class="btn btn-p" onclick="fillCS();openOv('ov-contract')">+ إضافة عقد</button></div>
       <div class="tw"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-contracts"><tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Payments -->
     <div class="page" id="pg-payments">
       <div class="topbar"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل</div></div><button class="btn btn-p" onclick="fillPS();openOv('ov-payment')">+ تسجيل دفعة</button></div>
       <div class="tw"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
     </div>
 
-    <!-- Users -->
     <div class="page" id="pg-users">
       <div class="topbar"><div><div class="pg-title">إدارة المستخدمين <span class="pill p-p">Admin</span></div></div></div>
       <div class="uf">
@@ -279,17 +268,13 @@ select option { background: #1e2535; }
       </div>
       <div id="users-list"><div class="ld"><div class="sp"></div></div></div>
     </div>
-
   </div>
 </div>
 
 <!-- MODALS -->
 <div class="ov" id="ov-unit"><div class="modal"><div class="modal-ttl">إضافة وحدة جديدة</div><div class="fg"><div class="fgi"><label>رقم الوحدة *</label><input id="u-num" placeholder="301"></div><div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="3"></div><div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number"></div><div class="fgi"><label>الإيجار (ج/شهر)</label><input id="u-rn" type="number"></div><div class="fgi full"><label>الحالة</label><select id="u-st"><option value="vacant">فارغة</option><option value="rented">مؤجرة</option><option value="maintenance">صيانة</option></select></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-unit')">إلغاء</button><button class="btn btn-p" onclick="addUnit()">حفظ</button></div></div></div>
-
 <div class="ov" id="ov-tenant"><div class="modal"><div class="modal-ttl">إضافة مستأجر</div><div class="fg"><div class="fgi full"><label>الاسم *</label><input id="t-nm" placeholder="محمد أحمد علي"></div><div class="fgi"><label>الهاتف</label><input id="t-ph" placeholder="01012345678"></div><div class="fgi"><label>الرقم القومي</label><input id="t-ni"></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-tenant')">إلغاء</button><button class="btn btn-p" onclick="addTenant()">حفظ</button></div></div></div>
-
 <div class="ov" id="ov-contract"><div class="modal"><div class="modal-ttl">إضافة عقد</div><div class="fg"><div class="fgi full"><label>المستأجر *</label><select id="c-tn"><option value="">اختر...</option></select></div><div class="fgi full"><label>الوحدة *</label><select id="c-un"><option value="">اختر...</option></select></div><div class="fgi"><label>الإيجار (ج) *</label><input id="c-rn" type="number"></div><div class="fgi"><label>الحالة</label><select id="c-st"><option value="active">نشط</option><option value="expired">منتهي</option><option value="cancelled">ملغي</option></select></div><div class="fgi"><label>تاريخ البداية *</label><input id="c-sd" type="date"></div><div class="fgi"><label>تاريخ النهاية *</label><input id="c-ed" type="date"></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-contract')">إلغاء</button><button class="btn btn-p" onclick="addContract()">حفظ</button></div></div></div>
-
 <div class="ov" id="ov-payment"><div class="modal"><div class="modal-ttl">تسجيل دفعة</div><div class="fg"><div class="fgi full"><label>العقد *</label><select id="p-ct"><option value="">اختر...</option></select></div><div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number"></div><div class="fgi"><label>تاريخ الدفع *</label><input id="p-dt" type="date"></div><div class="fgi full"><label>الحالة</label><select id="p-st"><option value="paid">مدفوع</option><option value="pending">معلق</option><option value="late">متأخر</option></select></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-payment')">إلغاء</button><button class="btn btn-p" onclick="addPayment()">حفظ</button></div></div></div>
 
 <div class="toast" id="toast"></div>
@@ -298,13 +283,11 @@ select option { background: #1e2535; }
 const SB_URL = 'https://ptimioffmszhmpxxuqha.supabase.co';
 const SB_KEY = 'sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
 const ADMIN = 'mahmoudabdelaalaboalsaoud@gmail.com';
+const REDIRECT = 'https://iigari.vercel.app/iigari.html';
 const { createClient } = supabase;
 const db = createClient(SB_URL, SB_KEY);
+let CU = null, isAdm = false, AU = [], AT = [], AC = [], AP = [], USERS = [], curF = 'all';
 
-let CU = null, isAdm = false;
-let AU = [], AT = [], AC = [], AP = [], USERS = [], curF = 'all';
-
-// INIT
 window.addEventListener('load', async () => {
   document.getElementById('pg-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const { data: { session } } = await db.auth.getSession();
@@ -334,12 +317,26 @@ function enterApp(user) {
   const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستخدم';
   document.getElementById('u-nm').textContent = user.email;
   document.getElementById('u-rl').textContent = isAdm ? 'Admin ⚡' : 'عضو';
-  document.getElementById('u-av').textContent = name.charAt(0).toUpperCase();
+  const av = document.getElementById('u-av');
+  if (user.user_metadata?.avatar_url) {
+    av.innerHTML = `<img src="${user.user_metadata.avatar_url}" alt="">`;
+  } else {
+    av.textContent = name.charAt(0).toUpperCase();
+  }
   if (isAdm) { document.getElementById('adm-b').classList.add('show'); document.getElementById('ni-users').style.display = 'flex'; }
   loadAll();
 }
 
-// AUTH
+// GOOGLE AUTH
+async function doGoogle() {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: REDIRECT }
+  });
+  if (error) toast('خطأ في Google: ' + error.message, true);
+}
+
+// EMAIL AUTH
 function swTab(t, el) {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
@@ -370,14 +367,11 @@ async function doReg() {
   if (error) { err.textContent = 'خطأ: ' + error.message; err.classList.add('show'); return; }
   if (data.user) await db.from('user_profiles').upsert({ id: data.user.id, email: e, full_name: name, status: 'pending' });
   ok.classList.add('show');
-  document.getElementById('r-n').value = '';
-  document.getElementById('r-e').value = '';
-  document.getElementById('r-p').value = '';
+  ['r-n','r-e','r-p'].forEach(id => document.getElementById(id).value = '');
 }
 
 async function doOut() { await db.auth.signOut(); showS('login'); }
 
-// NAV
 function goPage(pg, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
@@ -386,30 +380,23 @@ function goPage(pg, el) {
   if (pg === 'users') loadUsers();
 }
 
-// TOAST / MODAL
 function toast(msg, err = false) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderColor = err ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)';
-  t.style.color = err ? '#ef4444' : '#22c55e';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  t.textContent = msg; t.style.borderColor = err ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)'; t.style.color = err ? '#ef4444' : '#22c55e';
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
 }
 function openOv(id) { document.getElementById(id).classList.add('open'); }
 function closeOv(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
 
-// STATUS
 function sl(s) {
   const m = { rented:'مؤجرة', vacant:'فارغة', maintenance:'صيانة', active:'نشط', expired:'منتهي', cancelled:'ملغي', paid:'مدفوع', pending:'معلق', late:'متأخر' };
   const c = { rented:'g', active:'g', paid:'g', vacant:'b', pending:'a', maintenance:'a', expired:'r', cancelled:'r', late:'r' };
   return `<span class="pill p-${c[s]||'b'}">${m[s]||s}</span>`;
 }
 
-// LOAD ALL
 async function loadAll() { await Promise.all([loadUnits(), loadTenants(), loadContracts(), loadPayments()]); loadDash(); }
 
-// UNITS
 async function loadUnits() {
   let q = db.from('units').select('*').order('created_at', { ascending: false });
   if (!isAdm && CU) q = q.eq('user_id', CU.id);
@@ -432,7 +419,6 @@ async function addUnit() {
 }
 async function delUnit(id) { if (!confirm('حذف الوحدة؟')) return; await db.from('units').delete().eq('id', id); toast('تم الحذف'); await loadUnits(); loadDash(); }
 
-// TENANTS
 async function loadTenants() {
   let q = db.from('tenants').select('*').order('created_at', { ascending: false });
   if (!isAdm && CU) q = q.eq('user_id', CU.id);
@@ -455,7 +441,6 @@ async function addTenant() {
 }
 async function delTenant(id) { if (!confirm('حذف المستأجر؟')) return; await db.from('tenants').delete().eq('id', id); toast('تم الحذف'); await loadTenants(); }
 
-// CONTRACTS
 async function loadContracts() {
   const { data } = await db.from('contracts').select('*,units(unit_number),tenants(name)').order('created_at', { ascending: false });
   AC = data || []; renderContracts(AC);
@@ -481,7 +466,6 @@ async function addContract() {
 }
 async function delContract(id) { if (!confirm('حذف العقد؟')) return; await db.from('contracts').delete().eq('id', id); toast('تم الحذف'); await loadContracts(); }
 
-// PAYMENTS
 async function loadPayments() {
   const { data } = await db.from('payments').select('*,contracts(monthly_rent,tenants(name))').order('created_at', { ascending: false });
   AP = data || []; renderPayments(AP);
@@ -503,7 +487,6 @@ async function addPayment() {
 }
 async function delPayment(id) { if (!confirm('حذف الدفعة؟')) return; await db.from('payments').delete().eq('id', id); toast('تم الحذف'); await loadPayments(); }
 
-// USERS
 async function loadUsers() {
   const { data } = await db.from('user_profiles').select('*').order('created_at', { ascending: false });
   USERS = data || [];
@@ -523,13 +506,13 @@ function renderUsers(users) {
   list.innerHTML = users.map(u => {
     const badge = u.status==='pending' ? `<span class="bp bp-p">بانتظار الموافقة</span>` : u.status==='approved' ? `<span class="bp bp-a">موافق عليه</span>` : `<span class="bp bp-r">مرفوض</span>`;
     const acts = u.status==='pending' ? `<button class="btn-ok" onclick="approveU('${u.id}')">✓ موافقة</button><button class="btn-rj" onclick="rejectU('${u.id}')">✕ رفض</button>` : u.status==='approved' ? `<button class="btn-rj" onclick="rejectU('${u.id}')">إلغاء</button>` : `<button class="btn-ok" onclick="approveU('${u.id}')">إعادة موافقة</button>`;
-    return `<div class="uc"><div class="uc-av">${(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}</div></div>`;
+    const av = u.avatar_url ? `<img src="${u.avatar_url}" alt="">` : (u.full_name||u.email||'م').charAt(0).toUpperCase();
+    return `<div class="uc"><div class="uc-av">${av}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}</div></div>`;
   }).join('');
 }
 async function approveU(id) { await db.from('user_profiles').update({ status: 'approved' }).eq('id', id); toast('✓ تمت الموافقة'); await loadUsers(); fUsers(curF, null); }
 async function rejectU(id) { await db.from('user_profiles').update({ status: 'rejected' }).eq('id', id); toast('تم الرفض'); await loadUsers(); fUsers(curF, null); }
 
-// DASHBOARD
 function loadDash() {
   const tot = AU.length, ren = AU.filter(u => u.status==='rented').length, vac = AU.filter(u => u.status==='vacant').length;
   document.getElementById('m1').textContent = tot;

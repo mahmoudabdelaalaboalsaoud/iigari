@@ -3,38 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إيجاري — منصة إدارة الوحدات</title>
+<title>إيجاري — منصة إدارة العقارات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#f0f4f8; --bg2:#fff; --bg3:#f7f9fb; --border:#e2e8f0;
-  --text:#1a202c; --text2:#4a5568; --text3:#a0aec0;
-  --accent:#4f46e5; --accent2:#4338ca; --purple:#7c3aed;
-  --green:#16a34a; --red:#dc2626; --amber:#d97706;
-  --shadow:0 1px 3px rgba(0,0,0,.08); --shadow2:0 4px 16px rgba(0,0,0,.10);
-  --sb-w:240px;
-}
-[data-theme="dark"] {
-  --bg:#0f1117; --bg2:#161b27; --bg3:#1e2535; --border:#2a3348;
-  --text:#e8edf5; --text2:#8b95a8; --text3:#5a6478;
-  --shadow:0 1px 3px rgba(0,0,0,.3); --shadow2:0 4px 16px rgba(0,0,0,.4);
-}
+:root{--bg:#f0f4f8;--bg2:#fff;--bg3:#f7f9fb;--border:#e2e8f0;--text:#1a202c;--text2:#4a5568;--text3:#a0aec0;--accent:#4f46e5;--purple:#7c3aed;--green:#16a34a;--red:#dc2626;--amber:#d97706;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.10)}
+[data-theme="dark"]{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3348;--text:#e8edf5;--text2:#8b95a8;--text3:#5a6478;--shadow:0 1px 3px rgba(0,0,0,.3);--shadow2:0 4px 16px rgba(0,0,0,.4)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.screen{display:none;min-height:100vh}.screen.active{display:flex}
 
-/* SCREENS */
-.screen{display:none;min-height:100vh}
-.screen.active{display:flex}
-
-/* ── LOGIN ── */
+/* LOGIN */
 #s-login{align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--purple))}
 .login-box{background:var(--bg2);border-radius:20px;padding:36px 32px;width:100%;max-width:420px;margin:16px;box-shadow:var(--shadow2)}
 .l-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
 .l-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
-.l-name{font-size:24px;font-weight:800;color:var(--text)}
+.l-name{font-size:24px;font-weight:800}
 .l-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:24px}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:10px;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:14px;transition:all .15s}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:10px;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:14px}
 .btn-google:hover{border-color:var(--accent)}
 .btn-google svg{width:20px;height:20px;flex-shrink:0}
 .divider{display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--text3);font-size:12px}
@@ -53,7 +39,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .msg.ok{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);color:var(--green)}
 .note{font-size:11px;color:var(--text3);text-align:center;margin-top:14px}
 
-/* ── PENDING ── */
+/* PENDING */
 #s-pending{align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--purple))}
 .pending-box{background:var(--bg2);border-radius:20px;padding:48px 32px;width:100%;max-width:420px;margin:16px;text-align:center;box-shadow:var(--shadow2)}
 .p-icon{font-size:56px;margin-bottom:16px}
@@ -61,15 +47,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .p-sub{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:24px}
 .btn-sec{background:none;border:1.5px solid var(--border);border-radius:10px;padding:9px 24px;font-size:13px;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif;font-weight:600}
 
-/* ── APP ── */
+/* APP */
 #s-app{flex-direction:column}
-
-/* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);box-shadow:var(--shadow);position:sticky;top:0;z-index:50}
 .tb-right{display:flex;align-items:center;gap:10px}
 .tb-logo{display:flex;align-items:center;gap:8px}
 .tb-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0}
-.tb-name{font-size:16px;font-weight:800;color:var(--text)}
+.tb-name{font-size:16px;font-weight:800}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border-radius:8px;border:none;background:none}
 .hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;display:block;transition:all .3s}
 .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
@@ -77,16 +61,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
 .tb-left{display:flex;align-items:center;gap:8px}
 .theme-btn{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
-.u-mini{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer}
+.u-mini{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
 .u-mini-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0}
 .u-mini-av img{width:100%;height:100%;object-fit:cover}
-.u-mini-name{font-size:12px;font-weight:600;color:var(--text);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* LAYOUT */
+.u-mini-name{font-size:12px;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .app-body{display:flex;flex:1;min-height:calc(100vh - 56px)}
-
-/* SIDEBAR */
-.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:transform .3s}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:transform .3s}
 .sb-nav{padding:12px 10px;flex:1}
 .nav-lbl{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:0 8px;margin:16px 0 6px}
 .ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:all .15s}
@@ -98,22 +78,16 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .u-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
 .u-av img{width:100%;height:100%;object-fit:cover}
 .u-info{flex:1;overflow:hidden}
-.u-name{font-size:12px;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .u-role{font-size:10px;color:var(--accent);font-weight:600}
 .btn-logout{width:100%;background:none;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif}
 .btn-logout:hover{background:rgba(220,38,38,.06);color:var(--red);border-color:rgba(220,38,38,.3)}
-
-/* MAIN CONTENT */
 .main{flex:1;padding:20px;overflow-x:hidden}
-
-/* OVERLAY (mobile) */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;backdrop-filter:blur(2px)}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49}
 .sb-overlay.show{display:block}
-
-/* PAGES */
 .page{display:none}.page.on{display:block}
 .pg-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
-.pg-title{font-size:20px;font-weight:800;color:var(--text)}
+.pg-title{font-size:20px;font-weight:800}
 .pg-sub{font-size:13px;color:var(--text2);margin-top:2px}
 .bc{font-size:12px;color:var(--text3);margin-bottom:2px}
 .pg-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -121,18 +95,46 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
 .stat{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-icon{font-size:28px;position:absolute;top:12px;left:12px;opacity:.3}
 .stat-lbl{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:6px}
-.stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1}
+.stat-val{font-size:26px;font-weight:800;line-height:1}
 .stat-sub{font-size:12px;margin-top:5px;color:var(--text3)}
 .stat-sub.up{color:var(--green);font-weight:600}
-.stat-icon{font-size:28px;position:absolute;top:12px;left:12px;opacity:.3}
+.stat-sub.down{color:var(--red);font-weight:600}
 
-/* CARDS */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
-.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.card-ttl{font-size:13px;font-weight:700;color:var(--text)}
-.card-lnk{font-size:12px;color:var(--accent);cursor:pointer;font-weight:600}
+/* BUILDINGS */
+.buildings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:20px}
+.building-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;transition:all .2s}
+.building-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px)}
+.building-header{background:linear-gradient(135deg,var(--accent),var(--purple));padding:16px;color:#fff}
+.building-name{font-size:16px;font-weight:800;margin-bottom:4px}
+.building-addr{font-size:12px;opacity:.8}
+.building-stats{display:flex;gap:12px;margin-top:10px}
+.bstat{background:rgba(255,255,255,.2);border-radius:8px;padding:6px 10px;text-align:center;flex:1}
+.bstat-val{font-size:18px;font-weight:800}
+.bstat-lbl{font-size:10px;opacity:.8}
+.building-body{padding:14px}
+.building-actions{display:flex;gap:8px}
+
+/* UNITS GRID */
+.units-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px}
+.unit-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow);position:relative}
+.unit-card.rented{border-right:4px solid var(--green)}
+.unit-card.vacant{border-right:4px solid var(--accent)}
+.unit-card.maintenance{border-right:4px solid var(--amber)}
+.unit-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.unit-num{font-size:18px;font-weight:800}
+.unit-floor{font-size:12px;color:var(--text3);margin-top:2px}
+.unit-body{display:flex;flex-direction:column;gap:8px}
+.unit-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.unit-row-lbl{color:var(--text3);font-size:12px;min-width:70px}
+.unit-row-val{color:var(--text);font-weight:600;flex:1}
+.unit-footer{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.alert-row{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--red);font-weight:600;display:flex;align-items:center;gap:6px;margin-top:8px}
+.days-left{font-size:12px;font-weight:600}
+.days-left.ok{color:var(--green)}
+.days-left.warn{color:var(--amber)}
+.days-left.danger{color:var(--red)}
 
 /* TABLE */
 .tw{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow)}
@@ -153,26 +155,34 @@ tr:hover td{background:var(--bg3)}
 .p-p{background:rgba(124,58,237,.1);color:var(--purple)}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:700;border:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:13px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:700;border:none;white-space:nowrap;transition:all .15s}
 .btn-p{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff}
-.btn-g2{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border)}
-.btn-ok{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:5px 12px;font-size:12px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:700}
-.btn-rj{background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:5px 12px;font-size:12px;font-family:'Cairo',sans-serif;cursor:pointer;font-weight:700}
+.btn-p:hover{opacity:.9}
+.btn-g{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border)}
+.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.btn-green{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+.btn-red{background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2)}
+.btn-wa{background:#25d366;color:#fff;border:none}
+.btn-wa:hover{background:#128c7e}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:8px}
 .abtn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text3);cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif;font-weight:600}
 .abtn.del:hover{background:rgba(220,38,38,.06);color:var(--red);border-color:rgba(220,38,38,.3)}
+.abtn.edit:hover{background:rgba(79,70,229,.06);color:var(--accent);border-color:rgba(79,70,229,.3)}
 
 /* MODAL */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:16px}
 .ov.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow2)}
-.modal-ttl{font-size:18px;font-weight:800;margin-bottom:18px;color:var(--text)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow2)}
+.modal-ttl{font-size:18px;font-weight:800;margin-bottom:18px}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fgi{display:flex;flex-direction:column;gap:6px}
 .fgi.full{grid-column:1/-1}
+.fgi.third{grid-column:span 1}
 label{font-size:12px;color:var(--text2);font-weight:700}
-input,select{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;width:100%}
-input:focus,select:focus{border-color:var(--accent);background:var(--bg2)}
+input,select,textarea{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);font-family:'Cairo',sans-serif;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--bg2)}
 select option{background:var(--bg2)}
+textarea{resize:vertical;min-height:80px}
 .fa{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
 
 /* MISC */
@@ -186,60 +196,60 @@ select option{background:var(--bg2)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:999;display:none;box-shadow:var(--shadow2);white-space:nowrap}
 .toast.show{display:flex;align-items:center;gap:8px;animation:su .2s ease}
 @keyframes su{from{transform:translateX(-50%) translateY(10px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.mrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;gap:8px}
-.mrow:last-child{border-bottom:none}
 .adm-b{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(79,70,229,.1));border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:16px;display:none}
 .adm-b.show{display:flex;align-items:center;gap:8px}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff}
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.mrow:last-child{border-bottom:none}
+
+/* USERS */
 .uc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;box-shadow:var(--shadow);flex-wrap:wrap}
 .uc-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
 .uc-av img{width:100%;height:100%;object-fit:cover}
 .uc-info{flex:1;min-width:0}
-.uc-name{font-size:13px;font-weight:700;color:var(--text)}
-.uc-email{font-size:12px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uc-name{font-size:13px;font-weight:700}
+.uc-email{font-size:12px;color:var(--text3)}
 .uc-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .uf{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .fb{background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap}
 .fb.on{background:linear-gradient(135deg,rgba(79,70,229,.1),rgba(124,58,237,.1));color:var(--accent);border-color:rgba(79,70,229,.3)}
-.bp{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.bp{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 .bp-p{background:rgba(217,119,6,.1);color:var(--amber)}
 .bp-a{background:rgba(22,163,74,.1);color:var(--green)}
 .bp-r{background:rgba(220,38,38,.1);color:var(--red)}
-.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff}
 
-/* BOTTOM NAV (mobile) */
+/* BOTTOM NAV */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,.08)}
-.bn-items{display:flex;justify-content:space-around;align-items:center}
+.bn-items{display:flex;justify-content:space-around}
 .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;cursor:pointer;border-radius:8px;min-width:48px;color:var(--text3);font-size:10px;font-weight:600}
 .bn-item.on{color:var(--accent)}
 .bn-item svg{width:22px;height:22px}
-.bn-more{display:none}
 
-/* ── RESPONSIVE ── */
+/* SECTION DIVIDER */
+.sec-div{display:flex;align-items:center;gap:12px;margin:20px 0 14px}
+.sec-div-line{flex:1;height:1px;background:var(--border)}
+.sec-div-txt{font-size:13px;font-weight:700;color:var(--text2);white-space:nowrap}
+
+/* RESPONSIVE */
 @media(max-width:768px){
   .hamburger{display:flex}
   .u-mini-name{display:none}
-  .sidebar{position:fixed;top:0;right:0;height:100vh;z-index:50;transform:translateX(100%);transition:transform .3s}
+  .sidebar{position:fixed;top:0;right:0;height:100vh;z-index:50;transform:translateX(100%)}
   .sidebar.open{transform:translateX(0)}
   .app-body{flex-direction:column}
   .main{padding:12px;padding-bottom:80px}
   .bottom-nav{display:block}
   .stats{grid-template-columns:1fr 1fr;gap:10px}
-  .g2{grid-template-columns:1fr}
+  .stat-val{font-size:22px}
   .fg{grid-template-columns:1fr}
   .fgi.full{grid-column:1}
   .sbar{max-width:100%}
-  .pg-hdr{flex-direction:column;align-items:flex-start}
+  .pg-hdr{flex-direction:column}
   .pg-actions{width:100%}
-  .pg-actions .sbar{flex:1}
-  .pg-actions .btn{flex:1;justify-content:center}
   .fa{flex-direction:column-reverse}
   .fa .btn{width:100%;justify-content:center}
-}
-@media(max-width:480px){
-  .stats{grid-template-columns:1fr 1fr;gap:8px}
-  .stat-val{font-size:22px}
-  .uc{flex-wrap:wrap}
-  .uc-act{width:100%}
+  .buildings-grid{grid-template-columns:1fr}
+  .units-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -249,7 +259,7 @@ select option{background:var(--bg2)}
 <div class="screen active" id="s-login">
   <div class="login-box">
     <div class="l-logo"><div class="l-icon">إ</div><div class="l-name">إيجاري</div></div>
-    <div class="l-sub">منصة إدارة الوحدات والإيجارات</div>
+    <div class="l-sub">منصة إدارة العقارات والإيجارات</div>
     <button class="btn-google" onclick="doGoogle()">
       <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8.9 20-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C40.8 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
       متابعة بـ Google
@@ -282,119 +292,98 @@ select option{background:var(--bg2)}
   <div class="pending-box">
     <div class="p-icon">⏳</div>
     <div class="p-title">حسابك قيد المراجعة</div>
-    <div class="p-sub">شكراً على تسجيلك في إيجاري!<br>طلبك وصل للمسؤول وهيتم مراجعته قريباً.</div>
+    <div class="p-sub">شكراً على تسجيلك! طلبك وصل للمسؤول وهيتم مراجعته قريباً.</div>
     <button class="btn-sec" onclick="doOut()">تسجيل الخروج</button>
   </div>
 </div>
 
 <!-- APP -->
 <div class="screen" id="s-app">
-
-  <!-- TOP BAR -->
   <div class="topbar">
     <div class="tb-right">
-      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="tb-logo">
-        <div class="tb-icon">إ</div>
-        <div class="tb-name">إيجاري</div>
-      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+      <div class="tb-logo"><div class="tb-icon">إ</div><div class="tb-name">إيجاري</div></div>
     </div>
     <div class="tb-left">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
-      <div class="u-mini">
-        <div class="u-mini-av" id="u-mini-av">م</div>
-        <div class="u-mini-name" id="u-mini-nm">...</div>
-      </div>
+      <div class="u-mini"><div class="u-mini-av" id="u-mini-av">م</div><div class="u-mini-name" id="u-mini-nm">...</div></div>
     </div>
   </div>
 
-  <!-- BODY -->
   <div class="app-body">
-
-    <!-- SIDEBAR OVERLAY -->
     <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
-
-    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sb-nav">
         <div class="nav-lbl">القائمة</div>
         <div class="ni on" onclick="goPage('dash',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>لوحة التحكم</div>
-        <div class="ni" onclick="goPage('units',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>الوحدات</div>
-        <div class="ni" onclick="goPage('tenants',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>المستأجرون</div>
+        <div class="ni" onclick="goPage('buildings',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>عقاراتي</div>
         <div class="ni" onclick="goPage('contracts',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
         <div class="ni" onclick="goPage('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
         <div class="ni" id="ni-users" style="display:none" onclick="goPage('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span id="ni-users-txt">المستخدمون</span></div>
       </div>
       <div class="sb-foot">
-        <div class="u-card">
-          <div class="u-av" id="u-av">م</div>
-          <div class="u-info">
-            <div class="u-name" id="u-nm">...</div>
-            <div class="u-role" id="u-rl">عضو</div>
-          </div>
-        </div>
+        <div class="u-card"><div class="u-av" id="u-av">م</div><div class="u-info"><div class="u-name" id="u-nm">...</div><div class="u-role" id="u-rl">عضو</div></div></div>
         <button class="btn-logout" onclick="doOut()">تسجيل الخروج</button>
       </div>
     </div>
 
-    <!-- MAIN -->
     <div class="main">
 
-      <!-- Dashboard -->
+      <!-- DASHBOARD -->
       <div class="page on" id="pg-dash">
-        <div class="adm-b" id="adm-b">⚡ أنت Admin — تشوف كل البيانات</div>
+        <div class="adm-b" id="adm-b">⚡ أنت Admin</div>
         <div class="pg-hdr"><div><div class="pg-title">لوحة التحكم 👋</div><div class="pg-sub" id="pg-date"></div></div></div>
         <div class="stats">
-          <div class="stat"><div class="stat-icon">🏠</div><div class="stat-lbl">إجمالي الوحدات</div><div class="stat-val" id="m1">—</div><div class="stat-sub">في قاعدة البيانات</div></div>
-          <div class="stat"><div class="stat-icon">✅</div><div class="stat-lbl">وحدات مؤجرة</div><div class="stat-val" id="m2">—</div><div class="stat-sub up" id="m2s">—</div></div>
-          <div class="stat"><div class="stat-icon">🔑</div><div class="stat-lbl">وحدات فارغة</div><div class="stat-val" id="m3">—</div><div class="stat-sub">متاحة</div></div>
-          <div class="stat"><div class="stat-icon">👥</div><div class="stat-lbl">المستأجرون</div><div class="stat-val" id="m4">—</div><div class="stat-sub">مستأجر</div></div>
+          <div class="stat"><div class="stat-icon">🏢</div><div class="stat-lbl">إجمالي العقارات</div><div class="stat-val" id="m1">—</div><div class="stat-sub">في قاعدة البيانات</div></div>
+          <div class="stat"><div class="stat-icon">🏠</div><div class="stat-lbl">إجمالي الوحدات</div><div class="stat-val" id="m2">—</div><div class="stat-sub up" id="m2s">—</div></div>
+          <div class="stat"><div class="stat-icon">💰</div><div class="stat-lbl">إيرادات الشهر</div><div class="stat-val" id="m3">—</div><div class="stat-sub">جنيه مصري</div></div>
+          <div class="stat"><div class="stat-icon">⚠️</div><div class="stat-lbl">متأخرات</div><div class="stat-val" id="m4">—</div><div class="stat-sub down" id="m4s">—</div></div>
         </div>
-        <div class="g2">
-          <div class="card"><div class="card-hdr"><div class="card-ttl">🏠 آخر الوحدات</div><span class="card-lnk" onclick="goPage('units',document.querySelectorAll('.ni')[1])">عرض الكل ←</span></div><div id="d-units"><div class="ld"><div class="sp"></div></div></div></div>
-          <div class="card"><div class="card-hdr"><div class="card-ttl">👥 آخر المستأجرين</div><span class="card-lnk" onclick="goPage('tenants',document.querySelectorAll('.ni')[2])">عرض الكل ←</span></div><div id="d-tenants"><div class="ld"><div class="sp"></div></div></div></div>
-        </div>
+        <div class="sec-div"><div class="sec-div-line"></div><div class="sec-div-txt">وحدات تنتهي عقودها قريباً 🔔</div><div class="sec-div-line"></div></div>
+        <div id="expiring-list"><div class="ld"><div class="sp"></div></div></div>
+        <div class="sec-div"><div class="sec-div-line"></div><div class="sec-div-txt">المتأخرون في الدفع 🔴</div><div class="sec-div-line"></div></div>
+        <div id="late-list"><div class="ld"><div class="sp"></div></div></div>
       </div>
 
-      <!-- Units -->
+      <!-- BUILDINGS -->
+      <div class="page" id="pg-buildings">
+        <div class="pg-hdr">
+          <div><div class="bc">الرئيسية</div><div class="pg-title">عقاراتي 🏢</div></div>
+          <div class="pg-actions"><button class="btn btn-p" onclick="openOv('ov-building')">+ إضافة عقار</button></div>
+        </div>
+        <div id="buildings-list"><div class="ld"><div class="sp"></div></div></div>
+      </div>
+
+      <!-- UNITS VIEW (inside building) -->
       <div class="page" id="pg-units">
         <div class="pg-hdr">
-          <div><div class="bc">الرئيسية</div><div class="pg-title">الوحدات</div></div>
-          <div class="pg-actions"><input class="sbar" placeholder="🔍 بحث..." id="u-src" oninput="fUnits()"><button class="btn btn-p" onclick="openOv('ov-unit')">+ إضافة</button></div>
+          <div><div class="bc" id="units-bc" style="cursor:pointer" onclick="goPage('buildings',document.querySelectorAll('.ni')[1])">← عقاراتي</div><div class="pg-title" id="units-title">الوحدات</div></div>
+          <div class="pg-actions">
+            <select class="sbar" id="units-filter" onchange="filterUnitsByStatus()" style="max-width:160px">
+              <option value="all">كل الوحدات</option>
+              <option value="rented">مؤجرة</option>
+              <option value="vacant">فارغة</option>
+              <option value="maintenance">صيانة</option>
+            </select>
+            <button class="btn btn-p" onclick="openOv('ov-unit')">+ إضافة وحدة</button>
+          </div>
         </div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>رقم الوحدة</th><th>الطابق</th><th>المساحة</th><th>الإيجار</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-units"><tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="units-grid" id="units-grid"></div>
       </div>
 
-      <!-- Tenants -->
-      <div class="page" id="pg-tenants">
-        <div class="pg-hdr">
-          <div><div class="bc">الرئيسية</div><div class="pg-title">المستأجرون</div></div>
-          <div class="pg-actions"><input class="sbar" placeholder="🔍 بحث..." id="t-src" oninput="fTenants()"><button class="btn btn-p" onclick="openOv('ov-tenant')">+ إضافة</button></div>
-        </div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الرقم القومي</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead><tbody id="tb-tenants"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-      </div>
-
-      <!-- Contracts -->
+      <!-- CONTRACTS -->
       <div class="page" id="pg-contracts">
-        <div class="pg-hdr">
-          <div><div class="bc">الرئيسية</div><div class="pg-title">العقود</div></div>
-          <div class="pg-actions"><button class="btn btn-p" onclick="fillCS();openOv('ov-contract')">+ إضافة عقد</button></div>
-        </div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-contracts"><tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">العقود 📄</div></div></div>
+        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>العقار</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody id="tb-contracts"><tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
       </div>
 
-      <!-- Payments -->
+      <!-- PAYMENTS -->
       <div class="page" id="pg-payments">
-        <div class="pg-hdr">
-          <div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل</div></div>
-          <div class="pg-actions"><button class="btn btn-p" onclick="fillPS();openOv('ov-payment')">+ تسجيل دفعة</button></div>
-        </div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل 💳</div></div><button class="btn btn-p" onclick="openOv('ov-payment')">+ تسجيل دفعة</button></div>
+        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
       </div>
 
-      <!-- Users -->
+      <!-- USERS -->
       <div class="page" id="pg-users">
         <div class="pg-hdr"><div><div class="pg-title">المستخدمون <span class="badge">Admin</span></div></div></div>
         <div class="uf">
@@ -409,42 +398,79 @@ select option{background:var(--bg2)}
     </div>
   </div>
 
-  <!-- BOTTOM NAV (mobile) -->
+  <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <div class="bn-items">
-      <div class="bn-item on" id="bn-dash" onclick="goPage('dash',document.querySelectorAll('.ni')[0]);setBN('dash')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        الرئيسية
-      </div>
-      <div class="bn-item" id="bn-units" onclick="goPage('units',document.querySelectorAll('.ni')[1]);setBN('units')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        الوحدات
-      </div>
-      <div class="bn-item" id="bn-tenants" onclick="goPage('tenants',document.querySelectorAll('.ni')[2]);setBN('tenants')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        المستأجرون
-      </div>
-      <div class="bn-item" id="bn-contracts" onclick="goPage('contracts',document.querySelectorAll('.ni')[3]);setBN('contracts')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        العقود
-      </div>
-      <div class="bn-item" id="bn-payments" onclick="goPage('payments',document.querySelectorAll('.ni')[4]);setBN('payments')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        التحصيل
-      </div>
+      <div class="bn-item on" id="bn-dash" onclick="goPage('dash',document.querySelectorAll('.ni')[0]);setBN('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>الرئيسية</div>
+      <div class="bn-item" id="bn-buildings" onclick="goPage('buildings',document.querySelectorAll('.ni')[1]);setBN('buildings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>عقاراتي</div>
+      <div class="bn-item" id="bn-contracts" onclick="goPage('contracts',document.querySelectorAll('.ni')[2]);setBN('contracts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
+      <div class="bn-item" id="bn-payments" onclick="goPage('payments',document.querySelectorAll('.ni')[3]);setBN('payments')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
     </div>
   </div>
-
 </div>
 
 <!-- MODALS -->
-<div class="ov" id="ov-unit"><div class="modal"><div class="modal-ttl">🏠 إضافة وحدة جديدة</div><div class="fg"><div class="fgi"><label>رقم الوحدة *</label><input id="u-num" placeholder="301"></div><div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="3"></div><div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number" placeholder="85"></div><div class="fgi"><label>الإيجار (ج/شهر)</label><input id="u-rn" type="number" placeholder="5000"></div><div class="fgi full"><label>الحالة</label><select id="u-st"><option value="vacant">فارغة</option><option value="rented">مؤجرة</option><option value="maintenance">صيانة</option></select></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-unit')">إلغاء</button><button class="btn btn-p" onclick="addUnit()">حفظ</button></div></div></div>
+<!-- Building Modal -->
+<div class="ov" id="ov-building">
+  <div class="modal">
+    <div class="modal-ttl">🏢 إضافة عقار جديد</div>
+    <div class="fg">
+      <div class="fgi full"><label>اسم العقار *</label><input id="b-name" placeholder="مثال: عمارة النيل، فيلا الزهراء..."></div>
+      <div class="fgi full"><label>العنوان</label><input id="b-addr" placeholder="مثال: شارع الجمهورية، القاهرة"></div>
+      <div class="fgi"><label>عدد الطوابق</label><input id="b-floors" type="number" placeholder="5" min="1"></div>
+      <div class="fgi"><label>نوع العقار</label><select id="b-type"><option value="apartment">عمارة سكنية</option><option value="villa">فيلا</option><option value="commercial">تجاري</option><option value="other">أخرى</option></select></div>
+      <div class="fgi full"><label>ملاحظات</label><textarea id="b-notes" placeholder="أي معلومات إضافية..."></textarea></div>
+    </div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-building')">إلغاء</button><button class="btn btn-p" onclick="addBuilding()">حفظ العقار</button></div>
+  </div>
+</div>
 
-<div class="ov" id="ov-tenant"><div class="modal"><div class="modal-ttl">👤 إضافة مستأجر</div><div class="fg"><div class="fgi full"><label>الاسم الكامل *</label><input id="t-nm" placeholder="محمد أحمد علي"></div><div class="fgi"><label>الهاتف</label><input id="t-ph" placeholder="01012345678"></div><div class="fgi"><label>الرقم القومي</label><input id="t-ni" placeholder="29001011234567"></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-tenant')">إلغاء</button><button class="btn btn-p" onclick="addTenant()">حفظ</button></div></div></div>
+<!-- Unit Modal -->
+<div class="ov" id="ov-unit">
+  <div class="modal">
+    <div class="modal-ttl" id="unit-modal-title">🏠 إضافة وحدة جديدة</div>
+    <input type="hidden" id="u-id">
+    <div class="fg">
+      <div class="fgi"><label>رقم الوحدة / الشقة *</label><input id="u-num" placeholder="مثال: 101، شقة أ..."></div>
+      <div class="fgi"><label>الطابق</label><input id="u-fl" placeholder="مثال: الأول، 3..."></div>
+      <div class="fgi"><label>المساحة (م²)</label><input id="u-ar" type="number" placeholder="120"></div>
+      <div class="fgi"><label>الإيجار الشهري (ج)</label><input id="u-rn" type="number" placeholder="5000"></div>
+      <div class="fgi full"><label>الحالة</label><select id="u-st" onchange="toggleTenantFields()"><option value="vacant">🔑 فارغة — متاحة للإيجار</option><option value="rented">✅ مؤجرة</option><option value="maintenance">🔧 تحت الصيانة</option></select></div>
 
-<div class="ov" id="ov-contract"><div class="modal"><div class="modal-ttl">📄 إضافة عقد</div><div class="fg"><div class="fgi full"><label>المستأجر *</label><select id="c-tn"><option value="">اختر...</option></select></div><div class="fgi full"><label>الوحدة *</label><select id="c-un"><option value="">اختر...</option></select></div><div class="fgi"><label>الإيجار (ج) *</label><input id="c-rn" type="number"></div><div class="fgi"><label>الحالة</label><select id="c-st"><option value="active">نشط</option><option value="expired">منتهي</option><option value="cancelled">ملغي</option></select></div><div class="fgi"><label>تاريخ البداية *</label><input id="c-sd" type="date"></div><div class="fgi"><label>تاريخ النهاية *</label><input id="c-ed" type="date"></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-contract')">إلغاء</button><button class="btn btn-p" onclick="addContract()">حفظ</button></div></div></div>
+      <!-- Tenant fields (shown when rented) -->
+      <div id="tenant-fields" style="display:none;grid-column:1/-1">
+        <div class="sec-div" style="margin:8px 0 12px"><div class="sec-div-line"></div><div class="sec-div-txt">بيانات المستأجر</div><div class="sec-div-line"></div></div>
+        <div class="fg">
+          <div class="fgi full"><label>اسم المستأجر *</label><input id="u-tname" placeholder="محمد أحمد علي"></div>
+          <div class="fgi"><label>رقم هاتف المستأجر</label><input id="u-tphone" placeholder="01012345678" type="tel"></div>
+          <div class="fgi"><label>الرقم القومي</label><input id="u-tnid" placeholder="29001011234567"></div>
+          <div class="fgi"><label>تاريخ بداية العقد</label><input id="u-tstart" type="date"></div>
+          <div class="fgi"><label>تاريخ نهاية العقد</label><input id="u-tend" type="date"></div>
+          <div class="fgi"><label>الإيجار المتفق عليه (ج)</label><input id="u-trent" type="number" placeholder="5000"></div>
+          <div class="fgi full"><label>هل عليه متأخرات؟</label><select id="u-tlate"><option value="no">لا — ملتزم بالدفع</option><option value="yes">نعم — عليه متأخرات</option></select></div>
+          <div class="fgi full" id="late-amount-wrap" style="display:none"><label>مبلغ المتأخرات (ج)</label><input id="u-tlate-amt" type="number" placeholder="3000"></div>
+          <div class="fgi full"><label>ملاحظات</label><textarea id="u-tnotes" placeholder="أي ملاحظات على المستأجر..."></textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-unit');clearUnitForm()">إلغاء</button><button class="btn btn-p" onclick="saveUnit()">حفظ الوحدة</button></div>
+  </div>
+</div>
 
-<div class="ov" id="ov-payment"><div class="modal"><div class="modal-ttl">💳 تسجيل دفعة</div><div class="fg"><div class="fgi full"><label>العقد *</label><select id="p-ct"><option value="">اختر...</option></select></div><div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number"></div><div class="fgi"><label>تاريخ الدفع *</label><input id="p-dt" type="date"></div><div class="fgi full"><label>الحالة</label><select id="p-st"><option value="paid">مدفوع</option><option value="pending">معلق</option><option value="late">متأخر</option></select></div></div><div class="fa"><button class="btn btn-g2" onclick="closeOv('ov-payment')">إلغاء</button><button class="btn btn-p" onclick="addPayment()">حفظ</button></div></div></div>
+<!-- Payment Modal -->
+<div class="ov" id="ov-payment">
+  <div class="modal">
+    <div class="modal-ttl">💳 تسجيل دفعة</div>
+    <div class="fg">
+      <div class="fgi full"><label>الوحدة *</label><select id="p-unit"><option value="">اختر وحدة مؤجرة...</option></select></div>
+      <div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number"></div>
+      <div class="fgi"><label>تاريخ الدفع *</label><input id="p-dt" type="date"></div>
+      <div class="fgi full"><label>الحالة</label><select id="p-st"><option value="paid">✅ مدفوع</option><option value="pending">⏳ معلق</option><option value="late">🔴 متأخر</option></select></div>
+      <div class="fgi full"><label>ملاحظة</label><input id="p-note" placeholder="اختياري..."></div>
+    </div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-payment')">إلغاء</button><button class="btn btn-p" onclick="addPayment()">حفظ</button></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -455,7 +481,7 @@ const ADMIN='mahmoudabdelaalaboalsaoud@gmail.com';
 const REDIRECT='https://iigari.vercel.app/iigari.html';
 const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
-let CU=null,isAdm=false,AU=[],AT=[],AC=[],AP=[],USERS=[],curF='all';
+let CU=null,isAdm=false,BUILDINGS=[],ALL_UNITS=[],CONTRACTS=[],PAYMENTS=[],USERS=[],curBuildingId=null,curF='all';
 
 // THEME
 const savedTheme=localStorage.getItem('iigari-theme')||'light';
@@ -481,14 +507,10 @@ function toggleTheme(){
   document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
 }
 
-// SIDEBAR MOBILE
 function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  const hb=document.getElementById('hamburger');
-  const ov=document.getElementById('sb-overlay');
-  sb.classList.toggle('open');
-  hb.classList.toggle('open');
-  ov.classList.toggle('show');
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('show');
 }
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
@@ -516,11 +538,12 @@ function enterApp(user){
   document.getElementById('u-nm').textContent=name;
   document.getElementById('u-mini-nm').textContent=name;
   document.getElementById('u-rl').textContent=isAdm?'Admin ⚡':'عضو';
-  const av=document.getElementById('u-av');
-  const mav=document.getElementById('u-mini-av');
   const pic=user.user_metadata?.avatar_url||user.user_metadata?.picture;
-  if(pic){av.innerHTML=`<img src="${pic}" alt="">`;mav.innerHTML=`<img src="${pic}" alt="">`;}
-  else{av.textContent=name.charAt(0).toUpperCase();mav.textContent=name.charAt(0).toUpperCase();}
+  ['u-av','u-mini-av'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(pic) el.innerHTML=`<img src="${pic}" alt="">`;
+    else el.textContent=name.charAt(0).toUpperCase();
+  });
   if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';}
   loadAll();
 }
@@ -562,6 +585,8 @@ function goPage(pg,el){
   document.getElementById('pg-'+pg).classList.add('on');
   if(el) el.classList.add('on');
   if(pg==='users') loadUsers();
+  if(pg==='contracts') renderContracts();
+  if(pg==='payments') renderPayments();
   closeSidebar();
 }
 function setBN(pg){
@@ -588,95 +613,292 @@ function sl(s){
   return`<span class="pill p-${c[s]||'b'}">${i[s]||''} ${m[s]||s}</span>`;
 }
 
-async function loadAll(){await Promise.all([loadUnits(),loadTenants(),loadContracts(),loadPayments()]);loadDash();}
+function daysLeft(dateStr){
+  if(!dateStr) return null;
+  const diff=Math.ceil((new Date(dateStr)-new Date())/(1000*60*60*24));
+  return diff;
+}
 
-async function loadUnits(){
+function daysLeftBadge(dateStr){
+  const d=daysLeft(dateStr);
+  if(d===null) return '';
+  if(d<0) return`<span class="days-left danger">منتهي منذ ${Math.abs(d)} يوم</span>`;
+  if(d<=30) return`<span class="days-left warn">⚠️ ${d} يوم متبقي</span>`;
+  if(d<=90) return`<span class="days-left warn">${d} يوم متبقي</span>`;
+  return`<span class="days-left ok">${d} يوم متبقي</span>`;
+}
+
+async function loadAll(){
+  await loadBuildings();
+  await loadUnitsAll();
+  await loadPaymentsData();
+  loadDash();
+}
+
+// ── BUILDINGS ──
+async function loadBuildings(){
+  let q=db.from('properties').select('*').order('created_at',{ascending:false});
+  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
+  const{data}=await q;
+  BUILDINGS=data||[];
+  renderBuildings();
+}
+
+function renderBuildings(){
+  const list=document.getElementById('buildings-list');
+  if(!BUILDINGS.length){
+    list.innerHTML='<div class="empty"><div class="ei">🏢</div><div class="et">لا توجد عقارات بعد</div><div style="margin-top:12px"><button class="btn btn-p" onclick="openOv(\'ov-building\')">+ أضف أول عقار</button></div></div>';
+    return;
+  }
+  list.innerHTML='<div class="buildings-grid">'+BUILDINGS.map(b=>{
+    const units=ALL_UNITS.filter(u=>u.property_id===b.id);
+    const rented=units.filter(u=>u.status==='rented').length;
+    const vacant=units.filter(u=>u.status==='vacant').length;
+    const typeMap={apartment:'🏢 عمارة سكنية',villa:'🏡 فيلا',commercial:'🏪 تجاري',other:'🏠 أخرى'};
+    return`<div class="building-card">
+      <div class="building-header">
+        <div class="building-name">${b.name}</div>
+        <div class="building-addr">${typeMap[b.type]||'🏠'} ${b.address||''}</div>
+        <div class="building-stats">
+          <div class="bstat"><div class="bstat-val">${units.length}</div><div class="bstat-lbl">وحدة</div></div>
+          <div class="bstat"><div class="bstat-val">${rented}</div><div class="bstat-lbl">مؤجرة</div></div>
+          <div class="bstat"><div class="bstat-val">${vacant}</div><div class="bstat-lbl">فارغة</div></div>
+        </div>
+      </div>
+      <div class="building-body">
+        <div class="building-actions">
+          <button class="btn btn-p" style="flex:1" onclick="viewBuilding('${b.id}','${b.name}')">عرض الوحدات 🏠</button>
+          <button class="btn btn-g btn-sm" onclick="deleteBuilding('${b.id}')">حذف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+async function addBuilding(){
+  const name=document.getElementById('b-name').value.trim();
+  if(!name){toast('اسم العقار مطلوب',true);return;}
+  const{error}=await db.from('properties').insert({
+    name,
+    address:document.getElementById('b-addr').value||null,
+    type:document.getElementById('b-type').value,
+    notes:document.getElementById('b-notes').value||null,
+    user_id:CU.id
+  });
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تمت إضافة العقار');closeOv('ov-building');
+  ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
+  await loadBuildings();renderBuildings();
+}
+
+async function deleteBuilding(id){
+  if(!confirm('حذف العقار وكل وحداته؟')) return;
+  await db.from('units').delete().eq('property_id',id);
+  await db.from('properties').delete().eq('id',id);
+  toast('تم الحذف');await loadAll();
+}
+
+function viewBuilding(id,name){
+  curBuildingId=id;
+  document.getElementById('units-title').textContent=name+' 🏠';
+  goPage('units',document.querySelectorAll('.ni')[1]);
+  renderUnitsForBuilding(id);
+}
+
+// ── UNITS ──
+async function loadUnitsAll(){
   let q=db.from('units').select('*').order('created_at',{ascending:false});
   if(!isAdm&&CU) q=q.eq('user_id',CU.id);
-  const{data}=await q;AU=data||[];renderUnits(AU);
+  const{data}=await q;
+  ALL_UNITS=data||[];
 }
-function renderUnits(u){
-  const tb=document.getElementById('tb-units');
-  if(!u.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">🏠</div><div class="et">لا توجد وحدات</div></div></td></tr>';return;}
-  tb.innerHTML=u.map(x=>`<tr><td class="td-m">${x.unit_number}</td><td>${x.floor||'—'}</td><td>${x.area_sqm?x.area_sqm+' م²':'—'}</td><td>${x.rent_price?Number(x.rent_price).toLocaleString('ar-EG')+' ج':'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delUnit('${x.id}')">حذف</button></td></tr>`).join('');
+
+function renderUnitsForBuilding(buildingId){
+  const filter=document.getElementById('units-filter')?.value||'all';
+  let units=ALL_UNITS.filter(u=>u.property_id===buildingId);
+  if(filter!=='all') units=units.filter(u=>u.status===filter);
+  const grid=document.getElementById('units-grid');
+  if(!units.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">🏠</div><div class="et">لا توجد وحدات — أضف أول وحدة</div></div>';
+    return;
+  }
+  grid.innerHTML=units.map(u=>{
+    const dl=daysLeft(u.contract_end);
+    const hasLate=u.late_amount>0;
+    return`<div class="unit-card ${u.status}">
+      <div class="unit-top">
+        <div><div class="unit-num">وحدة ${u.unit_number}</div><div class="unit-floor">${u.floor?'الطابق: '+u.floor:''}</div></div>
+        ${sl(u.status)}
+      </div>
+      <div class="unit-body">
+        ${u.area_sqm?`<div class="unit-row"><span class="unit-row-lbl">المساحة</span><span class="unit-row-val">${u.area_sqm} م²</span></div>`:''}
+        ${u.rent_price?`<div class="unit-row"><span class="unit-row-lbl">الإيجار</span><span class="unit-row-val">${Number(u.rent_price).toLocaleString('ar-EG')} ج/شهر</span></div>`:''}
+        ${u.status==='rented'&&u.tenant_name?`<div class="unit-row"><span class="unit-row-lbl">المستأجر</span><span class="unit-row-val">${u.tenant_name}</span></div>`:''}
+        ${u.status==='rented'&&u.tenant_phone?`<div class="unit-row"><span class="unit-row-lbl">الهاتف</span><span class="unit-row-val">${u.tenant_phone}</span></div>`:''}
+        ${u.status==='rented'&&u.contract_end?`<div class="unit-row"><span class="unit-row-lbl">نهاية العقد</span><span class="unit-row-val">${new Date(u.contract_end).toLocaleDateString('ar-EG')}</span></div>`:''}
+        ${u.status==='rented'&&u.contract_end?`<div class="unit-row"><span class="unit-row-lbl">المتبقي</span><span class="unit-row-val">${daysLeftBadge(u.contract_end)}</span></div>`:''}
+        ${hasLate?`<div class="alert-row">⚠️ متأخرات: ${Number(u.late_amount).toLocaleString('ar-EG')} ج</div>`:''}
+      </div>
+      <div class="unit-footer">
+        <button class="btn btn-g btn-sm" onclick="editUnit('${u.id}')">✏️ تعديل</button>
+        <button class="btn btn-red btn-sm" onclick="deleteUnit('${u.id}')">حذف</button>
+        ${u.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${u.tenant_phone}')">💬 واتساب</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
-function fUnits(){const q=document.getElementById('u-src').value.toLowerCase();renderUnits(AU.filter(u=>u.unit_number.toLowerCase().includes(q)));}
-async function addUnit(){
+
+function filterUnitsByStatus(){
+  if(curBuildingId) renderUnitsForBuilding(curBuildingId);
+}
+
+function openWhatsApp(phone){
+  const clean=phone.replace(/[^0-9]/g,'');
+  const intl=clean.startsWith('0')?'2'+clean:clean;
+  window.open(`https://wa.me/${intl}`,'_blank');
+}
+
+function toggleTenantFields(){
+  const st=document.getElementById('u-st').value;
+  document.getElementById('tenant-fields').style.display=st==='rented'?'block':'none';
+}
+document.getElementById('u-tlate')?.addEventListener('change',function(){
+  document.getElementById('late-amount-wrap').style.display=this.value==='yes'?'flex':'none';
+});
+
+function clearUnitForm(){
+  ['u-id','u-num','u-fl','u-ar','u-rn','u-tname','u-tphone','u-tnid','u-tstart','u-tend','u-trent','u-tlate-amt','u-tnotes'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('u-st').value='vacant';
+  document.getElementById('u-tlate').value='no';
+  document.getElementById('tenant-fields').style.display='none';
+  document.getElementById('late-amount-wrap').style.display='none';
+  document.getElementById('unit-modal-title').textContent='🏠 إضافة وحدة جديدة';
+}
+
+async function saveUnit(){
+  const uid=document.getElementById('u-id').value;
   const num=document.getElementById('u-num').value.trim();
+  const status=document.getElementById('u-st').value;
   if(!num){toast('رقم الوحدة مطلوب',true);return;}
-  const{error}=await db.from('units').insert({unit_number:num,floor:document.getElementById('u-fl').value||null,area_sqm:document.getElementById('u-ar').value||null,rent_price:document.getElementById('u-rn').value||null,status:document.getElementById('u-st').value,user_id:CU.id});
-  if(error){toast('خطأ: '+error.message,true);return;}
-  toast('تمت إضافة الوحدة');closeOv('ov-unit');
-  ['u-num','u-fl','u-ar','u-rn'].forEach(id=>document.getElementById(id).value='');
-  await loadUnits();loadDash();
-}
-async function delUnit(id){if(!confirm('حذف الوحدة؟'))return;await db.from('units').delete().eq('id',id);toast('تم الحذف');await loadUnits();loadDash();}
+  if(!curBuildingId){toast('اختر العقار أولاً',true);return;}
 
-async function loadTenants(){
-  let q=db.from('tenants').select('*').order('created_at',{ascending:false});
-  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
-  const{data}=await q;AT=data||[];renderTenants(AT);
-}
-function renderTenants(t){
-  const tb=document.getElementById('tb-tenants');
-  if(!t.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">👥</div><div class="et">لا يوجد مستأجرون</div></div></td></tr>';return;}
-  tb.innerHTML=t.map(x=>`<tr><td class="td-m">${x.name}</td><td>${x.phone||'—'}</td><td>${x.national_id||'—'}</td><td>${new Date(x.created_at).toLocaleDateString('ar-EG')}</td><td><button class="abtn del" onclick="delTenant('${x.id}')">حذف</button></td></tr>`).join('');
-}
-function fTenants(){const q=document.getElementById('t-src').value.toLowerCase();renderTenants(AT.filter(t=>t.name.toLowerCase().includes(q)||(t.phone||'').includes(q)));}
-async function addTenant(){
-  const name=document.getElementById('t-nm').value.trim();
-  if(!name){toast('الاسم مطلوب',true);return;}
-  const{error}=await db.from('tenants').insert({name,phone:document.getElementById('t-ph').value||null,national_id:document.getElementById('t-ni').value||null,user_id:CU.id});
-  if(error){toast('خطأ: '+error.message,true);return;}
-  toast('تمت إضافة المستأجر');closeOv('ov-tenant');
-  ['t-nm','t-ph','t-ni'].forEach(id=>document.getElementById(id).value='');
-  await loadTenants();loadDash();
-}
-async function delTenant(id){if(!confirm('حذف المستأجر؟'))return;await db.from('tenants').delete().eq('id',id);toast('تم الحذف');await loadTenants();}
+  const data={
+    unit_number:num,
+    floor:document.getElementById('u-fl').value||null,
+    area_sqm:document.getElementById('u-ar').value||null,
+    rent_price:document.getElementById('u-rn').value||null,
+    status,
+    user_id:CU.id,
+    property_id:curBuildingId,
+    tenant_name:status==='rented'?document.getElementById('u-tname').value||null:null,
+    tenant_phone:status==='rented'?document.getElementById('u-tphone').value||null:null,
+    tenant_nid:status==='rented'?document.getElementById('u-tnid').value||null:null,
+    contract_start:status==='rented'?document.getElementById('u-tstart').value||null:null,
+    contract_end:status==='rented'?document.getElementById('u-tend').value||null:null,
+    agreed_rent:status==='rented'?document.getElementById('u-trent').value||null:null,
+    has_late:status==='rented'&&document.getElementById('u-tlate').value==='yes',
+    late_amount:status==='rented'&&document.getElementById('u-tlate').value==='yes'?document.getElementById('u-tlate-amt').value||0:0,
+    notes:document.getElementById('u-tnotes').value||null,
+  };
 
-async function loadContracts(){
-  const{data}=await db.from('contracts').select('*,units(unit_number),tenants(name)').order('created_at',{ascending:false});
-  AC=data||[];renderContracts(AC);
-}
-function renderContracts(c){
-  const tb=document.getElementById('tb-contracts');
-  if(!c.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📄</div><div class="et">لا توجد عقود</div></div></td></tr>';return;}
-  tb.innerHTML=c.map(x=>`<tr><td class="td-m">${x.tenants?.name||'—'}</td><td>${x.units?.unit_number||'—'}</td><td>${x.monthly_rent?Number(x.monthly_rent).toLocaleString('ar-EG')+' ج':'—'}</td><td>${x.start_date?new Date(x.start_date).toLocaleDateString('ar-EG'):'—'}</td><td>${x.end_date?new Date(x.end_date).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delContract('${x.id}')">حذف</button></td></tr>`).join('');
-}
-function fillCS(){
-  document.getElementById('c-tn').innerHTML='<option value="">اختر مستأجر...</option>'+AT.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
-  document.getElementById('c-un').innerHTML='<option value="">اختر وحدة...</option>'+AU.filter(u=>u.status==='vacant').map(u=>`<option value="${u.id}">${u.unit_number}</option>`).join('');
-}
-async function addContract(){
-  const tid=document.getElementById('c-tn').value,uid=document.getElementById('c-un').value,rent=document.getElementById('c-rn').value,sd=document.getElementById('c-sd').value,ed=document.getElementById('c-ed').value;
-  if(!tid||!uid||!rent||!sd||!ed){toast('أكمل جميع الحقول',true);return;}
-  const{error}=await db.from('contracts').insert({tenant_id:tid,unit_id:uid,monthly_rent:rent,start_date:sd,end_date:ed,status:document.getElementById('c-st').value});
+  let error;
+  if(uid){
+    ({error}=await db.from('units').update(data).eq('id',uid));
+  } else {
+    ({error}=await db.from('units').insert(data));
+  }
   if(error){toast('خطأ: '+error.message,true);return;}
-  await db.from('units').update({status:'rented'}).eq('id',uid);
-  toast('تمت إضافة العقد');closeOv('ov-contract');
-  await Promise.all([loadContracts(),loadUnits()]);loadDash();
+  toast(uid?'تم التعديل':'تمت إضافة الوحدة');
+  closeOv('ov-unit');clearUnitForm();
+  await loadUnitsAll();
+  renderUnitsForBuilding(curBuildingId);
+  renderBuildings();
+  loadDash();
 }
-async function delContract(id){if(!confirm('حذف العقد؟'))return;await db.from('contracts').delete().eq('id',id);toast('تم الحذف');await loadContracts();}
 
-async function loadPayments(){
-  const{data}=await db.from('payments').select('*,contracts(monthly_rent,tenants(name))').order('created_at',{ascending:false});
-  AP=data||[];renderPayments(AP);
+function editUnit(id){
+  const u=ALL_UNITS.find(x=>x.id===id);
+  if(!u) return;
+  document.getElementById('u-id').value=u.id;
+  document.getElementById('u-num').value=u.unit_number||'';
+  document.getElementById('u-fl').value=u.floor||'';
+  document.getElementById('u-ar').value=u.area_sqm||'';
+  document.getElementById('u-rn').value=u.rent_price||'';
+  document.getElementById('u-st').value=u.status||'vacant';
+  document.getElementById('u-tname').value=u.tenant_name||'';
+  document.getElementById('u-tphone').value=u.tenant_phone||'';
+  document.getElementById('u-tnid').value=u.tenant_nid||'';
+  document.getElementById('u-tstart').value=u.contract_start||'';
+  document.getElementById('u-tend').value=u.contract_end||'';
+  document.getElementById('u-trent').value=u.agreed_rent||'';
+  document.getElementById('u-tlate').value=u.has_late?'yes':'no';
+  document.getElementById('u-tlate-amt').value=u.late_amount||'';
+  document.getElementById('u-tnotes').value=u.notes||'';
+  document.getElementById('tenant-fields').style.display=u.status==='rented'?'block':'none';
+  document.getElementById('late-amount-wrap').style.display=u.has_late?'flex':'none';
+  document.getElementById('unit-modal-title').textContent='✏️ تعديل الوحدة';
+  openOv('ov-unit');
 }
-function renderPayments(p){
+
+async function deleteUnit(id){
+  if(!confirm('حذف الوحدة؟')) return;
+  await db.from('units').delete().eq('id',id);
+  toast('تم الحذف');
+  await loadUnitsAll();
+  renderUnitsForBuilding(curBuildingId);
+  renderBuildings();loadDash();
+}
+
+// ── PAYMENTS ──
+async function loadPaymentsData(){
+  const{data}=await db.from('payments').select('*').order('created_at',{ascending:false});
+  PAYMENTS=data||[];
+  renderPayments();
+}
+
+function renderPayments(){
   const tb=document.getElementById('tb-payments');
-  if(!p.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">💳</div><div class="et">لا توجد مدفوعات</div></div></td></tr>';return;}
-  tb.innerHTML=p.map(x=>`<tr><td class="td-m">${x.contracts?.tenants?.name||'—'}</td><td>${x.amount?Number(x.amount).toLocaleString('ar-EG')+' ج':'—'}</td><td>${x.paid_at?new Date(x.paid_at).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(x.status)}</td><td><button class="abtn del" onclick="delPayment('${x.id}')">حذف</button></td></tr>`).join('');
+  if(!PAYMENTS.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">💳</div><div class="et">لا توجد مدفوعات</div></div></td></tr>';return;}
+  tb.innerHTML=PAYMENTS.map(p=>{
+    const unit=ALL_UNITS.find(u=>u.id===p.unit_id);
+    return`<tr><td class="td-m">${unit?.tenant_name||'—'}</td><td>${p.amount?Number(p.amount).toLocaleString('ar-EG')+' ج':'—'}</td><td>${p.paid_at?new Date(p.paid_at).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(p.status)}</td><td>${p.note||'—'}</td></tr>`;
+  }).join('');
 }
-function fillPS(){document.getElementById('p-ct').innerHTML='<option value="">اختر عقد...</option>'+AC.map(c=>`<option value="${c.id}">${c.tenants?.name||'عقد'} — ${c.units?.unit_number||''}</option>`).join('');}
-async function addPayment(){
-  const cid=document.getElementById('p-ct').value,am=document.getElementById('p-am').value,dt=document.getElementById('p-dt').value;
-  if(!cid||!am||!dt){toast('أكمل جميع الحقول',true);return;}
-  const{error}=await db.from('payments').insert({contract_id:cid,amount:am,paid_at:dt,status:document.getElementById('p-st').value});
-  if(error){toast('خطأ: '+error.message,true);return;}
-  toast('تم تسجيل الدفعة');closeOv('ov-payment');await loadPayments();
-}
-async function delPayment(id){if(!confirm('حذف الدفعة؟'))return;await db.from('payments').delete().eq('id',id);toast('تم الحذف');await loadPayments();}
 
+function fillPaymentUnits(){
+  const rentedUnits=ALL_UNITS.filter(u=>u.status==='rented');
+  document.getElementById('p-unit').innerHTML='<option value="">اختر وحدة مؤجرة...</option>'+rentedUnits.map(u=>{
+    const b=BUILDINGS.find(x=>x.id===u.property_id);
+    return`<option value="${u.id}">${u.tenant_name||'—'} — ${b?.name||''} وحدة ${u.unit_number}</option>`;
+  }).join('');
+}
+
+async function addPayment(){
+  const uid=document.getElementById('p-unit').value,am=document.getElementById('p-am').value,dt=document.getElementById('p-dt').value;
+  if(!uid||!am||!dt){toast('أكمل جميع الحقول',true);return;}
+  const{error}=await db.from('payments').insert({unit_id:uid,amount:am,paid_at:dt,status:document.getElementById('p-st').value,note:document.getElementById('p-note').value||null,user_id:CU.id});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم تسجيل الدفعة');closeOv('ov-payment');
+  await loadPaymentsData();
+}
+
+// ── CONTRACTS VIEW ──
+function renderContracts(){
+  const tb=document.getElementById('tb-contracts');
+  const rentedUnits=ALL_UNITS.filter(u=>u.status==='rented'&&u.tenant_name);
+  if(!rentedUnits.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">📄</div><div class="et">لا توجد عقود</div></div></td></tr>';return;}
+  tb.innerHTML=rentedUnits.map(u=>{
+    const b=BUILDINGS.find(x=>x.id===u.property_id);
+    const d=daysLeft(u.contract_end);
+    const st=d===null?'—':d<0?`<span class="pill p-r">⏰ منتهي</span>`:d<=30?`<span class="pill p-a">⚠️ ${d} يوم</span>`:`<span class="pill p-g">✅ ${d} يوم</span>`;
+    return`<tr><td class="td-m">${u.tenant_name||'—'}</td><td>وحدة ${u.unit_number}</td><td>${b?.name||'—'}</td><td>${u.agreed_rent?Number(u.agreed_rent).toLocaleString('ar-EG')+' ج':'—'}</td><td>${u.contract_start?new Date(u.contract_start).toLocaleDateString('ar-EG'):'—'}</td><td>${u.contract_end?new Date(u.contract_end).toLocaleDateString('ar-EG'):'—'}</td><td>${st}</td><td>${u.has_late?`<span class="pill p-r">⚠️ ${Number(u.late_amount).toLocaleString('ar-EG')} ج</span>`:'<span class="pill p-g">✅ ملتزم</span>'}</td></tr>`;
+  }).join('');
+}
+
+// ── USERS ──
 async function loadUsers(){
   const{data}=await db.from('user_profiles').select('*').order('created_at',{ascending:false});
   USERS=data||[];
@@ -695,24 +917,77 @@ function renderUsers(users){
   if(!users.length){list.innerHTML='<div class="empty"><div class="ei">👥</div><div class="et">لا يوجد مستخدمون</div></div>';return;}
   list.innerHTML=users.map(u=>{
     const badge=u.status==='pending'?`<span class="bp bp-p">⏳ انتظار</span>`:u.status==='approved'?`<span class="bp bp-a">✅ موافق</span>`:`<span class="bp bp-r">❌ مرفوض</span>`;
-    const acts=u.status==='pending'?`<button class="btn-ok" onclick="approveU('${u.id}')">✓ موافقة</button><button class="btn-rj" onclick="rejectU('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn-rj" onclick="rejectU('${u.id}')">إلغاء</button>`:`<button class="btn-ok" onclick="approveU('${u.id}')">إعادة موافقة</button>`;
-    const pic=u.avatar_url;
-    return`<div class="uc"><div class="uc-av">${pic?`<img src="${pic}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}</div></div>`;
+    const acts=u.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">✓ موافقة</button><button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">إلغاء</button>`:`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">إعادة موافقة</button>`;
+    return`<div class="uc"><div class="uc-av">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}</div></div>`;
   }).join('');
 }
-async function approveU(id){await db.from('user_profiles').update({status:'approved'}).eq('id',id);toast('تمت الموافقة ✅');await loadUsers();fUsers(curF,null);}
+async function approveU(id){await db.from('user_profiles').update({status:'approved'}).eq('id',id);toast('تمت الموافقة');await loadUsers();fUsers(curF,null);}
 async function rejectU(id){await db.from('user_profiles').update({status:'rejected'}).eq('id',id);toast('تم الرفض');await loadUsers();fUsers(curF,null);}
 
+// ── DASHBOARD ──
 function loadDash(){
-  const tot=AU.length,ren=AU.filter(u=>u.status==='rented').length,vac=AU.filter(u=>u.status==='vacant').length;
-  document.getElementById('m1').textContent=tot;
-  document.getElementById('m2').textContent=ren;
-  document.getElementById('m3').textContent=vac;
-  document.getElementById('m4').textContent=AT.length;
-  document.getElementById('m2s').textContent=tot?`نسبة الإشغال ${Math.round(ren/tot*100)}%`:'0%';
-  document.getElementById('d-units').innerHTML=AU.length?AU.slice(0,5).map(u=>`<div class="mrow"><span class="td-m">${u.unit_number}</span>${sl(u.status)}</div>`).join(''):'<div class="empty"><div class="ei">🏠</div><div class="et">لا توجد وحدات</div></div>';
-  document.getElementById('d-tenants').innerHTML=AT.length?AT.slice(0,5).map(t=>`<div class="mrow"><span class="td-m">${t.name}</span><span style="font-size:12px;color:var(--text3)">${t.phone||'—'}</span></div>`).join(''):'<div class="empty"><div class="ei">👥</div><div class="et">لا يوجد مستأجرون</div></div>';
+  const totalBuildings=BUILDINGS.length;
+  const totalUnits=ALL_UNITS.length;
+  const rentedUnits=ALL_UNITS.filter(u=>u.status==='rented').length;
+  const occ=totalUnits?Math.round(rentedUnits/totalUnits*100):0;
+  const thisMonth=new Date().getMonth();
+  const monthIncome=PAYMENTS.filter(p=>p.status==='paid'&&new Date(p.paid_at).getMonth()===thisMonth).reduce((s,p)=>s+Number(p.amount||0),0);
+  const lateUnits=ALL_UNITS.filter(u=>u.has_late&&u.late_amount>0);
+  const totalLate=lateUnits.reduce((s,u)=>s+Number(u.late_amount||0),0);
+
+  document.getElementById('m1').textContent=totalBuildings;
+  document.getElementById('m2').textContent=totalUnits;
+  document.getElementById('m2s').textContent=`نسبة الإشغال ${occ}% — ${rentedUnits} مؤجرة`;
+  document.getElementById('m3').textContent=monthIncome.toLocaleString('ar-EG');
+  document.getElementById('m4').textContent=totalLate.toLocaleString('ar-EG');
+  document.getElementById('m4s').textContent=lateUnits.length>0?`${lateUnits.length} وحدة متأخرة`:'لا توجد متأخرات';
+
+  // Expiring contracts
+  const expiring=ALL_UNITS.filter(u=>u.status==='rented'&&u.contract_end).map(u=>({...u,dl:daysLeft(u.contract_end)})).filter(u=>u.dl!==null&&u.dl<=60).sort((a,b)=>a.dl-b.dl);
+  const expEl=document.getElementById('expiring-list');
+  if(!expiring.length){expEl.innerHTML='<div class="empty"><div class="ei">✅</div><div class="et">لا توجد عقود تنتهي قريباً</div></div>';}
+  else{
+    expEl.innerHTML='<div class="units-grid">'+expiring.slice(0,6).map(u=>{
+      const b=BUILDINGS.find(x=>x.id===u.property_id);
+      return`<div class="unit-card ${u.dl<=0?'rented':'rented'}" style="border-right-color:${u.dl<=0?'var(--red)':u.dl<=30?'var(--amber)':'var(--green)'}">
+        <div class="unit-top"><div><div class="unit-num">وحدة ${u.unit_number}</div><div class="unit-floor">${b?.name||''}</div></div>${daysLeftBadge(u.contract_end)}</div>
+        <div class="unit-body">
+          <div class="unit-row"><span class="unit-row-lbl">المستأجر</span><span class="unit-row-val">${u.tenant_name||'—'}</span></div>
+          <div class="unit-row"><span class="unit-row-lbl">نهاية العقد</span><span class="unit-row-val">${new Date(u.contract_end).toLocaleDateString('ar-EG')}</span></div>
+        </div>
+        <div class="unit-footer">
+          ${u.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${u.tenant_phone}')">💬 تواصل</button>`:''}
+          <button class="btn btn-g btn-sm" onclick="editUnit('${u.id}')">تجديد العقد</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+  }
+
+  // Late payments
+  const lateEl=document.getElementById('late-list');
+  if(!lateUnits.length){lateEl.innerHTML='<div class="empty"><div class="ei">✅</div><div class="et">لا توجد متأخرات</div></div>';}
+  else{
+    lateEl.innerHTML='<div class="units-grid">'+lateUnits.map(u=>{
+      const b=BUILDINGS.find(x=>x.id===u.property_id);
+      return`<div class="unit-card rented" style="border-right-color:var(--red)">
+        <div class="unit-top"><div><div class="unit-num">وحدة ${u.unit_number}</div><div class="unit-floor">${b?.name||''}</div></div><span class="pill p-r">⚠️ متأخر</span></div>
+        <div class="unit-body">
+          <div class="unit-row"><span class="unit-row-lbl">المستأجر</span><span class="unit-row-val">${u.tenant_name||'—'}</span></div>
+          <div class="unit-row"><span class="unit-row-lbl">المتأخرات</span><span class="unit-row-val" style="color:var(--red)">${Number(u.late_amount).toLocaleString('ar-EG')} ج</span></div>
+        </div>
+        <div class="unit-footer">
+          ${u.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${u.tenant_phone}')">💬 واتساب</button>`:''}
+          <button class="btn btn-g btn-sm" onclick="editUnit('${u.id}')">تعديل</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+  }
 }
+
+// Open payment modal with units filled
+document.getElementById('ov-payment').addEventListener('click',()=>{});
+const payBtn=document.querySelector('[onclick="openOv(\'ov-payment\')"]');
+function openPaymentModal(){fillPaymentUnits();openOv('ov-payment');}
 </script>
 </body>
 </html>

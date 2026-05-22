@@ -418,7 +418,7 @@ textarea{resize:vertical;min-height:80px}
       <div class="fgi full"><label>اسم العقار *</label><input id="b-name" placeholder="مثال: عمارة النيل، فيلا الزهراء..."></div>
       <div class="fgi full"><label>العنوان</label><input id="b-addr" placeholder="مثال: شارع الجمهورية، القاهرة"></div>
       <div class="fgi"><label>عدد الطوابق</label><input id="b-floors" type="number" placeholder="5" min="1"></div>
-      <div class="fgi"><label>نوع العقار</label><select id="b-type"><option value="apartment">عمارة سكنية</option><option value="villa">فيلا</option><option value="commercial">تجاري</option><option value="other">أخرى</option></select></div>
+      <div class="fgi"><label>نوع العقار</label><select id="b-type"><option value="apartment">🏢 عمارة سكنية</option><option value="house">🏠 بيت</option><option value="flat">🛏️ شقة</option><option value="villa">🏡 فيلا</option><option value="shop">🏪 محل تجاري</option><option value="land">🌿 أرض</option><option value="office">🏦 مكتب</option><option value="warehouse">🏭 مخزن / مستودع</option><option value="commercial">🏬 مبنى تجاري</option><option value="other">📦 أخرى</option></select></div>
       <div class="fgi full"><label>ملاحظات</label><textarea id="b-notes" placeholder="أي معلومات إضافية..."></textarea></div>
     </div>
     <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-building')">إلغاء</button><button class="btn btn-p" onclick="addBuilding()">حفظ العقار</button></div>
@@ -654,7 +654,7 @@ function renderBuildings(){
     const units=ALL_UNITS.filter(u=>u.property_id===b.id);
     const rented=units.filter(u=>u.status==='rented').length;
     const vacant=units.filter(u=>u.status==='vacant').length;
-    const typeMap={apartment:'🏢 عمارة سكنية',villa:'🏡 فيلا',commercial:'🏪 تجاري',other:'🏠 أخرى'};
+    const typeMap={apartment:'🏢 عمارة سكنية',house:'🏠 بيت',flat:'🛏️ شقة',villa:'🏡 فيلا',shop:'🏪 محل تجاري',land:'🌿 أرض',office:'🏦 مكتب',warehouse:'🏭 مخزن',commercial:'🏬 مبنى تجاري',other:'📦 أخرى'};
     return`<div class="building-card">
       <div class="building-header">
         <div class="building-name">${b.name}</div>

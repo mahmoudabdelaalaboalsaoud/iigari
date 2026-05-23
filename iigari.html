@@ -655,6 +655,41 @@ function renderBuildings(){
     const rented=units.filter(u=>u.status==='rented').length;
     const vacant=units.filter(u=>u.status==='vacant').length;
     const typeMap={apartment:'🏢 عمارة سكنية',house:'🏠 بيت',flat:'🛏️ شقة',villa:'🏡 فيلا',shop:'🏪 محل تجاري',land:'🌿 أرض',office:'🏦 مكتب',warehouse:'🏭 مخزن',commercial:'🏬 مبنى تجاري',other:'📦 أخرى'};
+    // أنواع وحدة واحدة
+    const singleUnit=['house','flat','shop','land','office','warehouse'];
+    const isSingle=singleUnit.includes(b.type);
+    const unit=isSingle?units[0]:null;
+    const hasLate=unit&&unit.late_amount>0;
+    if(isSingle){
+      // عرض مباشر لبيانات العقار كوحدة واحدة
+      return`<div class="building-card">
+        <div class="building-header">
+          <div class="building-name">${b.name}</div>
+          <div class="building-addr">${typeMap[b.type]||'🏠'} ${b.address||''}</div>
+          <div class="building-stats">
+            <div class="bstat"><div class="bstat-val">${unit?sl(unit.status):'—'}</div><div class="bstat-lbl">الحالة</div></div>
+            <div class="bstat"><div class="bstat-val">${unit?.rent_price?Number(unit.rent_price).toLocaleString('ar-EG')+' ج':'—'}</div><div class="bstat-lbl">الإيجار</div></div>
+          </div>
+        </div>
+        <div class="building-body">
+          ${unit&&unit.status==='rented'?`
+            <div style="font-size:13px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px">
+              ${unit.tenant_name?`<div class="unit-row"><span class="unit-row-lbl">المستأجر</span><span class="unit-row-val">${unit.tenant_name}</span></div>`:''}
+              ${unit.tenant_phone?`<div class="unit-row"><span class="unit-row-lbl">الهاتف</span><span class="unit-row-val">${unit.tenant_phone}</span></div>`:''}
+              ${unit.contract_end?`<div class="unit-row"><span class="unit-row-lbl">نهاية العقد</span><span class="unit-row-val">${new Date(unit.contract_end).toLocaleDateString('ar-EG')}</span></div>`:''}
+              ${unit.contract_end?`<div class="unit-row"><span class="unit-row-lbl">المتبقي</span><span class="unit-row-val">${daysLeftBadge(unit.contract_end)}</span></div>`:''}
+              ${hasLate?`<div class="alert-row">⚠️ متأخرات: ${Number(unit.late_amount).toLocaleString('ar-EG')} ج</div>`:''}
+            </div>`:
+            `<div style="color:var(--text3);font-size:13px;margin-bottom:10px">🔑 العقار فارغ — متاح للإيجار</div>`
+          }
+          <div class="building-actions">
+            <button class="btn btn-p" style="flex:1" onclick="editSingleUnit('${b.id}','${b.name}','${b.type}')">✏️ تعديل البيانات</button>
+            ${unit&&unit.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${unit.tenant_phone}')">💬</button>`:''}
+            <button class="btn btn-g btn-sm" onclick="deleteBuilding('${b.id}')">حذف</button>
+          </div>
+        </div>
+      </div>`;
+    }
     return`<div class="building-card">
       <div class="building-header">
         <div class="building-name">${b.name}</div>
@@ -675,20 +710,62 @@ function renderBuildings(){
   }).join('')+'</div>';
 }
 
+const SINGLE_TYPES=['house','flat','shop','land','office','warehouse'];
+
 async function addBuilding(){
   const name=document.getElementById('b-name').value.trim();
+  const type=document.getElementById('b-type').value;
   if(!name){toast('اسم العقار مطلوب',true);return;}
-  const{error}=await db.from('properties').insert({
+  const{data:prop,error}=await db.from('properties').insert({
     name,
     address:document.getElementById('b-addr').value||null,
-    type:document.getElementById('b-type').value,
+    type,
     notes:document.getElementById('b-notes').value||null,
     user_id:CU.id
-  });
+  }).select().single();
   if(error){toast('خطأ: '+error.message,true);return;}
+  // لو نوع وحدة واحدة — ننشئ وحدة تلقائياً
+  if(SINGLE_TYPES.includes(type)&&prop){
+    await db.from('units').insert({
+      property_id:prop.id,
+      unit_number:'1',
+      status:'vacant',
+      user_id:CU.id
+    });
+  }
   toast('تمت إضافة العقار');closeOv('ov-building');
   ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
-  await loadBuildings();renderBuildings();
+  await loadAll();
+}
+
+function editSingleUnit(buildingId,buildingName,buildingType){
+  // افتح modal الوحدة مباشرة للعقار ذو الوحدة الواحدة
+  curBuildingId=buildingId;
+  const unit=ALL_UNITS.find(u=>u.property_id===buildingId);
+  clearUnitForm();
+  if(unit){
+    document.getElementById('u-id').value=unit.id;
+    document.getElementById('u-num').value=unit.unit_number||'1';
+    document.getElementById('u-fl').value=unit.floor||'';
+    document.getElementById('u-ar').value=unit.area_sqm||'';
+    document.getElementById('u-rn').value=unit.rent_price||'';
+    document.getElementById('u-st').value=unit.status||'vacant';
+    document.getElementById('u-tname').value=unit.tenant_name||'';
+    document.getElementById('u-tphone').value=unit.tenant_phone||'';
+    document.getElementById('u-tnid').value=unit.tenant_nid||'';
+    document.getElementById('u-tstart').value=unit.contract_start||'';
+    document.getElementById('u-tend').value=unit.contract_end||'';
+    document.getElementById('u-trent').value=unit.agreed_rent||'';
+    document.getElementById('u-tlate').value=unit.has_late?'yes':'no';
+    document.getElementById('u-tlate-amt').value=unit.late_amount||'';
+    document.getElementById('u-tnotes').value=unit.notes||'';
+    document.getElementById('tenant-fields').style.display=unit.status==='rented'?'block':'none';
+    document.getElementById('late-amount-wrap').style.display=unit.has_late?'flex':'none';
+  }
+  // عنوان المودال حسب نوع العقار
+  const typeNames={house:'🏠 بيانات البيت',flat:'🛏️ بيانات الشقة',shop:'🏪 بيانات المحل',land:'🌿 بيانات الأرض',office:'🏦 بيانات المكتب',warehouse:'🏭 بيانات المخزن'};
+  document.getElementById('unit-modal-title').textContent=(typeNames[buildingType]||'✏️ تعديل العقار')+' — '+buildingName;
+  openOv('ov-unit');
 }
 
 async function deleteBuilding(id){

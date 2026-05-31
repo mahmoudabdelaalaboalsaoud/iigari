@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إيجاري — العقارات المتاحة للإيجار</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:100vh}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(79,70,229,.3)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:800}
+.logo-name{font-size:20px;font-weight:800;color:#fff}
+.header-links{display:flex;align-items:center;gap:12px}
+.btn-login{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-login:hover{background:rgba(255,255,255,.25)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:48px 24px;text-align:center;color:#fff}
+.hero h1{font-size:32px;font-weight:800;margin-bottom:10px}
+.hero p{font-size:16px;opacity:.85;margin-bottom:32px}
+.search-bar-wrap{max-width:600px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 16px;font-size:14px;color:#fff;font-family:'Cairo',sans-serif;outline:none}
+.search-input::placeholder{color:rgba(255,255,255,.6)}
+.search-input:focus{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.6)}
+
+/* FILTERS */
+.filters{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;position:sticky;top:64px;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.filters-inner{max-width:1200px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filter-lbl{font-size:12px;font-weight:700;color:#4a5568}
+.fsel{background:#f7f9fb;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;font-size:13px;font-family:'Cairo',sans-serif;color:#1a202c;outline:none;cursor:pointer}
+.fsel:focus{border-color:#4f46e5}
+.results-count{margin-right:auto;font-size:13px;color:#718096;font-weight:600}
+
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:24px}
+
+/* CARDS GRID */
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.listing-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:all .2s;border:1px solid #e2e8f0}
+.listing-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.12);transform:translateY(-3px)}
+.card-img{height:180px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.card-badge{position:absolute;top:12px;right:12px;background:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4f46e5}
+.card-body{padding:16px}
+.card-title{font-size:16px;font-weight:800;color:#1a202c;margin-bottom:4px}
+.card-addr{font-size:12px;color:#a0aec0;margin-bottom:12px;display:flex;align-items:center;gap:4px}
+.card-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.card-detail{background:#f7f9fb;border-radius:8px;padding:8px 10px}
+.cd-lbl{font-size:10px;color:#a0aec0;font-weight:600;margin-bottom:2px}
+.cd-val{font-size:13px;font-weight:700;color:#1a202c}
+.card-price{font-size:20px;font-weight:800;color:#4f46e5;margin-bottom:14px}
+.card-price span{font-size:13px;color:#a0aec0;font-weight:400}
+.card-footer{display:flex;gap:8px}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;background:#25d366;color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;text-decoration:none}
+.btn-wa:hover{background:#128c7e}
+.btn-request{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer}
+.btn-request:hover{opacity:.9}
+
+/* EMPTY */
+.empty{text-align:center;padding:80px 24px;color:#a0aec0}
+.empty-icon{font-size:64px;margin-bottom:16px}
+.empty-title{font-size:20px;font-weight:700;margin-bottom:8px;color:#4a5568}
+.empty-sub{font-size:14px}
+
+/* LOADING */
+.ld{display:flex;align-items:center;justify-content:center;padding:80px;color:#a0aec0;font-size:14px;gap:10px}
+.sp{width:20px;height:20px;border:3px solid #e2e8f0;border-top-color:#4f46e5;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:16px}
+.ov.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-ttl{font-size:20px;font-weight:800;margin-bottom:6px;color:#1a202c}
+.modal-sub{font-size:13px;color:#718096;margin-bottom:20px}
+.modal-prop{background:#f7f9fb;border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.modal-prop-icon{font-size:24px}
+.modal-prop-name{font-size:14px;font-weight:700;color:#1a202c}
+.modal-prop-addr{font-size:12px;color:#a0aec0}
+.fgi{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+label{font-size:12px;color:#4a5568;font-weight:700}
+input,textarea{background:#f7f9fb;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;font-size:13px;color:#1a202c;font-family:'Cairo',sans-serif;outline:none;width:100%}
+input:focus,textarea:focus{border-color:#4f46e5;background:#fff}
+input::placeholder,textarea::placeholder{color:#a0aec0}
+textarea{resize:vertical;min-height:80px}
+.fa{display:flex;gap:10px;margin-top:18px}
+.btn-submit{flex:1;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer}
+.btn-cancel{background:#f7f9fb;color:#718096;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer}
+.success-box{text-align:center;padding:20px 0}
+.success-icon{font-size:56px;margin-bottom:12px}
+.success-title{font-size:18px;font-weight:800;color:#16a34a;margin-bottom:6px}
+.success-sub{font-size:13px;color:#718096;margin-bottom:20px;line-height:1.7}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.toast.show{display:flex;align-items:center;gap:8px;animation:su .2s ease}
+@keyframes su{from{transform:translateX(-50%) translateY(10px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+
+/* FOOTER */
+.footer{background:#1a202c;color:#a0aec0;padding:32px 24px;margin-top:48px;text-align:center}
+.footer-logo{font-size:20px;font-weight:800;color:#fff;margin-bottom:8px}
+.footer-sub{font-size:13px;margin-bottom:16px}
+.footer-link{color:#4f46e5;text-decoration:none;font-weight:600}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .hero h1{font-size:24px}
+  .hero p{font-size:14px}
+  .listings-grid{grid-template-columns:1fr}
+  .header-links .btn-login span{display:none}
+  .filters-inner{gap:8px}
+  .search-bar-wrap{flex-direction:column}
+  .search-input{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">إ</div>
+      <div class="logo-name">إيجاري</div>
+    </a>
+    <div class="header-links">
+      <a class="btn-login" href="iigari.html">🔐 <span>دخول المالك</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🏠 عقارات متاحة للإيجار</h1>
+  <p>ابحث عن بيتك المناسب وسجل طلبك مباشرة</p>
+  <div class="search-bar-wrap">
+    <input class="search-input" id="search" placeholder="🔍 ابحث بالاسم أو المنطقة..." oninput="applyFilters()">
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="filters-inner">
+    <div class="filter-lbl">فلتر:</div>
+    <select class="fsel" id="f-type" onchange="applyFilters()">
+      <option value="">كل الأنواع</option>
+      <option value="apartment">🏢 عمارة</option>
+      <option value="house">🏠 بيت</option>
+      <option value="flat">🛏️ شقة</option>
+      <option value="villa">🏡 فيلا</option>
+      <option value="shop">🏪 محل</option>
+      <option value="office">🏦 مكتب</option>
+      <option value="other">📦 أخرى</option>
+    </select>
+    <select class="fsel" id="f-price" onchange="applyFilters()">
+      <option value="">كل الأسعار</option>
+      <option value="0-2000">أقل من 2,000 ج</option>
+      <option value="2000-5000">2,000 — 5,000 ج</option>
+      <option value="5000-10000">5,000 — 10,000 ج</option>
+      <option value="10000-99999">أكثر من 10,000 ج</option>
+    </select>
+    <div class="results-count" id="results-count"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div id="listings-container"><div class="ld"><div class="sp"></div> جاري تحميل العقارات...</div></div>
+</div>
+
+<!-- REQUEST MODAL -->
+<div class="ov" id="ov-request">
+  <div class="modal">
+    <div id="modal-content">
+      <div class="modal-ttl">📋 طلب إيجار</div>
+      <div class="modal-sub">أدخل بياناتك وهنتواصل معاك في أقرب وقت</div>
+      <div class="modal-prop" id="modal-prop-info"></div>
+      <div class="fgi"><label>الاسم الكامل *</label><input id="req-name" placeholder="محمد أحمد علي"></div>
+      <div class="fgi"><label>رقم الهاتف / واتساب *</label><input id="req-phone" placeholder="01012345678" type="tel"></div>
+      <div class="fgi"><label>ملاحظات أو أسئلة</label><textarea id="req-notes" placeholder="مثال: عايز أعرف أكتر عن العقار، متى ممكن أعمل معاينة..."></textarea></div>
+      <div class="fa">
+        <button class="btn-cancel" onclick="closeOv('ov-request')">إلغاء</button>
+        <button class="btn-submit" onclick="submitRequest()">إرسال الطلب 📨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo">● إيجاري</div>
+  <div class="footer-sub">منصة إدارة العقارات والإيجارات</div>
+  <div><a class="footer-link" href="iigari.html">دخول المالك ←</a></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://ptimioffmszhmpxxuqha.supabase.co';
+const SB_KEY='sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
+const {createClient}=supabase;
+const db=createClient(SB_URL,SB_KEY);
+
+let ALL_LISTINGS=[];
+let currentUnitId=null;
+
+const typeMap={apartment:'🏢 عمارة',house:'🏠 بيت',flat:'🛏️ شقة',villa:'🏡 فيلا',shop:'🏪 محل',land:'🌿 أرض',office:'🏦 مكتب',warehouse:'🏭 مخزن',commercial:'🏬 مبنى تجاري',other:'📦 أخرى'};
+const typeEmoji={apartment:'🏢',house:'🏠',flat:'🛏️',villa:'🏡',shop:'🏪',land:'🌿',office:'🏦',warehouse:'🏭',commercial:'🏬',other:'📦'};
+
+window.addEventListener('load', async()=>{
+  await loadListings();
+});
+
+async function loadListings(){
+  // جلب الوحدات الفارغة أو المدرجة للإيجار
+  const{data:units,error}=await db.from('units')
+    .select('*, properties(name, address, type, notes)')
+    .eq('status','vacant')
+    .order('created_at',{ascending:false});
+
+  if(error){
+    document.getElementById('listings-container').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">حدث خطأ</div><div class="empty-sub">تعذر تحميل العقارات</div></div>';
+    return;
+  }
+
+  // فلتر الوحدات اللي عندها property
+  ALL_LISTINGS=(units||[]).filter(u=>u.properties);
+  renderListings(ALL_LISTINGS);
+}
+
+function applyFilters(){
+  const search=document.getElementById('search').value.toLowerCase();
+  const fType=document.getElementById('f-type').value;
+  const fPrice=document.getElementById('f-price').value;
+
+  let filtered=ALL_LISTINGS.filter(u=>{
+    const prop=u.properties;
+    const matchSearch=!search||
+      prop.name?.toLowerCase().includes(search)||
+      prop.address?.toLowerCase().includes(search)||
+      prop.type?.toLowerCase().includes(search);
+    const matchType=!fType||prop.type===fType;
+    let matchPrice=true;
+    if(fPrice&&u.rent_price){
+      const [min,max]=fPrice.split('-').map(Number);
+      matchPrice=u.rent_price>=min&&u.rent_price<=max;
+    }
+    return matchSearch&&matchType&&matchPrice;
+  });
+  renderListings(filtered);
+}
+
+function renderListings(listings){
+  const container=document.getElementById('listings-container');
+  const count=document.getElementById('results-count');
+  count.textContent=`${listings.length} عقار متاح`;
+
+  if(!listings.length){
+    container.innerHTML=`<div class="empty">
+      <div class="empty-icon">🏠</div>
+      <div class="empty-title">لا توجد عقارات متاحة حالياً</div>
+      <div class="empty-sub">جرب تغيير الفلتر أو تعال لاحقاً</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML=`<div class="listings-grid">${listings.map(u=>{
+    const prop=u.properties;
+    const type=prop?.type||'other';
+    const emoji=typeEmoji[type]||'🏠';
+    const typeName=typeMap[type]||'عقار';
+    const price=u.listing_price||u.rent_price;
+    return`<div class="listing-card">
+      <div class="card-img">
+        <span style="font-size:72px">${emoji}</span>
+        <div class="card-badge">${typeName}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${prop?.name||'عقار متاح'}</div>
+        <div class="card-addr">📍 ${prop?.address||'العنوان غير محدد'}</div>
+        <div class="card-details">
+          ${u.area_sqm?`<div class="card-detail"><div class="cd-lbl">المساحة</div><div class="cd-val">${u.area_sqm} م²</div></div>`:''}
+          ${u.floor?`<div class="card-detail"><div class="cd-lbl">الطابق</div><div class="cd-val">${u.floor}</div></div>`:''}
+          ${u.unit_number?`<div class="card-detail"><div class="cd-lbl">رقم الوحدة</div><div class="cd-val">${u.unit_number}</div></div>`:''}
+        </div>
+        ${price?`<div class="card-price">${Number(price).toLocaleString('ar-EG')} ج <span>/ شهرياً</span></div>`:'<div class="card-price" style="color:#a0aec0">السعر عند التواصل</div>'}
+        ${u.listing_notes||prop?.notes?`<div style="font-size:12px;color:#718096;margin-bottom:12px;line-height:1.6">${u.listing_notes||prop?.notes}</div>`:''}
+        <div class="card-footer">
+          <button class="btn-request" onclick="openRequest('${u.id}','${(prop?.name||'').replace(/'/g,'')}\`','${emoji}','${prop?.address||''}')">📋 سجل طلبك</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openRequest(unitId, propName, emoji, addr){
+  currentUnitId=unitId;
+  document.getElementById('modal-prop-info').innerHTML=`
+    <div class="modal-prop-icon">${emoji}</div>
+    <div><div class="modal-prop-name">${propName}</div><div class="modal-prop-addr">📍 ${addr||'العنوان غير محدد'}</div></div>`;
+  document.getElementById('modal-content').querySelector('.modal-ttl').textContent='📋 طلب إيجار';
+  document.getElementById('req-name').value='';
+  document.getElementById('req-phone').value='';
+  document.getElementById('req-notes').value='';
+  document.getElementById('ov-request').classList.add('open');
+}
+
+function closeOv(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+async function submitRequest(){
+  const name=document.getElementById('req-name').value.trim();
+  const phone=document.getElementById('req-phone').value.trim();
+  const notes=document.getElementById('req-notes').value.trim();
+  if(!name||!phone){toast('أدخل الاسم ورقم الهاتف',true);return;}
+
+  const{error}=await db.from('rental_requests').insert({
+    unit_id:currentUnitId,
+    name,phone,notes,status:'new'
+  });
+  if(error){toast('خطأ: '+error.message,true);return;}
+
+  // عرض رسالة النجاح
+  document.getElementById('modal-content').innerHTML=`
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">تم إرسال طلبك!</div>
+      <div class="success-sub">شكراً ${name}!<br>طلبك وصل لصاحب العقار وهيتواصل معاك على<br><strong>${phone}</strong><br>في أقرب وقت.</div>
+      <button class="btn-submit" onclick="closeOv('ov-request')">حسناً ✓</button>
+    </div>`;
+}
+
+function toast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.innerHTML=`${err?'❌':'✅'} ${msg}`;
+  t.style.borderColor=err?'rgba(220,38,38,.3)':'rgba(22,163,74,.3)';
+  t.style.color=err?'#dc2626':'#16a34a';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>

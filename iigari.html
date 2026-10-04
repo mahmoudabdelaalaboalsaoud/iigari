@@ -495,6 +495,8 @@ textarea{resize:vertical;min-height:80px}
       <div class="fgi"><label>الإيجار الشهري (ج)</label><input id="u-rn" type="number" placeholder="5000"></div>
       <div class="fgi full"><label>الحالة</label><select id="u-st" onchange="toggleTenantFields()"><option value="vacant">🔑 فارغة — متاحة للإيجار</option><option value="rented">✅ مؤجرة</option><option value="maintenance">🔧 تحت الصيانة</option></select></div>
 
+      <div class="fgi full"><label>عرض في صفحة الإيجارات العامة؟</label><select id="u-list"><option value="no">🔒 لا — غير معروضة</option><option value="yes">🌐 نعم — تظهر للزوار (تعمل مع حالة "فارغة" فقط)</option></select></div>
+
       <!-- Tenant fields (shown when rented) -->
       <div id="tenant-fields" style="display:none;grid-column:1/-1">
         <div class="sec-div" style="margin:8px 0 12px"><div class="sec-div-line"></div><div class="sec-div-txt">بيانات المستأجر</div><div class="sec-div-line"></div></div>
@@ -862,6 +864,7 @@ function editSingleUnit(buildingId,buildingName,buildingType){
     document.getElementById('u-ar').value=unit.area_sqm||'';
     document.getElementById('u-rn').value=unit.rent_price||'';
     document.getElementById('u-st').value=unit.status||'vacant';
+    document.getElementById('u-list').value=unit.is_listed?'yes':'no';
     document.getElementById('u-tname').value=unit.tenant_name||'';
     document.getElementById('u-tphone').value=unit.tenant_phone||'';
     document.getElementById('u-tnid').value=unit.tenant_nid||'';
@@ -961,6 +964,7 @@ function clearUnitForm(){
     if(el) el.value='';
   });
   document.getElementById('u-st').value='vacant';
+  document.getElementById('u-list').value='no';
   document.getElementById('u-tlate').value='no';
   document.getElementById('tenant-fields').style.display='none';
   document.getElementById('late-amount-wrap').style.display='none';
@@ -980,6 +984,7 @@ async function saveUnit(){
     area_sqm:document.getElementById('u-ar').value||null,
     rent_price:document.getElementById('u-rn').value||null,
     status,
+    is_listed:status==='vacant'&&document.getElementById('u-list').value==='yes',
     user_id:CU.id,
     property_id:curBuildingId,
     tenant_name:status==='rented'?document.getElementById('u-tname').value||null:null,
@@ -1017,6 +1022,7 @@ function editUnit(id){
   document.getElementById('u-ar').value=u.area_sqm||'';
   document.getElementById('u-rn').value=u.rent_price||'';
   document.getElementById('u-st').value=u.status||'vacant';
+  document.getElementById('u-list').value=u.is_listed?'yes':'no';
   document.getElementById('u-tname').value=u.tenant_name||'';
   document.getElementById('u-tphone').value=u.tenant_phone||'';
   document.getElementById('u-tnid').value=u.tenant_nid||'';

@@ -201,8 +201,8 @@ textarea{resize:vertical;min-height:80px}
 <div class="toast" id="toast"></div>
 
 <script>
-const SB_URL='https://ptimioffmszhmpxxuqha.supabase.co';
-const SB_KEY='sb_publishable_R4Wcbp0XcWoIz1bQBkUopQ_L0Ctapzl';
+const SB_URL='https://ovhyefrscxqniaeeomiq.supabase.co';
+const SB_KEY='sb_publishable_IZOI-f85WV6ScLaOfykMmA_Z05hGHdM';
 const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
 
@@ -219,8 +219,9 @@ window.addEventListener('load', async()=>{
 async function loadListings(){
   // جلب الوحدات الفارغة أو المدرجة للإيجار
   const{data:units,error}=await db.from('units')
-    .select('*, properties(name, address, type, notes)')
+    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes)')
     .eq('status','vacant')
+    .eq('is_listed',true)
     .order('created_at',{ascending:false});
 
   if(error){

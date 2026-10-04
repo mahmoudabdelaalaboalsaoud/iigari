@@ -330,7 +330,7 @@ textarea{resize:vertical;min-height:80px}
     </div>
     <div class="tb-left">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
-      <div class="u-mini"><div class="u-mini-av" id="u-mini-av">م</div><div class="u-mini-name" id="u-mini-nm">...</div></div>
+      <div class="u-mini" style="cursor:pointer" onclick="toggleUM(event)"><div class="u-mini-av" id="u-mini-av">م</div><div class="u-mini-name" id="u-mini-nm">...</div></div>
     </div>
   </div>
 
@@ -351,6 +351,11 @@ textarea{resize:vertical;min-height:80px}
         <div class="u-card"><div class="u-av" id="u-av">م</div><div class="u-info"><div class="u-name" id="u-nm">...</div><div class="u-role" id="u-rl">عضو</div></div></div>
         <button class="btn-logout" onclick="doOut()">تسجيل الخروج</button>
       </div>
+    </div>
+
+    <div id="u-menu" style="display:none;position:fixed;top:60px;left:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;z-index:60;min-width:170px">
+      <div id="u-menu-nm" style="font-size:13px;font-weight:700;padding:6px 8px"></div>
+      <button class="btn-logout" onclick="doOut()">تسجيل الخروج</button>
     </div>
 
     <div class="main">
@@ -613,7 +618,7 @@ function enterApp(user){
     if(pic) el.innerHTML=`<img src="${pic}" alt="">`;
     else el.textContent=name.charAt(0).toUpperCase();
   });
-  if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';}
+  if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';loadUsers();}
   loadAll();
 }
 
@@ -646,6 +651,13 @@ async function doReg(){
   ok.classList.add('show');
   ['r-n','r-e','r-p'].forEach(id=>document.getElementById(id).value='');
 }
+function toggleUM(e){
+  e.stopPropagation();
+  const m=document.getElementById('u-menu');
+  document.getElementById('u-menu-nm').textContent=document.getElementById('u-mini-nm').textContent;
+  m.style.display=m.style.display==='block'?'none':'block';
+}
+document.addEventListener('click',()=>{const m=document.getElementById('u-menu');if(m)m.style.display='none';});
 async function doOut(){await db.auth.signOut();showS('login');}
 
 function goPage(pg,el){
@@ -1154,6 +1166,12 @@ async function loadUsers(){
   USERS=data||[];
   const pnd=USERS.filter(u=>u.status==='pending').length;
   document.getElementById('ni-users-txt').textContent=pnd>0?`المستخدمون (${pnd})`:'المستخدمون';
+  const ab=document.getElementById('adm-b');
+  if(ab&&isAdm){
+    ab.textContent=pnd>0?`⏳ ${pnd} مستخدم ينتظر موافقتك — اضغط للمراجعة`:'⚡ أنت Admin';
+    ab.style.cursor=pnd>0?'pointer':'default';
+    ab.onclick=pnd>0?()=>goPage('users',document.getElementById('ni-users')):null;
+  }
   renderUsers(USERS);
 }
 function fUsers(f,el){

@@ -173,6 +173,21 @@ textarea{resize:vertical;min-height:80px}
   <div id="listings-container"><div class="ld"><div class="sp"></div> جاري تحميل العقارات...</div></div>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="ov" id="ov-auth">
+  <div class="modal">
+    <div class="modal-ttl" id="au-title">🔐 سجّل دخولك أولاً</div>
+    <div class="modal-sub">لازم يكون عندك حساب عشان تتواصل مع صاحب العقار ويتسجل طلبك</div>
+    <div class="fgi" id="au-name-w" style="display:none"><label>الاسم الكامل *</label><input id="au-name" placeholder="محمد أحمد علي"></div>
+    <div class="fgi"><label>البريد الإلكتروني *</label><input id="au-email" type="email" placeholder="name@example.com"></div>
+    <div class="fgi"><label>كلمة المرور * (8 أحرف+)</label><input id="au-pass" type="password"></div>
+    <div class="fa">
+      <button class="btn-cancel" id="au-toggle" onclick="toggleAuth()">ليس لدي حساب — إنشاء حساب</button>
+      <button class="btn-submit" id="au-go" onclick="doAuth()">دخول</button>
+    </div>
+  </div>
+</div>
+
 <!-- REQUEST MODAL -->
 <div class="ov" id="ov-request">
   <div class="modal">
@@ -205,6 +220,7 @@ const SB_URL='https://ovhyefrscxqniaeeomiq.supabase.co';
 const SB_KEY='sb_publishable_IZOI-f85WV6ScLaOfykMmA_Z05hGHdM';
 const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
+const dbPub=createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 
 let ALL_LISTINGS=[];
 let currentUnitId=null;
@@ -218,7 +234,7 @@ window.addEventListener('load', async()=>{
 
 async function loadListings(){
   // جلب الوحدات الفارغة أو المدرجة للإيجار
-  const{data:units,error}=await db.from('units')
+  const{data:units,error}=await dbPub.from('units')
     .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes)')
     .eq('status','vacant')
     .eq('is_listed',true)
@@ -299,18 +315,52 @@ function renderListings(listings){
   }).join('')}</div>`;
 }
 
-function openRequest(unitId, propName, emoji, addr){
+function showRequest(unitId, propName, emoji, addr, uname){
   currentUnitId=unitId;
   document.getElementById('modal-prop-info').innerHTML=`
     <div class="modal-prop-icon">${emoji}</div>
     <div><div class="modal-prop-name">${propName}</div><div class="modal-prop-addr">📍 ${addr||'العنوان غير محدد'}</div></div>`;
   document.getElementById('modal-content').querySelector('.modal-ttl').textContent='📋 طلب إيجار';
-  document.getElementById('req-name').value='';
+  document.getElementById('req-name').value=uname||'';
   document.getElementById('req-phone').value='';
   document.getElementById('req-notes').value='';
   document.getElementById('ov-request').classList.add('open');
 }
 
+
+let pendingReq=null, authMode='login';
+async function openRequest(unitId, propName, emoji, addr){
+  pendingReq=[unitId, propName, emoji, addr];
+  const{data:{session}}=await db.auth.getSession();
+  if(!session){document.getElementById('ov-auth').classList.add('open');return;}
+  const m=session.user.user_metadata||{};
+  showRequest(unitId, propName, emoji, addr, m.full_name||m.name||'');
+}
+function toggleAuth(){
+  authMode=authMode==='login'?'signup':'login';
+  const su=authMode==='signup';
+  document.getElementById('au-name-w').style.display=su?'block':'none';
+  document.getElementById('au-toggle').textContent=su?'لدي حساب — تسجيل الدخول':'ليس لدي حساب — إنشاء حساب';
+  document.getElementById('au-go').textContent=su?'إنشاء حساب':'دخول';
+  document.getElementById('au-title').textContent=su?'📝 إنشاء حساب':'🔐 سجّل دخولك أولاً';
+}
+async function doAuth(){
+  const email=document.getElementById('au-email').value.trim();
+  const pass=document.getElementById('au-pass').value;
+  const name=document.getElementById('au-name').value.trim();
+  if(!email||pass.length<8){toast('أدخل البريد وكلمة مرور 8 أحرف على الأقل',true);return;}
+  let r;
+  if(authMode==='signup'){
+    if(!name){toast('أدخل الاسم الكامل',true);return;}
+    r=await db.auth.signUp({email,password:pass,options:{data:{full_name:name,role:'customer'}}});
+    if(!r.error&&!r.data.session){toast('تم إرسال رابط تأكيد على بريدك. أكّده ثم سجّل دخولك');return;}
+  } else {
+    r=await db.auth.signInWithPassword({email,password:pass});
+  }
+  if(r.error){toast(r.error.message==='Invalid login credentials'?'بيانات غير صحيحة':r.error.message,true);return;}
+  closeOv('ov-auth');
+  if(pendingReq){const u=r.data.user.user_metadata||{};showRequest(...pendingReq, u.full_name||u.name||name||'');}
+}
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
@@ -320,9 +370,11 @@ async function submitRequest(){
   const notes=document.getElementById('req-notes').value.trim();
   if(!name||!phone){toast('أدخل الاسم ورقم الهاتف',true);return;}
 
+  const{data:{user}}=await db.auth.getUser();
+  if(!user){closeOv('ov-request');document.getElementById('ov-auth').classList.add('open');return;}
   const{error}=await db.from('rental_requests').insert({
     unit_id:currentUnitId,
-    name,phone,notes,status:'new'
+    name,phone,notes,email:user.email,status:'new'
   });
   if(error){toast('خطأ: '+error.message,true);return;}
 

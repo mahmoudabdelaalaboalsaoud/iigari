@@ -775,7 +775,7 @@ async function setLeadStatus(id,st){
 
 // ── PLANS ──
 const PLANS={free:{n:'مجانية',max:1,price:0},p3:{n:'باقة 3 عقارات',max:3,price:300},p5:{n:'باقة 5 عقارات',max:5,price:500},pro:{n:'باقة أكثر من 5 عقارات',max:Infinity,price:700}};
-const PAY_INFO='';   // مثال: 'حوّل على فودافون كاش/إنستاباي رقم 01XXXXXXXXX ثم أرسل صورة التحويل على واتساب'
+const PAY={name:'محمود',vf:'01015726786',vfLink:'http://vf.eg/vfcash?id=mt&qrId=P1TJGE',ipLink:'https://ipn.eg/S/mahmoudaboalsaoud909/instapay/4P5vxM',wa:'201015726786'};
 let MYPLAN={plan:'free',until:null};
 const todayStr=()=>new Date().toISOString().slice(0,10);
 function effPlan(){
@@ -804,7 +804,7 @@ function openPlans(limitHit){
   document.getElementById('plans-body').innerHTML=
     (limitHit?`<div style="margin-bottom:10px;color:var(--red);font-weight:700">باقتك الحالية (${p.n}) تسمح بـ ${p.max===Infinity?'عدد غير محدود':p.max} عقار، ولا يمكن إضافة المزيد. رقّ باقتك للإضافة.</div>`:`<div style="margin-bottom:6px">باقتك الحالية: <b>${isAdm?'أدمن — غير محدودة':p.n}</b> · عقاراتك: ${used}${isAdm||p.max===Infinity?'':' / '+p.max}</div>`)+
     until+rows+
-    `<div style="font-size:13px;margin:10px 0;line-height:1.7">${PAY_INFO?escH(PAY_INFO):'للترقية تواصل مع إدارة التطبيق، وسيتم تفعيل الباقة بعد التحويل.'}</div>`;
+    `<div style="font-size:13px;margin:10px 0;line-height:1.9"><b>طريقة الدفع (باسم ${PAY.name}):</b><br>📱 فودافون كاش: <b dir="ltr">${PAY.vf}</b> — <a href="${PAY.vfLink}" target="_blank" rel="noopener">رابط الدفع</a><br>💳 إنستاباي: <a href="${PAY.ipLink}" target="_blank" rel="noopener">رابط الدفع</a><br>بعد التحويل أرسل سكرين شوت وسيتم تفعيل الباقة، ولو احتجت مساعدة أو تعديل بسيط نعمله لك مجانًا إن شاء الله.<br><a class="btn btn-green btn-sm" style="margin-top:8px;display:inline-flex" href="https://wa.me/${PAY.wa}?text=${encodeURIComponent('السلام عليكم، قمت بتحويل اشتراك إيجاري وهذا سكرين شوت التحويل. إيميل حسابي: '+(CU?.email||''))}" target="_blank" rel="noopener">💬 أرسل صورة التحويل</a></div>`;
   openOv('ov-plans');
 }
 function planCtl(u){

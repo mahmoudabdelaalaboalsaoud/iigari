@@ -343,7 +343,8 @@ textarea{resize:vertical;min-height:80px}
         <div class="ni" onclick="goPage('buildings',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>عقاراتي</div>
         <div class="ni" onclick="goPage('contracts',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
         <div class="ni" onclick="goPage('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
-        <div class="ni" onclick="goPage('leads',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><polyline points="22,6 12,13 2,6"/></svg>العملاء المهتمين <span id="leads-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-right:6px"></span></div>
+        <div class="ni" id="ni-leads" onclick="goPage('leads',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><polyline points="22,6 12,13 2,6"/></svg>العملاء المهتمين <span id="leads-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-right:6px"></span></div>
+        <div class="ni" onclick="openPlans(false);closeSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>باقتي <span id="plan-tag" style="font-size:11px;color:var(--text3);margin-right:6px"></span></div>
         <div class="ni" onclick="location.href='listings.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>المعرض العام</div>
         <div class="ni" id="ni-users" style="display:none" onclick="goPage('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span id="ni-users-txt">المستخدمون</span></div>
       </div>
@@ -363,6 +364,7 @@ textarea{resize:vertical;min-height:80px}
       <!-- DASHBOARD -->
       <div class="page on" id="pg-dash">
         <div class="adm-b" id="adm-b">⚡ أنت Admin</div>
+        <div id="leads-alert" onclick="goPage('leads',document.getElementById('ni-leads'));setBN('leads')" style="display:none;cursor:pointer;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--red);margin-bottom:16px"></div>
         <div class="pg-hdr"><div><div class="pg-title">لوحة التحكم 👋</div><div class="pg-sub" id="pg-date"></div></div></div>
         <div class="stats">
           <div class="stat"><div class="stat-icon">🏢</div><div class="stat-lbl">إجمالي العقارات</div><div class="stat-val" id="m1">—</div><div class="stat-sub">في قاعدة البيانات</div></div>
@@ -405,7 +407,7 @@ textarea{resize:vertical;min-height:80px}
               <option value="office">🏦 مكتب</option>
               <option value="other">📦 أخرى</option>
             </select>
-            <button class="btn btn-p" onclick="openOv('ov-building')">+ إضافة عقار</button>
+            <button class="btn btn-p" onclick="openAddBuilding()">+ إضافة عقار</button>
           </div>
         </div>
         <!-- Buildings Stats -->
@@ -444,7 +446,7 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- PAYMENTS -->
       <div class="page" id="pg-payments">
-        <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل 💳</div></div><button class="btn btn-p" onclick="openOv('ov-payment')">+ تسجيل دفعة</button></div>
+        <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل 💳</div></div><button class="btn btn-p" onclick="openPaymentModal()">+ تسجيل دفعة</button></div>
         <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
       </div>
 
@@ -476,8 +478,18 @@ textarea{resize:vertical;min-height:80px}
       <div class="bn-item" id="bn-buildings" onclick="goPage('buildings',document.querySelectorAll('.ni')[1]);setBN('buildings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>عقاراتي</div>
       <div class="bn-item" id="bn-contracts" onclick="goPage('contracts',document.querySelectorAll('.ni')[2]);setBN('contracts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>العقود</div>
       <div class="bn-item" id="bn-payments" onclick="goPage('payments',document.querySelectorAll('.ni')[3]);setBN('payments')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>التحصيل</div>
+      <div class="bn-item" id="bn-leads" style="position:relative" onclick="goPage('leads',document.getElementById('ni-leads'));setBN('leads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><polyline points="22,6 12,13 2,6"/></svg><span id="bn-leads-badge" style="display:none;position:absolute;top:-2px;right:4px;background:var(--red);color:#fff;border-radius:10px;min-width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;padding:0 4px"></span>العملاء</div>
       <div class="bn-item" id="bn-gallery" onclick="location.href='listings.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>المعرض</div>
     </div>
+  </div>
+</div>
+
+<!-- Plans Modal -->
+<div class="ov" id="ov-plans">
+  <div class="modal">
+    <div class="modal-ttl" id="plans-ttl">📦 باقتي</div>
+    <div id="plans-body"></div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-plans')">إغلاق</button></div>
   </div>
 </div>
 
@@ -619,6 +631,7 @@ function enterApp(user){
     else el.textContent=name.charAt(0).toUpperCase();
   });
   if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';loadUsers();}
+  loadMyPlan();
   loadAll();
 }
 
@@ -722,6 +735,10 @@ async function loadLeads(){
   const n=LEADS.filter(l=>l.status==='new').length;
   const b=document.getElementById('leads-badge');
   if(b){b.textContent=n||'';b.style.display=n?'inline-block':'none';}
+  const bb=document.getElementById('bn-leads-badge');
+  if(bb){bb.textContent=n||'';bb.style.display=n?'block':'none';}
+  const la=document.getElementById('leads-alert');
+  if(la){la.textContent=n?`📨 ${n} استفسار جديد من العملاء — اضغط للمراجعة`:'';la.style.display=n?'block':'none';}
   renderLeads();
 }
 function renderLeads(){
@@ -734,6 +751,7 @@ function renderLeads(){
     const ph=String(l.phone||'').replace(/\D/g,'');
     const wa=ph.startsWith('0')?'2'+ph:ph;
     const dt=l.created_at?new Date(l.created_at).toLocaleDateString('ar-EG'):'';
+    const msg=`السلام عليكم ورحمة الله وبركاته 🌹\nأهلاً وسهلاً ${l.name}\nلقد تلقيت طلبك بخصوص ${b?.name||'العقار'}${u?' — وحدة '+u.unit_number:''}.\nماذا تريد أن تستفسر؟`;
     const opts=Object.keys(LST).map(k=>`<option value="${k}"${l.status===k?' selected':''}>${LST[k]}</option>`).join('');
     return `<div class="tw" style="padding:14px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${escH(l.name)}</b><span style="font-size:12px;color:var(--text3)">${dt}</span></div>
@@ -742,7 +760,7 @@ function renderLeads(){
       ${l.notes?`<div style="font-size:13px;margin:6px 0">💬 ${escH(l.notes)}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">
         <a class="btn btn-green btn-sm" href="tel:${escH(ph)}">📞 اتصال</a>
-        <a class="btn btn-green btn-sm" href="https://wa.me/${escH(wa)}" target="_blank" rel="noopener">💬 واتساب</a>
+        <a class="btn btn-green btn-sm" href="https://wa.me/${escH(wa)}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 واتساب</a>
         <select onchange="setLeadStatus('${l.id}',this.value)" style="padding:5px 8px;border-radius:8px">${opts}</select>
       </div>
     </div>`;
@@ -753,6 +771,60 @@ async function setLeadStatus(id,st){
   if(error){toast('خطأ: '+error.message,true);return;}
   const l=LEADS.find(x=>x.id===id); if(l) l.status=st;
   loadLeads();
+}
+
+// ── PLANS ──
+const PLANS={free:{n:'مجانية',max:1,price:0},p3:{n:'باقة 3 عقارات',max:3,price:300},p5:{n:'باقة 5 عقارات',max:5,price:500},pro:{n:'باقة أكثر من 5 عقارات',max:Infinity,price:700}};
+const PAY_INFO='';   // مثال: 'حوّل على فودافون كاش/إنستاباي رقم 01XXXXXXXXX ثم أرسل صورة التحويل على واتساب'
+let MYPLAN={plan:'free',until:null};
+const todayStr=()=>new Date().toISOString().slice(0,10);
+function effPlan(){
+  if(isAdm) return 'pro';
+  return (MYPLAN.plan!=='free'&&MYPLAN.until&&MYPLAN.until>=todayStr())?MYPLAN.plan:'free';
+}
+async function loadMyPlan(){
+  const{data}=await db.from('user_profiles').select('plan,plan_until').eq('id',CU.id).maybeSingle();
+  if(data) MYPLAN={plan:data.plan||'free',until:data.plan_until};
+  const t=document.getElementById('plan-tag'); if(t) t.textContent=isAdm?'(غير محدودة)':'('+PLANS[effPlan()].n+')';
+}
+function openAddBuilding(){
+  const p=PLANS[effPlan()];
+  if(!isAdm&&BUILDINGS.length>=p.max){openPlans(true);return;}
+  openOv('ov-building');
+}
+function openPlans(limitHit){
+  const cur=effPlan(), p=PLANS[cur];
+  const used=BUILDINGS.length;
+  document.getElementById('plans-ttl').textContent=limitHit?'🔒 وصلت للحد الأقصى':'📦 باقتي';
+  const rows=Object.keys(PLANS).map(k=>{
+    const x=PLANS[k];
+    return `<div style="display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;${k===cur?'background:rgba(79,70,229,.08);border-color:var(--accent)':''}"><b>${x.n}${k===cur?' ✓':''}</b><span>${x.price?x.price+' جنيه / شهر':'مجانًا'}</span></div>`;
+  }).join('');
+  const until=(!isAdm&&cur!=='free'&&MYPLAN.until)?`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">تنتهي في: ${MYPLAN.until}</div>`:'';
+  document.getElementById('plans-body').innerHTML=
+    (limitHit?`<div style="margin-bottom:10px;color:var(--red);font-weight:700">باقتك الحالية (${p.n}) تسمح بـ ${p.max===Infinity?'عدد غير محدود':p.max} عقار، ولا يمكن إضافة المزيد. رقّ باقتك للإضافة.</div>`:`<div style="margin-bottom:6px">باقتك الحالية: <b>${isAdm?'أدمن — غير محدودة':p.n}</b> · عقاراتك: ${used}${isAdm||p.max===Infinity?'':' / '+p.max}</div>`)+
+    until+rows+
+    `<div style="font-size:13px;margin:10px 0;line-height:1.7">${PAY_INFO?escH(PAY_INFO):'للترقية تواصل مع إدارة التطبيق، وسيتم تفعيل الباقة بعد التحويل.'}</div>`;
+  openOv('ov-plans');
+}
+function planCtl(u){
+  if(u.status!=='approved') return '';
+  const opts=Object.keys(PLANS).map(k=>`<option value="${k}"${(u.plan||'free')===k?' selected':''}>${PLANS[k].n}</option>`).join('');
+  return `<div style="flex-basis:100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px"><select onchange="setPlan('${u.id}',this.value)" style="padding:5px 8px;border-radius:8px">${opts}</select><button class="btn btn-green btn-sm" onclick="renewPlan('${u.id}')">+30 يوم</button><span style="font-size:11px;color:var(--text3)">${u.plan_until?'حتى '+u.plan_until:''}</span></div>`;
+}
+function addDays(base,n){const d=new Date(base+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+async function setPlan(id,plan){
+  const upd=plan==='free'?{plan:'free',plan_until:null}:{plan,plan_until:addDays(todayStr(),30)};
+  const{error}=await db.from('user_profiles').update(upd).eq('id',id);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم تحديث الباقة');await loadUsers();
+}
+async function renewPlan(id){
+  const u=USERS.find(x=>x.id===id); if(!u||!u.plan||u.plan==='free'){toast('اختر الباقة أولًا',true);return;}
+  const base=(u.plan_until&&u.plan_until>todayStr())?u.plan_until:todayStr();
+  const{error}=await db.from('user_profiles').update({plan_until:addDays(base,30)}).eq('id',id);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم التجديد 30 يوم');await loadUsers();
 }
 async function loadAll(){
   await loadBuildings();
@@ -904,6 +976,7 @@ async function addBuilding(){
     notes:document.getElementById('b-notes').value||null,
     user_id:CU.id
   }).select().single();
+  if(error&&String(error.message).includes('PLAN_LIMIT')){closeOv('ov-building');openPlans(true);return;}
   if(error){toast('خطأ: '+error.message,true);return;}
   // لو نوع وحدة واحدة — ننشئ وحدة تلقائياً
   if(SINGLE_TYPES.includes(type)&&prop){
@@ -1186,7 +1259,7 @@ function renderUsers(users){
   list.innerHTML=users.map(u=>{
     const badge=u.status==='pending'?`<span class="bp bp-p">⏳ انتظار</span>`:u.status==='approved'?`<span class="bp bp-a">✅ موافق</span>`:`<span class="bp bp-r">❌ مرفوض</span>`;
     const acts=u.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">✓ موافقة</button><button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">إلغاء</button>`:`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">إعادة موافقة</button>`;
-    return`<div class="uc"><div class="uc-av">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}</div></div>`;
+    return`<div class="uc"><div class="uc-av">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${u.full_name||'—'}</div><div class="uc-email">${u.email||'—'}</div></div><div class="uc-act">${badge} ${acts}${planCtl(u)}</div></div>`;
   }).join('');
 }
 async function approveU(id){await db.from('user_profiles').update({status:'approved'}).eq('id',id);toast('تمت الموافقة');await loadUsers();fUsers(curF,null);}

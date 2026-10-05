@@ -997,7 +997,7 @@ function renderBuildingsFiltered(list){
       return`<div class="building-card">
         <div class="building-cover" onclick="editSingleUnit('${b.id}','${b.name}','${b.type}')">
           ${coverImg}
-          <span class="building-cover-emoji">${emoji}</span>
+          ${cov?'':`<span class="building-cover-emoji">${emoji}</span>`}
           <div class="building-type-badge">${typeName}</div>
           <button class="building-cover-edit" onclick="event.stopPropagation();editBuilding('${b.id}')">📷 تغيير الصورة</button>
         </div>
@@ -1026,7 +1026,7 @@ function renderBuildingsFiltered(list){
     return`<div class="building-card">
       <div class="building-cover" onclick="viewBuilding('${b.id}','${b.name}')">
         ${coverImg}
-        <span class="building-cover-emoji">${emoji}</span>
+        ${cov?'':`<span class="building-cover-emoji">${emoji}</span>`}
         <div class="building-type-badge">${typeName}</div>
         <button class="building-cover-edit" onclick="event.stopPropagation();editBuilding('${b.id}')">📷 تغيير الصورة</button>
         ${occ>=80?'<div style="position:absolute;top:10px;left:10px;background:#16a34a;color:#fff;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;z-index:2">🔥 ممتلئ '+occ+'%</div>':occ===0?'<div style="position:absolute;top:10px;left:10px;background:#4f46e5;color:#fff;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;z-index:2">🔑 فارغ</div>':''}

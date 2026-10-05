@@ -509,13 +509,13 @@ textarea{resize:vertical;min-height:80px}
 <!-- Building Modal -->
 <div class="ov" id="ov-building">
   <div class="modal">
-    <div class="modal-ttl">🏢 إضافة عقار جديد</div>
+    <div class="modal-ttl" id="b-ttl">🏢 إضافة عقار جديد</div>
     <div class="fg">
       <div class="fgi full"><label>اسم العقار *</label><input id="b-name" placeholder="مثال: عمارة النيل، فيلا الزهراء..."></div>
       <div class="fgi full"><label>العنوان</label><input id="b-addr" placeholder="مثال: شارع الجمهورية، القاهرة"></div>
       <div id="b-loc" style="display:contents"></div>
       <div class="fgi"><label>عدد الطوابق</label><input id="b-floors" type="number" placeholder="5" min="1"></div>
-      <div class="fgi"><label>نوع العقار</label><select id="b-type"><option value="apartment">🏢 عمارة سكنية</option><option value="house">🏠 بيت</option><option value="flat">🛏️ شقة</option><option value="villa">🏡 فيلا</option><option value="shop">🏪 محل تجاري</option><option value="land">🌿 أرض</option><option value="office">🏦 مكتب</option><option value="warehouse">🏭 مخزن / مستودع</option><option value="commercial">🏬 مبنى تجاري</option><option value="other">📦 أخرى</option></select></div>
+      <div class="fgi"><label>نوع العقار</label><select id="b-type" onchange="typeHint()"><option value="apartment">🏢 عمارة سكنية</option><option value="house">🏠 بيت</option><option value="flat">🛏️ شقة</option><option value="villa">🏡 فيلا</option><option value="shop">🏪 محل تجاري</option><option value="land">🌿 أرض</option><option value="office">🏦 مكتب</option><option value="warehouse">🏭 مخزن / مستودع</option><option value="commercial">🏬 مبنى تجاري</option><option value="other">📦 أخرى</option></select></div><div class="fgi full" id="b-type-hint" style="font-size:12px;color:var(--text3);margin-top:-4px"></div>
       <div class="fgi full"><label>ملاحظات</label><textarea id="b-notes" placeholder="أي معلومات إضافية..."></textarea></div>
     </div>
     <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-building')">إلغاء</button><button class="btn btn-p" onclick="addBuilding()">حفظ العقار</button></div>
@@ -803,7 +803,9 @@ async function loadMyPlan(){
 function openAddBuilding(){
   const p=PLANS[effPlan()];
   if(!isAdm&&BUILDINGS.length>=p.max){openPlans(true);return;}
-  openOv('ov-building');resetLoc('b');initMap('b');
+  EDIT_BID=null;document.getElementById('b-ttl').textContent='🏢 إضافة عقار جديد';document.getElementById('b-type').disabled=false;
+  ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
+  openOv('ov-building');resetLoc('b');initMap('b');typeHint();
 }
 function openPlans(limitHit){
   const cur=effPlan(), p=PLANS[cur];
@@ -923,6 +925,11 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('l-loc').innerHTML=locBlock('l');
   setLoc('b','','','');setLoc('l','','','');
 });
+function typeHint(){
+  const t=document.getElementById('b-type').value,h=document.getElementById('b-type-hint');
+  h.textContent=SINGLE_TYPES.includes(t)?'ℹ️ سيتم إنشاء وحدة واحدة لهذا العقار تلقائيًا.':'ℹ️ هذا النوع يتكوّن من وحدات (شقق/محلات/الفيلا كاملة…). بعد الحفظ اضغط «عرض الوحدات» وأضف وحداته؛ التأجير والعقود والعرض في المعرض تتم على الوحدات.';
+}
+window.addEventListener('DOMContentLoaded',typeHint);
 async function loadAll(){
   await loadBuildings();
   await loadUnitsAll();
@@ -965,7 +972,7 @@ function renderBuildings(){
 function renderBuildingsFiltered(list){
   const el=document.getElementById('buildings-list');
   if(!list.length){
-    el.innerHTML='<div class="empty"><div class="ei">🏢</div><div class="et">لا توجد عقارات</div><div style="margin-top:12px"><button class="btn btn-p" onclick="openOv(\'ov-building\')">+ أضف أول عقار</button></div></div>';
+    el.innerHTML='<div class="empty"><div class="ei">🏢</div><div class="et">لا توجد عقارات</div><div style="margin-top:12px"><button class="btn btn-p" onclick="openAddBuilding()">+ أضف أول عقار</button></div></div>';
     return;
   }
   const typeMap={apartment:'🏢 عمارة',house:'🏠 بيت',flat:'🛏️ شقة',villa:'🏡 فيلا',shop:'🏪 محل',land:'🌿 أرض',office:'🏦 مكتب',warehouse:'🏭 مخزن',commercial:'🏬 مبنى تجاري',other:'📦 أخرى'};
@@ -994,7 +1001,7 @@ function renderBuildingsFiltered(list){
         </div>
         <div class="building-header">
           <div class="building-name">${b.name}</div>
-          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':' ⚠️ لم يُحدد على الخريطة'}</div>
+          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
         </div>
         <div class="building-stats">
           <div class="bstat"><div class="bstat-val">${sl(unit?.status||'vacant')}</div><div class="bstat-lbl">الحالة</div></div>
@@ -1003,10 +1010,11 @@ function renderBuildingsFiltered(list){
         <div class="building-body">
           ${unit?.tenant_name?`<div style="font-size:13px;color:var(--text2);margin-bottom:10px">👤 ${unit.tenant_name} ${unit.tenant_phone?`<span style="color:var(--accent)">📱 ${unit.tenant_phone}</span>`:''}</div>`:''}
           ${hasLate?`<div class="alert-row" style="margin-bottom:10px">⚠️ متأخرات: ${Number(unit.late_amount).toLocaleString('ar-EG')} ج</div>`:''}
-          <div class="building-actions">
+          <div style="margin-bottom:8px"><button class="btn btn-g" style="width:100%" onclick="editBuilding('${b.id}')">📍 تعديل بيانات العقار والموقع</button></div>
+        <div class="building-actions">
             <button class="btn btn-p" style="flex:1" onclick="editSingleUnit('${b.id}','${b.name}','${b.type}')">✏️ تعديل البيانات</button>
             ${unit?.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${unit.tenant_phone}')">💬</button>`:''}
-            <button class="btn btn-g btn-sm" onclick="openLoc('${b.id}')">🗺️</button>
+            
           <button class="btn btn-red btn-sm" onclick="deleteBuilding('${b.id}')">🗑️</button>
           </div>
         </div>
@@ -1023,7 +1031,7 @@ function renderBuildingsFiltered(list){
       </div>
       <div class="building-header">
         <div class="building-name">${b.name}</div>
-        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':' ⚠️ لم يُحدد على الخريطة'}</div>
+        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
       </div>
       <div class="building-stats">
         <div class="bstat"><div class="bstat-val">${units.length}</div><div class="bstat-lbl">وحدة</div></div>
@@ -1031,10 +1039,12 @@ function renderBuildingsFiltered(list){
         <div class="bstat"><div class="bstat-val" style="color:var(--accent)">${vacant}</div><div class="bstat-lbl">فارغة</div></div>
         <div class="bstat"><div class="bstat-val" style="color:${occ>=70?'var(--green)':'var(--amber)'}">${occ}%</div><div class="bstat-lbl">إشغال</div></div>
       </div>
+      ${(!units.length&&!isSingle)?`<div style="margin:10px 14px 0;padding:10px 12px;border-radius:10px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.35);font-size:12.5px;line-height:1.7;color:var(--amber)">⚠️ لا توجد وحدات لهذا العقار. التأجير والعقود والدفعات والعرض في المعرض كلها تتم على <b>الوحدات</b>، فاضغط «عرض الوحدات» وأضف وحدة (مثلًا «الفيلا كاملة» أو «شقة 1»).</div>`:''}
       <div class="building-body">
+        <div style="margin-bottom:8px"><button class="btn btn-g" style="width:100%" onclick="editBuilding('${b.id}')">📍 تعديل بيانات العقار والموقع</button></div>
         <div class="building-actions">
           <button class="btn btn-p" style="flex:1" onclick="viewBuilding('${b.id}','${b.name}')">عرض الوحدات 🏠</button>
-          <button class="btn btn-g btn-sm" onclick="openLoc('${b.id}')">🗺️</button>
+          
           <button class="btn btn-red btn-sm" onclick="deleteBuilding('${b.id}')">🗑️</button>
         </div>
       </div>
@@ -1064,10 +1074,27 @@ function uploadCover(buildingId){
 }
 const SINGLE_TYPES=['house','flat','shop','land','office','warehouse'];
 
+let EDIT_BID=null;
+function editBuilding(id){
+  const b=BUILDINGS.find(x=>x.id===id); if(!b) return;
+  EDIT_BID=id;
+  document.getElementById('b-ttl').textContent='✏️ تعديل بيانات العقار';
+  document.getElementById('b-name').value=b.name||'';
+  document.getElementById('b-addr').value=b.address||'';
+  document.getElementById('b-notes').value=b.notes||'';
+  const ty=document.getElementById('b-type'); ty.value=b.type||'apartment'; ty.disabled=ALL_UNITS.some(u=>u.property_id===id);
+  typeHint(); setLoc('b',b.governorate,b.city,b.district); clearPin('b');
+  openOv('ov-building'); initMap('b',b.lat,b.lng);
+}
 async function addBuilding(){
   const name=document.getElementById('b-name').value.trim();
   const type=document.getElementById('b-type').value;
   if(!name){toast('اسم العقار مطلوب',true);return;}
+  if(EDIT_BID){
+    const{error:ue}=await db.from('properties').update({name,address:document.getElementById('b-addr').value||null,type,notes:document.getElementById('b-notes').value||null,...locVals('b')}).eq('id',EDIT_BID);
+    if(ue){toast('خطأ: '+ue.message,true);return;}
+    toast('تم حفظ بيانات العقار');closeOv('ov-building');EDIT_BID=null;await loadAll();return;
+  }
   const{data:prop,error}=await db.from('properties').insert({
     name,
     address:document.getElementById('b-addr').value||null,
@@ -1087,7 +1114,7 @@ async function addBuilding(){
       user_id:CU.id
     });
   }
-  toast('تمت إضافة العقار');closeOv('ov-building');
+  toast(SINGLE_TYPES.includes(type)?'تمت إضافة العقار':'تمت إضافة العقار — الآن أضف وحداته من «عرض الوحدات»');closeOv('ov-building');
   ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
   await loadAll();
 }

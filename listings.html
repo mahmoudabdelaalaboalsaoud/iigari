@@ -121,6 +121,7 @@ textarea{resize:vertical;min-height:80px}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="egypt.js"></script>
+<script src="site.js"></script>
 </head>
 <body>
 
@@ -239,6 +240,7 @@ const typeMap={apartment:'🏢 عمارة',house:'🏠 بيت',flat:'🛏️ ش�
 const typeEmoji={apartment:'🏢',house:'🏠',flat:'🛏️',villa:'🏡',shop:'🏪',land:'🌿',office:'🏦',warehouse:'🏭',commercial:'🏬',other:'📦'};
 
 window.addEventListener('load', async()=>{
+  loadSite(dbPub);
   await loadListings();
 });
 

@@ -279,6 +279,7 @@ textarea{resize:vertical;min-height:80px}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="egypt.js"></script>
+<script src="site.js"></script>
 </head>
 <body>
 
@@ -349,6 +350,7 @@ textarea{resize:vertical;min-height:80px}
         <div class="ni" id="ni-leads" onclick="goPage('leads',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><polyline points="22,6 12,13 2,6"/></svg>العملاء المهتمين <span id="leads-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-right:6px"></span></div>
         <div class="ni" onclick="openPlans(false);closeSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>باقتي <span id="plan-tag" style="font-size:11px;color:var(--text3);margin-right:6px"></span></div>
         <div class="ni" onclick="location.href='listings.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>المعرض العام</div>
+        <div class="ni" id="ni-site" style="display:none" onclick="goPage('site',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>إعدادات الموقع</div>
         <div class="ni" id="ni-users" style="display:none" onclick="goPage('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span id="ni-users-txt">المستخدمون</span></div>
       </div>
       <div class="sb-foot">
@@ -451,6 +453,29 @@ textarea{resize:vertical;min-height:80px}
       <div class="page" id="pg-payments">
         <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل 💳</div></div><button class="btn btn-p" onclick="openPaymentModal()">+ تسجيل دفعة</button></div>
         <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+      </div>
+
+      <!-- SITE SETTINGS -->
+      <div class="page" id="pg-site">
+        <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">⚙️ إعدادات الموقع</div></div></div>
+        <div class="tw" style="padding:16px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div id="st-logo" style="width:64px;height:64px;border-radius:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:12px;color:var(--text3)">بدون شعار</div>
+            <div><input type="file" id="st-file" accept="image/*" style="display:none" onchange="upLogo(this)"><button class="btn btn-g btn-sm" onclick="document.getElementById('st-file').click()">📷 رفع الشعار</button> <button class="btn btn-red btn-sm" onclick="rmLogo()">حذف</button></div>
+          </div>
+          <div class="fg">
+            <div class="fgi full"><label>اسم المنصة</label><input id="st-name"></div>
+            <div class="fgi full"><label>السلوجان (الشعار اللفظي)</label><input id="st-slogan"></div>
+            <div class="fgi full"><label>نص الخاتمة (أسفل المعرض العام)</label><textarea id="st-footer"></textarea></div>
+            <div class="fgi"><label>رقم واتساب الدعم</label><input id="st-wa" dir="ltr" placeholder="201XXXXXXXXX"></div>
+            <div class="fgi"><label>رقم فودافون كاش</label><input id="st-vf" dir="ltr"></div>
+            <div class="fgi full"><label>رابط الدفع (فودافون كاش)</label><input id="st-vfl" dir="ltr"></div>
+            <div class="fgi full"><label>رابط إنستاباي</label><input id="st-ipl" dir="ltr"></div>
+            <div class="fgi"><label>الدفع باسم</label><input id="st-pn"></div>
+            <div class="fgi full"><label>ملاحظة تحت بيانات الدفع</label><textarea id="st-note"></textarea></div>
+          </div>
+          <button class="btn btn-p" style="width:100%;margin-top:12px" onclick="saveSite()">💾 حفظ الإعدادات</button>
+        </div>
       </div>
 
       <!-- LEADS -->
@@ -644,7 +669,7 @@ function enterApp(user){
     if(pic) el.innerHTML=`<img src="${pic}" alt="">`;
     else el.textContent=name.charAt(0).toUpperCase();
   });
-  if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';loadUsers();}
+  if(isAdm){document.getElementById('adm-b').classList.add('show');document.getElementById('ni-users').style.display='flex';document.getElementById('ni-site').style.display='flex';loadUsers();}
   loadMyPlan();
   loadAll();
 }
@@ -694,6 +719,7 @@ function goPage(pg,el){
   if(el) el.classList.add('on');
   if(pg==='users') loadUsers();
   if(pg==='leads') loadLeads();
+  if(pg==='site') loadSiteForm();
   if(pg==='contracts') renderContracts();
   if(pg==='payments') renderPayments();
   closeSidebar();
@@ -808,7 +834,13 @@ function openAddBuilding(){
   ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
   openOv('ov-building');resetLoc('b');initMap('b');typeHint();
 }
+function payInfo(){
+  const S=window.SITE||{};
+  return{name:S.pay_name||PAY.name,vf:S.vf_number||PAY.vf,vfLink:S.vf_link||PAY.vfLink,ipLink:S.instapay_link||PAY.ipLink,wa:S.wa_number||PAY.wa,
+    note:S.pay_note||'بعد التحويل أرسل سكرين شوت وسيتم تفعيل الباقة، ولو احتجت مساعدة أو تعديل بسيط نعمله لك مجانًا إن شاء الله.'};
+}
 function openPlans(limitHit){
+  const PY=payInfo();
   const cur=effPlan(), p=PLANS[cur];
   const used=BUILDINGS.length;
   document.getElementById('plans-ttl').textContent=limitHit?'🔒 وصلت للحد الأقصى':'📦 باقتي';
@@ -820,7 +852,7 @@ function openPlans(limitHit){
   document.getElementById('plans-body').innerHTML=
     (limitHit?`<div style="margin-bottom:10px;color:var(--red);font-weight:700">باقتك الحالية (${p.n}) تسمح بـ ${p.max===Infinity?'عدد غير محدود':p.max} عقار، ولا يمكن إضافة المزيد. رقّ باقتك للإضافة.</div>`:`<div style="margin-bottom:6px">باقتك الحالية: <b>${isAdm?'أدمن — غير محدودة':p.n}</b> · عقاراتك: ${used}${isAdm||p.max===Infinity?'':' / '+p.max}</div>`)+
     until+rows+
-    `<div style="font-size:13px;margin:10px 0;line-height:1.9"><b>طريقة الدفع (باسم ${PAY.name}):</b><br>📱 فودافون كاش: <b dir="ltr">${PAY.vf}</b> — <a href="${PAY.vfLink}" target="_blank" rel="noopener">رابط الدفع</a><br>💳 إنستاباي: <a href="${PAY.ipLink}" target="_blank" rel="noopener">رابط الدفع</a><br>بعد التحويل أرسل سكرين شوت وسيتم تفعيل الباقة، ولو احتجت مساعدة أو تعديل بسيط نعمله لك مجانًا إن شاء الله.<br><a class="btn btn-green btn-sm" style="margin-top:8px;display:inline-flex" href="https://wa.me/${PAY.wa}?text=${encodeURIComponent('السلام عليكم، قمت بتحويل اشتراك إيجاري وهذا سكرين شوت التحويل. إيميل حسابي: '+(CU?.email||''))}" target="_blank" rel="noopener">💬 أرسل صورة التحويل</a></div>`;
+    `<div style="font-size:13px;margin:10px 0;line-height:1.9"><b>طريقة الدفع (باسم ${PY.name}):</b><br>📱 فودافون كاش: <b dir="ltr">${PY.vf}</b> — <a href="${PY.vfLink}" target="_blank" rel="noopener">رابط الدفع</a><br>💳 إنستاباي: <a href="${PY.ipLink}" target="_blank" rel="noopener">رابط الدفع</a><br>${escH(PY.note)}<br><a class="btn btn-green btn-sm" style="margin-top:8px;display:inline-flex" href="https://wa.me/${PY.wa}?text=${encodeURIComponent('السلام عليكم، قمت بتحويل اشتراك إيجاري وهذا سكرين شوت التحويل. إيميل حسابي: '+(CU?.email||''))}" target="_blank" rel="noopener">💬 أرسل صورة التحويل</a></div>`;
   openOv('ov-plans');
 }
 function planCtl(u){
@@ -931,6 +963,46 @@ function typeHint(){
   h.textContent=SINGLE_TYPES.includes(t)?'ℹ️ سيتم إنشاء وحدة واحدة لهذا العقار تلقائيًا.':'ℹ️ هذا النوع يتكوّن من وحدات (شقق/محلات/الفيلا كاملة…). بعد الحفظ اضغط «عرض الوحدات» وأضف وحداته؛ التأجير والعقود والعرض في المعرض تتم على الوحدات.';
 }
 window.addEventListener('DOMContentLoaded',typeHint);
+
+// ── SITE SETTINGS (admin) ──
+let ST_LOGO=null;
+function renderStLogo(){
+  const el=document.getElementById('st-logo');
+  el.innerHTML=ST_LOGO?`<img src="${escH(ST_LOGO)}" style="width:100%;height:100%;object-fit:contain">`:'بدون شعار';
+}
+function loadSiteForm(){
+  const S=window.SITE||{};
+  ST_LOGO=S.logo_url||null;renderStLogo();
+  const v=(id,x)=>document.getElementById(id).value=x||'';
+  v('st-name',S.site_name);v('st-slogan',S.slogan);v('st-footer',S.footer_text);v('st-wa',S.wa_number);v('st-vf',S.vf_number);
+  v('st-vfl',S.vf_link);v('st-ipl',S.instapay_link);v('st-pn',S.pay_name);v('st-note',S.pay_note);
+}
+async function upLogo(inp){
+  const f=inp.files[0]; inp.value=''; if(!f) return;
+  toast('جاري رفع الشعار...');
+  try{
+    const bmp=await createImageBitmap(f), k=Math.min(1,512/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    const path='logo-'+Date.now()+'.png';
+    const{error}=await db.storage.from('site-assets').upload(path,blob,{contentType:'image/png'});
+    if(error){toast('تعذر الرفع: '+error.message,true);return;}
+    ST_LOGO=db.storage.from('site-assets').getPublicUrl(path).data.publicUrl;renderStLogo();
+    toast('تم رفع الشعار — اضغط حفظ');
+  }catch(e){toast('تعذر معالجة الصورة',true);}
+}
+function rmLogo(){ST_LOGO=null;renderStLogo();}
+async function saveSite(){
+  const g=id=>document.getElementById(id).value.trim()||null;
+  const row={site_name:g('st-name'),slogan:g('st-slogan'),footer_text:g('st-footer'),logo_url:ST_LOGO,wa_number:g('st-wa'),vf_number:g('st-vf'),vf_link:g('st-vfl'),instapay_link:g('st-ipl'),pay_name:g('st-pn'),pay_note:g('st-note'),updated_at:new Date().toISOString()};
+  const{error}=await db.from('site_settings').update(row).eq('id',1);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم حفظ الإعدادات');
+  if(!ST_LOGO){document.querySelectorAll('.l-icon,.tb-icon').forEach(e=>{e.style.background='';e.textContent='إ';});}
+  applySite({...(window.SITE||{}),...row});
+}
+window.addEventListener('DOMContentLoaded',()=>loadSite(db));
 async function loadAll(){
   await loadBuildings();
   await loadUnitsAll();

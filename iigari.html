@@ -514,6 +514,7 @@ textarea{resize:vertical;min-height:80px}
       <div class="fgi full"><label>اسم العقار *</label><input id="b-name" placeholder="مثال: عمارة النيل، فيلا الزهراء..."></div>
       <div class="fgi full"><label>العنوان</label><input id="b-addr" placeholder="مثال: شارع الجمهورية، القاهرة"></div>
       <div id="b-loc" style="display:contents"></div>
+      <div class="fgi full"><label>📷 صور العقار (حتى 6 صور — اضغط على صورة لتصبح الغلاف)</label><div id="b-imgs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div><input type="file" id="b-file" accept="image/*" multiple style="display:none" onchange="addImgs(this)"><button type="button" class="btn btn-g btn-sm" onclick="document.getElementById('b-file').click()">+ إضافة صور</button></div>
       <div class="fgi"><label>عدد الطوابق</label><input id="b-floors" type="number" placeholder="5" min="1"></div>
       <div class="fgi"><label>نوع العقار</label><select id="b-type" onchange="typeHint()"><option value="apartment">🏢 عمارة سكنية</option><option value="house">🏠 بيت</option><option value="flat">🛏️ شقة</option><option value="villa">🏡 فيلا</option><option value="shop">🏪 محل تجاري</option><option value="land">🌿 أرض</option><option value="office">🏦 مكتب</option><option value="warehouse">🏭 مخزن / مستودع</option><option value="commercial">🏬 مبنى تجاري</option><option value="other">📦 أخرى</option></select></div><div class="fgi full" id="b-type-hint" style="font-size:12px;color:var(--text3);margin-top:-4px"></div>
       <div class="fgi full"><label>ملاحظات</label><textarea id="b-notes" placeholder="أي معلومات إضافية..."></textarea></div>
@@ -803,7 +804,7 @@ async function loadMyPlan(){
 function openAddBuilding(){
   const p=PLANS[effPlan()];
   if(!isAdm&&BUILDINGS.length>=p.max){openPlans(true);return;}
-  EDIT_BID=null;document.getElementById('b-ttl').textContent='🏢 إضافة عقار جديد';document.getElementById('b-type').disabled=false;
+  EDIT_BID=null;B_IMGS=[];renderImgs();document.getElementById('b-ttl').textContent='🏢 إضافة عقار جديد';document.getElementById('b-type').disabled=false;
   ['b-name','b-addr','b-notes'].forEach(id=>document.getElementById(id).value='');
   openOv('ov-building');resetLoc('b');initMap('b');typeHint();
 }
@@ -988,7 +989,8 @@ function renderBuildingsFiltered(list){
     const unit=isSingle?units[0]:null;
     const emoji=typeEmoji[b.type]||'🏠';
     const typeName=typeMap[b.type]||'عقار';
-    const coverImg=b.cover_image?`<img src="${b.cover_image}" alt="${b.name}" onerror="this.style.display='none'">`:'' ;
+    const cov=(b.images&&b.images[0])||b.cover_image;
+    const coverImg=cov?`<img src="${escH(cov)}" alt="${escH(b.name)}" loading="lazy" onerror="this.style.display='none'">`:'' ;
     const hasLate=unit&&unit.late_amount>0;
 
     if(isSingle){
@@ -997,7 +999,7 @@ function renderBuildingsFiltered(list){
           ${coverImg}
           <span class="building-cover-emoji">${emoji}</span>
           <div class="building-type-badge">${typeName}</div>
-          <button class="building-cover-edit" onclick="event.stopPropagation();uploadCover('${b.id}')">📷 تغيير الصورة</button>
+          <button class="building-cover-edit" onclick="event.stopPropagation();editBuilding('${b.id}')">📷 تغيير الصورة</button>
         </div>
         <div class="building-header">
           <div class="building-name">${b.name}</div>
@@ -1026,7 +1028,7 @@ function renderBuildingsFiltered(list){
         ${coverImg}
         <span class="building-cover-emoji">${emoji}</span>
         <div class="building-type-badge">${typeName}</div>
-        <button class="building-cover-edit" onclick="event.stopPropagation();uploadCover('${b.id}')">📷 تغيير الصورة</button>
+        <button class="building-cover-edit" onclick="event.stopPropagation();editBuilding('${b.id}')">📷 تغيير الصورة</button>
         ${occ>=80?'<div style="position:absolute;top:10px;left:10px;background:#16a34a;color:#fff;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;z-index:2">🔥 ممتلئ '+occ+'%</div>':occ===0?'<div style="position:absolute;top:10px;left:10px;background:#4f46e5;color:#fff;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;z-index:2">🔑 فارغ</div>':''}
       </div>
       <div class="building-header">
@@ -1074,10 +1076,42 @@ function uploadCover(buildingId){
 }
 const SINGLE_TYPES=['house','flat','shop','land','office','warehouse'];
 
+
+// ── PROPERTY IMAGES (Supabase Storage) ──
+let B_IMGS=[];
+const MAX_IMGS=6;
+function renderImgs(){
+  const el=document.getElementById('b-imgs'); if(!el) return;
+  el.innerHTML=B_IMGS.map((u,i)=>`<div style="position:relative;width:76px;height:76px"><img src="${escH(u)}" onclick="coverImg(${i})" style="width:100%;height:100%;object-fit:cover;border-radius:10px;border:2px solid ${i===0?'var(--accent)':'var(--border)'}">${i===0?'<span style="position:absolute;bottom:3px;right:3px;background:var(--accent);color:#fff;font-size:10px;padding:1px 5px;border-radius:6px">غلاف</span>':''}<button type="button" onclick="delImg(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:12px;line-height:20px;padding:0">✕</button></div>`).join('');
+}
+function coverImg(i){const x=B_IMGS.splice(i,1)[0];B_IMGS.unshift(x);renderImgs();}
+function delImg(i){B_IMGS.splice(i,1);renderImgs();}
+async function shrink(file){
+  let bmp; try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'});}catch(e){bmp=await createImageBitmap(file);}
+  const k=Math.min(1,1280/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas'); c.width=Math.round(bmp.width*k); c.height=Math.round(bmp.height*k);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',0.78));
+}
+async function addImgs(inp){
+  const files=[...inp.files].slice(0,MAX_IMGS-B_IMGS.length); inp.value='';
+  if(!files.length){toast('وصلت للحد الأقصى '+MAX_IMGS+' صور',true);return;}
+  toast('جاري رفع الصور...');
+  for(const f of files){
+    try{
+      const blob=await shrink(f);
+      const path=`${CU.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+      const{error}=await db.storage.from('property-images').upload(path,blob,{contentType:'image/jpeg'});
+      if(error){toast('تعذر الرفع: '+error.message,true);continue;}
+      B_IMGS.push(db.storage.from('property-images').getPublicUrl(path).data.publicUrl);
+      renderImgs();
+    }catch(e){toast('تعذر معالجة الصورة',true);}
+  }
+}
 let EDIT_BID=null;
 function editBuilding(id){
   const b=BUILDINGS.find(x=>x.id===id); if(!b) return;
-  EDIT_BID=id;
+  EDIT_BID=id;B_IMGS=[...(b.images||[])];renderImgs();
   document.getElementById('b-ttl').textContent='✏️ تعديل بيانات العقار';
   document.getElementById('b-name').value=b.name||'';
   document.getElementById('b-addr').value=b.address||'';
@@ -1091,7 +1125,7 @@ async function addBuilding(){
   const type=document.getElementById('b-type').value;
   if(!name){toast('اسم العقار مطلوب',true);return;}
   if(EDIT_BID){
-    const{error:ue}=await db.from('properties').update({name,address:document.getElementById('b-addr').value||null,type,notes:document.getElementById('b-notes').value||null,...locVals('b')}).eq('id',EDIT_BID);
+    const{error:ue}=await db.from('properties').update({name,address:document.getElementById('b-addr').value||null,type,notes:document.getElementById('b-notes').value||null,...locVals('b'),images:B_IMGS}).eq('id',EDIT_BID);
     if(ue){toast('خطأ: '+ue.message,true);return;}
     toast('تم حفظ بيانات العقار');closeOv('ov-building');EDIT_BID=null;await loadAll();return;
   }
@@ -1101,6 +1135,7 @@ async function addBuilding(){
     type,
     notes:document.getElementById('b-notes').value||null,
     ...locVals('b'),
+    images:B_IMGS,
     user_id:CU.id
   }).select().single();
   if(error&&String(error.message).includes('PLAN_LIMIT')){closeOv('ov-building');openPlans(true);return;}

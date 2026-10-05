@@ -45,7 +45,7 @@ body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:
 .listing-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:all .2s;border:1px solid #e2e8f0}
 .listing-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.12);transform:translateY(-3px)}
 .card-img{height:180px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
-.card-badge{position:absolute;top:12px;right:12px;background:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4f46e5}
+.card-badge{z-index:2;position:absolute;top:12px;right:12px;background:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4f46e5}
 .card-body{padding:16px}
 .card-title{font-size:16px;font-weight:800;color:#1a202c;margin-bottom:4px}
 .card-addr{font-size:12px;color:#a0aec0;margin-bottom:12px;display:flex;align-items:center;gap:4px}
@@ -245,7 +245,7 @@ window.addEventListener('load', async()=>{
 async function loadListings(){
   // جلب الوحدات الفارغة أو المدرجة للإيجار
   const{data:units,error}=await dbPub.from('units')
-    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes,governorate,city,district,lat,lng)')
+    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes,governorate,city,district,lat,lng,images)')
     .eq('status','vacant')
     .eq('is_listed',true)
     .order('created_at',{ascending:false});
@@ -350,7 +350,7 @@ function renderListings(listings){
     const price=u.listing_price||u.rent_price;
     return`<div class="listing-card">
       <div class="card-img">
-        <span style="font-size:72px">${emoji}</span>
+        ${prop.images&&prop.images.length?`<div style="position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory">${prop.images.map(src=>`<img src="${escL(src)}" loading="lazy" style="flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start">`).join('')}</div>`:`<span style="font-size:72px">${emoji}</span>`}
         <div class="card-badge">${typeName}</div>
       </div>
       <div class="card-body">

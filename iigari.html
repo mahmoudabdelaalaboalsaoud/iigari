@@ -276,6 +276,9 @@ textarea{resize:vertical;min-height:80px}
   .units-grid{grid-template-columns:1fr}
 }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="egypt.js"></script>
 </head>
 <body>
 
@@ -484,6 +487,15 @@ textarea{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- Location Modal -->
+<div class="ov" id="ov-loc">
+  <div class="modal">
+    <div class="modal-ttl">🗺️ موقع العقار</div>
+    <div class="fg"><div id="l-loc" style="display:contents"></div></div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-loc')">إلغاء</button><button class="btn btn-p" onclick="saveLoc()">حفظ الموقع</button></div>
+  </div>
+</div>
+
 <!-- Plans Modal -->
 <div class="ov" id="ov-plans">
   <div class="modal">
@@ -501,6 +513,7 @@ textarea{resize:vertical;min-height:80px}
     <div class="fg">
       <div class="fgi full"><label>اسم العقار *</label><input id="b-name" placeholder="مثال: عمارة النيل، فيلا الزهراء..."></div>
       <div class="fgi full"><label>العنوان</label><input id="b-addr" placeholder="مثال: شارع الجمهورية، القاهرة"></div>
+      <div id="b-loc" style="display:contents"></div>
       <div class="fgi"><label>عدد الطوابق</label><input id="b-floors" type="number" placeholder="5" min="1"></div>
       <div class="fgi"><label>نوع العقار</label><select id="b-type"><option value="apartment">🏢 عمارة سكنية</option><option value="house">🏠 بيت</option><option value="flat">🛏️ شقة</option><option value="villa">🏡 فيلا</option><option value="shop">🏪 محل تجاري</option><option value="land">🌿 أرض</option><option value="office">🏦 مكتب</option><option value="warehouse">🏭 مخزن / مستودع</option><option value="commercial">🏬 مبنى تجاري</option><option value="other">📦 أخرى</option></select></div>
       <div class="fgi full"><label>ملاحظات</label><textarea id="b-notes" placeholder="أي معلومات إضافية..."></textarea></div>
@@ -790,7 +803,7 @@ async function loadMyPlan(){
 function openAddBuilding(){
   const p=PLANS[effPlan()];
   if(!isAdm&&BUILDINGS.length>=p.max){openPlans(true);return;}
-  openOv('ov-building');
+  openOv('ov-building');resetLoc('b');initMap('b');
 }
 function openPlans(limitHit){
   const cur=effPlan(), p=PLANS[cur];
@@ -826,6 +839,90 @@ async function renewPlan(id){
   if(error){toast('خطأ: '+error.message,true);return;}
   toast('تم التجديد 30 يوم');await loadUsers();
 }
+
+// ── LOCATION (governorate/city/district + map) ──
+const MAPS={}, XV='__x';
+function locBlock(p){
+  const fld=(k,l)=>`<div class="fgi"><label>${l}</label><select id="${p}-${k}" onchange="locChg('${p}','${k}')"></select><input id="${p}-${k}-x" placeholder="اكتب ${l}" style="display:none;margin-top:6px"></div>`;
+  return fld('gov','المحافظة')+fld('city','المدينة / المنطقة')+fld('dist','الحي')+
+  `<div class="fgi full"><label>📍 حدّد الموقع بالظبط (اضغط على الخريطة أو اسحب الدبوس)</label><div id="${p}-map" style="height:240px;border-radius:12px;border:1px solid var(--border)"></div><button type="button" class="btn btn-g btn-sm" style="margin-top:6px" onclick="myLoc('${p}')">📍 موقعي الحالي</button><input type="hidden" id="${p}-lat"><input type="hidden" id="${p}-lng"></div>`;
+}
+function fillSel(id,list,ph){
+  document.getElementById(id).innerHTML=`<option value="">${ph}</option>`+list.map(x=>`<option>${x}</option>`).join('')+`<option value="${XV}">✍️ أخرى (اكتب يدويًا)</option>`;
+}
+function locChg(p,k){
+  const v=document.getElementById(`${p}-${k}`).value;
+  document.getElementById(`${p}-${k}-x`).style.display=v===XV?'block':'none';
+  if(k==='gov'){
+    const g=EG[v]; fillSel(p+'-city',g?Object.keys(g):[],'اختر المدينة');
+    document.getElementById(p+'-city-x').style.display='none';
+    fillSel(p+'-dist',[],'اختر الحي'); document.getElementById(p+'-dist-x').style.display='none';
+  } else if(k==='city'){
+    const g=EG[document.getElementById(p+'-gov').value];
+    fillSel(p+'-dist',(g&&g[v])||[],'اختر الحي'); document.getElementById(p+'-dist-x').style.display='none';
+  }
+}
+function setSel(id,val,list){
+  const el=document.getElementById(id), x=document.getElementById(id+'-x');
+  if(!val){el.value='';x.style.display='none';return;}
+  if(list.includes(val)){el.value=val;x.style.display='none';}
+  else{el.value=XV;x.value=val;x.style.display='block';}
+}
+function setLoc(p,g,c,d){
+  const gl=Object.keys(EG); fillSel(p+'-gov',gl,'اختر المحافظة'); setSel(p+'-gov',g,gl);
+  const gv=document.getElementById(p+'-gov').value, cl=EG[gv]?Object.keys(EG[gv]):[];
+  fillSel(p+'-city',cl,'اختر المدينة'); setSel(p+'-city',c,cl);
+  const cv=document.getElementById(p+'-city').value, dl=(EG[gv]&&EG[gv][cv])||[];
+  fillSel(p+'-dist',dl,'اختر الحي'); setSel(p+'-dist',d,dl);
+}
+function getSel(id){const v=document.getElementById(id).value;return v===XV?(document.getElementById(id+'-x').value.trim()||null):(v||null);}
+function locVals(p){
+  const la=document.getElementById(p+'-lat').value, ln=document.getElementById(p+'-lng').value;
+  return{governorate:getSel(p+'-gov'),city:getSel(p+'-city'),district:getSel(p+'-dist'),lat:la?+la:null,lng:ln?+ln:null};
+}
+function initMap(p,lat,lng){
+  setTimeout(()=>{
+    if(!MAPS[p]){
+      const m=L.map(p+'-map').setView([27,30.5],6);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m);
+      m.on('click',e=>putPin(p,e.latlng.lat,e.latlng.lng));
+      MAPS[p]={m,mk:null};
+    }
+    const o=MAPS[p]; o.m.invalidateSize();
+    if(lat&&lng){putPin(p,lat,lng);o.m.setView([lat,lng],16);} else o.m.setView([27,30.5],6);
+  },300);
+}
+function putPin(p,lat,lng){
+  const o=MAPS[p]; if(!o) return;
+  if(o.mk) o.mk.setLatLng([lat,lng]);
+  else{o.mk=L.marker([lat,lng],{draggable:true}).addTo(o.m);o.mk.on('dragend',()=>{const q=o.mk.getLatLng();putPin(p,q.lat,q.lng);});}
+  document.getElementById(p+'-lat').value=(+lat).toFixed(6); document.getElementById(p+'-lng').value=(+lng).toFixed(6);
+}
+function clearPin(p){
+  document.getElementById(p+'-lat').value='';document.getElementById(p+'-lng').value='';
+  const o=MAPS[p]; if(o&&o.mk){o.m.removeLayer(o.mk);o.mk=null;}
+}
+function resetLoc(p){setLoc(p,'','','');clearPin(p);}
+function myLoc(p){
+  if(!navigator.geolocation){toast('المتصفح لا يدعم تحديد الموقع',true);return;}
+  navigator.geolocation.getCurrentPosition(pos=>{putPin(p,pos.coords.latitude,pos.coords.longitude);MAPS[p].m.setView([pos.coords.latitude,pos.coords.longitude],17);},()=>toast('اسمح للمتصفح بتحديد موقعك',true),{enableHighAccuracy:true});
+}
+let LOCID=null;
+function openLoc(id){
+  const b=BUILDINGS.find(x=>x.id===id); if(!b) return;
+  LOCID=id; setLoc('l',b.governorate,b.city,b.district); clearPin('l');
+  openOv('ov-loc'); initMap('l',b.lat,b.lng);
+}
+async function saveLoc(){
+  const{error}=await db.from('properties').update(locVals('l')).eq('id',LOCID);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم حفظ الموقع');closeOv('ov-loc');await loadBuildings();renderBuildings();
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('b-loc').innerHTML=locBlock('b');
+  document.getElementById('l-loc').innerHTML=locBlock('l');
+  setLoc('b','','','');setLoc('l','','','');
+});
 async function loadAll(){
   await loadBuildings();
   await loadUnitsAll();
@@ -897,7 +994,7 @@ function renderBuildingsFiltered(list){
         </div>
         <div class="building-header">
           <div class="building-name">${b.name}</div>
-          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>
+          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':' ⚠️ لم يُحدد على الخريطة'}</div>
         </div>
         <div class="building-stats">
           <div class="bstat"><div class="bstat-val">${sl(unit?.status||'vacant')}</div><div class="bstat-lbl">الحالة</div></div>
@@ -909,7 +1006,8 @@ function renderBuildingsFiltered(list){
           <div class="building-actions">
             <button class="btn btn-p" style="flex:1" onclick="editSingleUnit('${b.id}','${b.name}','${b.type}')">✏️ تعديل البيانات</button>
             ${unit?.tenant_phone?`<button class="btn btn-wa btn-sm" onclick="openWhatsApp('${unit.tenant_phone}')">💬</button>`:''}
-            <button class="btn btn-red btn-sm" onclick="deleteBuilding('${b.id}')">🗑️</button>
+            <button class="btn btn-g btn-sm" onclick="openLoc('${b.id}')">🗺️</button>
+          <button class="btn btn-red btn-sm" onclick="deleteBuilding('${b.id}')">🗑️</button>
           </div>
         </div>
       </div>`;
@@ -925,7 +1023,7 @@ function renderBuildingsFiltered(list){
       </div>
       <div class="building-header">
         <div class="building-name">${b.name}</div>
-        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>
+        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':' ⚠️ لم يُحدد على الخريطة'}</div>
       </div>
       <div class="building-stats">
         <div class="bstat"><div class="bstat-val">${units.length}</div><div class="bstat-lbl">وحدة</div></div>
@@ -936,6 +1034,7 @@ function renderBuildingsFiltered(list){
       <div class="building-body">
         <div class="building-actions">
           <button class="btn btn-p" style="flex:1" onclick="viewBuilding('${b.id}','${b.name}')">عرض الوحدات 🏠</button>
+          <button class="btn btn-g btn-sm" onclick="openLoc('${b.id}')">🗺️</button>
           <button class="btn btn-red btn-sm" onclick="deleteBuilding('${b.id}')">🗑️</button>
         </div>
       </div>
@@ -974,6 +1073,7 @@ async function addBuilding(){
     address:document.getElementById('b-addr').value||null,
     type,
     notes:document.getElementById('b-notes').value||null,
+    ...locVals('b'),
     user_id:CU.id
   }).select().single();
   if(error&&String(error.message).includes('PLAN_LIMIT')){closeOv('ov-building');openPlans(true);return;}

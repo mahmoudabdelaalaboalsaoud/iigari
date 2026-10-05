@@ -118,6 +118,9 @@ textarea{resize:vertical;min-height:80px}
   .search-input{width:100%}
 }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="egypt.js"></script>
 </head>
 <body>
 
@@ -164,12 +167,19 @@ textarea{resize:vertical;min-height:80px}
       <option value="5000-10000">5,000 — 10,000 ج</option>
       <option value="10000-99999">أكثر من 10,000 ج</option>
     </select>
+    <select class="fsel" id="f-gov" onchange="geoChg('gov')"></select>
+    <select class="fsel" id="f-city" onchange="geoChg('city')"></select>
+    <select class="fsel" id="f-dist" onchange="applyFilters()"></select>
+    <button class="fsel" id="btn-near" onclick="nearMe()">📍 القريب مني</button>
+    <select class="fsel" id="f-rad" onchange="applyFilters()" style="display:none"><option value="">أي مسافة</option><option value="5">5 كم</option><option value="10">10 كم</option><option value="25">25 كم</option><option value="50">50 كم</option></select>
+    <button class="fsel" id="btn-map" onclick="toggleMap()">🗺️ الخريطة</button>
     <div class="results-count" id="results-count"></div>
   </div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
+  <div id="map-wrap" style="display:none;height:340px;border-radius:14px;overflow:hidden;margin-bottom:14px;border:1px solid #e2e8f0"><div id="lmap" style="height:100%"></div></div>
   <div id="listings-container"><div class="ld"><div class="sp"></div> جاري تحميل العقارات...</div></div>
 </div>
 
@@ -235,7 +245,7 @@ window.addEventListener('load', async()=>{
 async function loadListings(){
   // جلب الوحدات الفارغة أو المدرجة للإيجار
   const{data:units,error}=await dbPub.from('units')
-    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes)')
+    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes,governorate,city,district,lat,lng)')
     .eq('status','vacant')
     .eq('is_listed',true)
     .order('created_at',{ascending:false});
@@ -250,29 +260,75 @@ async function loadListings(){
   renderListings(ALL_LISTINGS);
 }
 
+
+// ── LOCATION / MAP ──
+let NEAR=null, LMAP=null, LLAYER=null, LAST=[];
+const escL=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fillOpt(id,list,ph){document.getElementById(id).innerHTML=`<option value="">${ph}</option>`+list.map(x=>`<option>${x}</option>`).join('');}
+window.addEventListener('DOMContentLoaded',()=>{fillOpt('f-gov',Object.keys(EG),'كل المحافظات');fillOpt('f-city',[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');});
+function geoChg(k){
+  const g=document.getElementById('f-gov').value;
+  if(k==='gov'){fillOpt('f-city',EG[g]?Object.keys(EG[g]):[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');}
+  else{const c=document.getElementById('f-city').value;fillOpt('f-dist',(EG[g]&&EG[g][c])||[],'كل الأحياء');}
+  applyFilters();
+}
+function dist(a,b,c,d){const R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r;const h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+function nearMe(){
+  const btn=document.getElementById('btn-near'),rad=document.getElementById('f-rad');
+  if(NEAR){NEAR=null;btn.textContent='📍 القريب مني';rad.style.display='none';rad.value='';applyFilters();return;}
+  if(!navigator.geolocation){toast('المتصفح لا يدعم تحديد الموقع',true);return;}
+  navigator.geolocation.getCurrentPosition(p=>{NEAR={lat:p.coords.latitude,lng:p.coords.longitude};btn.textContent='✅ القريب مني (إلغاء)';rad.style.display='inline-block';applyFilters();},()=>toast('اسمح للمتصفح بتحديد موقعك',true),{enableHighAccuracy:true});
+}
+function locLine(u){
+  const p=u.properties,t=[p.governorate,p.city,p.district].filter(Boolean).join(' — ');
+  const d=u._d!=null?` · <b>${u._d<1?Math.round(u._d*1000)+' م':u._d.toFixed(1)+' كم'}</b>`:'';
+  const nav=p.lat!=null?` · <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" rel="noopener">🧭 الاتجاهات</a>`:'';
+  return(t||d||nav)?`<div style="font-size:12px;color:#718096;margin:2px 0 8px">${escL(t)}${d}${nav}</div>`:'';
+}
+function toggleMap(){
+  const w=document.getElementById('map-wrap'),show=w.style.display==='none';
+  w.style.display=show?'block':'none';
+  document.getElementById('btn-map').textContent=show?'📋 القائمة فقط':'🗺️ الخريطة';
+  if(!show) return;
+  if(!LMAP){LMAP=L.map('lmap').setView([27,30.5],6);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LMAP);LLAYER=L.layerGroup().addTo(LMAP);}
+  setTimeout(()=>{LMAP.invalidateSize();drawMap();},100);
+}
+function drawMap(){
+  LLAYER.clearLayers();const pts=[];
+  LAST.forEach(u=>{const p=u.properties;if(p.lat==null||p.lng==null)return;const price=u.listing_price||u.rent_price;
+    L.marker([p.lat,p.lng]).addTo(LLAYER).bindPopup(`<b>${escL(p.name)}</b><br>وحدة ${escL(u.unit_number)}${price?'<br>'+Number(price).toLocaleString('ar-EG')+' ج / شهريًا':''}`);pts.push([p.lat,p.lng]);});
+  if(NEAR){L.circleMarker([NEAR.lat,NEAR.lng],{radius:8,color:'#2563eb'}).addTo(LLAYER).bindPopup('موقعك');pts.push([NEAR.lat,NEAR.lng]);}
+  if(pts.length)LMAP.fitBounds(pts,{padding:[30,30],maxZoom:15});
+}
 function applyFilters(){
   const search=document.getElementById('search').value.toLowerCase();
   const fType=document.getElementById('f-type').value;
   const fPrice=document.getElementById('f-price').value;
+  const fG=document.getElementById('f-gov').value,fC=document.getElementById('f-city').value,fD=document.getElementById('f-dist').value,fR=+document.getElementById('f-rad').value||0;
 
   let filtered=ALL_LISTINGS.filter(u=>{
     const prop=u.properties;
     const matchSearch=!search||
       prop.name?.toLowerCase().includes(search)||
       prop.address?.toLowerCase().includes(search)||
-      prop.type?.toLowerCase().includes(search);
+      prop.type?.toLowerCase().includes(search)||[prop.governorate,prop.city,prop.district].some(x=>x&&x.toLowerCase().includes(search));
     const matchType=!fType||prop.type===fType;
     let matchPrice=true;
     if(fPrice&&u.rent_price){
       const [min,max]=fPrice.split('-').map(Number);
       matchPrice=u.rent_price>=min&&u.rent_price<=max;
     }
-    return matchSearch&&matchType&&matchPrice;
+    u._d=(NEAR&&prop.lat!=null&&prop.lng!=null)?dist(NEAR.lat,NEAR.lng,prop.lat,prop.lng):null;
+    const matchGeo=(!fG||prop.governorate===fG)&&(!fC||prop.city===fC)&&(!fD||prop.district===fD)&&(!(NEAR&&fR)||(u._d!=null&&u._d<=fR));
+    return matchSearch&&matchType&&matchPrice&&matchGeo;
   });
+  if(NEAR) filtered.sort((a,b)=>(a._d??1e9)-(b._d??1e9));
   renderListings(filtered);
 }
 
 function renderListings(listings){
+  LAST=listings;
+  if(document.getElementById('map-wrap').style.display!=='none') drawMap();
   const container=document.getElementById('listings-container');
   const count=document.getElementById('results-count');
   count.textContent=`${listings.length} عقار متاح`;
@@ -300,6 +356,7 @@ function renderListings(listings){
       <div class="card-body">
         <div class="card-title">${prop?.name||'عقار متاح'}</div>
         <div class="card-addr">📍 ${prop?.address||'العنوان غير محدد'}</div>
+        ${locLine(u)}
         <div class="card-details">
           ${u.area_sqm?`<div class="card-detail"><div class="cd-lbl">المساحة</div><div class="cd-val">${u.area_sqm} م²</div></div>`:''}
           ${u.floor?`<div class="card-detail"><div class="cd-lbl">الطابق</div><div class="cd-val">${u.floor}</div></div>`:''}

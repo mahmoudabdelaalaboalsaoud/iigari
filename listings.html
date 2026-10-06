@@ -64,6 +64,10 @@ body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:
 .card-img{height:180px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
 .card-badge{z-index:2;position:absolute;top:12px;right:12px;background:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4f46e5}
 .card-body{padding:16px}
+.card-footer{display:flex;gap:8px}
+.btn-request{flex:1}
+.btn-share{flex:0 0 auto;border:1.5px solid #4f46e5;color:#4f46e5;background:#fff;border-radius:10px;padding:0 14px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;font-size:13px}
+.hl{outline:3px solid #4f46e5;outline-offset:2px}
 .card-title{font-size:16px;font-weight:800;color:#1a202c;margin-bottom:4px}
 .card-addr{font-size:12px;color:#a0aec0;margin-bottom:12px;display:flex;align-items:center;gap:4px}
 .card-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
@@ -212,6 +216,7 @@ textarea{resize:vertical;min-height:80px}
   <div class="modal">
     <div class="modal-ttl" id="au-title">🔐 سجّل دخولك أولاً</div>
     <div class="modal-sub">لازم يكون عندك حساب عشان تتواصل مع صاحب العقار ويتسجل طلبك</div>
+    <div class="fgi" id="au-phone-w" style="display:none"><label>رقم الموبايل (واتساب) *</label><input id="au-phone" type="tel" dir="ltr" placeholder="01XXXXXXXXX"></div>
     <div class="fgi" id="au-name-w" style="display:none"><label>الاسم الكامل *</label><input id="au-name" placeholder="محمد أحمد علي"></div>
     <div class="fgi"><label>البريد الإلكتروني *</label><input id="au-email" type="email" placeholder="name@example.com"></div>
     <div class="fgi"><label>كلمة المرور * (8 أحرف+)</label><input id="au-pass" type="password"></div>
@@ -266,6 +271,7 @@ window.addEventListener('load', async()=>{
   loadSite(dbPub);
   ownerBtn();
   await loadListings();
+  focusFromUrl();
 });
 
 async function loadListings(){
@@ -360,6 +366,19 @@ async function ownerBtn(){
     else a.innerHTML=inHeader?'🏢 <span>لوحة العقارات</span>':'لوحة إدارة عقاراتي ←';
   });
 }
+
+async function shareUnit(id,name){
+  const url=location.origin+'/api/share?u='+id;
+  const data={title:name||'عقار للإيجار',text:'شوف العقار ده على '+((window.SITE&&SITE.site_name)||'إيجاري'),url};
+  if(navigator.share){try{await navigator.share(data);return;}catch(e){if(e.name==='AbortError')return;}}
+  try{await navigator.clipboard.writeText(url);toast('تم نسخ الرابط ✅');}catch(e){prompt('انسخ الرابط:',url);}
+}
+function focusFromUrl(){
+  const id=new URLSearchParams(location.search).get('u'); if(!id) return;
+  const el=document.getElementById('u-'+id);
+  if(!el){toast('هذا العقار لم يعد متاحًا',true);return;}
+  el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),4000);
+}
 function applyFilters(){
   const search=document.getElementById('search').value.toLowerCase();
   const fType=document.getElementById('f-type').value;
@@ -409,14 +428,14 @@ function renderListings(listings){
     const emoji=typeEmoji[type]||'🏠';
     const typeName=typeMap[type]||'عقار';
     const price=u.listing_price||u.rent_price;
-    return`<div class="listing-card">
+    return`<div class="listing-card" id="u-${u.id}">
       <div class="card-img">
         ${prop.images&&prop.images.length?`<div style="position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory">${prop.images.map(src=>`<img src="${escL(src)}" loading="lazy" style="flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start">`).join('')}</div>`:`<span style="font-size:72px">${emoji}</span>`}
         <div class="card-badge">${typeName}</div>
       </div>
       <div class="card-body">
-        <div class="card-title">${prop?.name||'عقار متاح'}</div>
-        <div class="card-addr">📍 ${prop?.address||'العنوان غير محدد'}</div>
+        <div class="card-title">${escL(prop?.name||'عقار متاح')}</div>
+        <div class="card-addr">📍 ${escL(prop?.address||'العنوان غير محدد')}</div>
         ${locLine(u)}
         <div class="card-details">
           ${u.area_sqm?`<div class="card-detail"><div class="cd-lbl">المساحة</div><div class="cd-val">${u.area_sqm} م²</div></div>`:''}
@@ -424,40 +443,43 @@ function renderListings(listings){
           ${u.unit_number?`<div class="card-detail"><div class="cd-lbl">رقم الوحدة</div><div class="cd-val">${u.unit_number}</div></div>`:''}
         </div>
         ${price?`<div class="card-price">${Number(price).toLocaleString('ar-EG')} ج <span>/ شهرياً</span></div>`:'<div class="card-price" style="color:#a0aec0">السعر عند التواصل</div>'}
-        ${u.listing_notes||prop?.notes?`<div style="font-size:12px;color:#718096;margin-bottom:12px;line-height:1.6">${u.listing_notes||prop?.notes}</div>`:''}
+        ${u.listing_notes||prop?.notes?`<div style="font-size:12px;color:#718096;margin-bottom:12px;line-height:1.6">${escL(u.listing_notes||prop?.notes)}</div>`:''}
         <div class="card-footer">
-          <button class="btn-request" onclick="openRequest('${u.id}','${(prop?.name||'').replace(/'/g,'')}\`','${emoji}','${prop?.address||''}')">📋 سجل طلبك</button>
+          <button class="btn-request" onclick="openRequest('${u.id}','${(prop?.name||'').replace(/['"<>`]/g,'')}','${emoji}','${(prop?.address||'').replace(/['"<>`]/g,'')}')">📋 سجل طلبك</button>
+          <button class="btn-share" onclick="shareUnit('${u.id}','${(prop?.name||'').replace(/['"<>`]/g,'')}')">🔗 مشاركة</button>
         </div>
       </div>
     </div>`;
   }).join('')}</div>`;
 }
 
-function showRequest(unitId, propName, emoji, addr, uname){
+function showRequest(unitId, propName, emoji, addr, uname, uphone){
   currentUnitId=unitId;
   document.getElementById('modal-prop-info').innerHTML=`
     <div class="modal-prop-icon">${emoji}</div>
-    <div><div class="modal-prop-name">${propName}</div><div class="modal-prop-addr">📍 ${addr||'العنوان غير محدد'}</div></div>`;
+    <div><div class="modal-prop-name">${escL(propName)}</div><div class="modal-prop-addr">📍 ${escL(addr||'العنوان غير محدد')}</div></div>`;
   document.getElementById('modal-content').querySelector('.modal-ttl').textContent='📋 طلب إيجار';
   document.getElementById('req-name').value=uname||'';
-  document.getElementById('req-phone').value='';
+  document.getElementById('req-phone').value=uphone||'';
   document.getElementById('req-notes').value='';
   document.getElementById('ov-request').classList.add('open');
 }
 
 
 let pendingReq=null, authMode='login';
+async function myProf(uid){const{data}=await db.from('user_profiles').select('phone,full_name').eq('id',uid).maybeSingle();return data||{};}
 async function openRequest(unitId, propName, emoji, addr){
   pendingReq=[unitId, propName, emoji, addr];
   const{data:{session}}=await db.auth.getSession();
   if(!session){document.getElementById('ov-auth').classList.add('open');return;}
-  const m=session.user.user_metadata||{};
-  showRequest(unitId, propName, emoji, addr, m.full_name||m.name||'');
+  const m=session.user.user_metadata||{},pf=await myProf(session.user.id);
+  showRequest(unitId, propName, emoji, addr, pf.full_name||m.full_name||m.name||'', pf.phone||m.phone||'');
 }
 function toggleAuth(){
   authMode=authMode==='login'?'signup':'login';
   const su=authMode==='signup';
   document.getElementById('au-name-w').style.display=su?'block':'none';
+  document.getElementById('au-phone-w').style.display=su?'block':'none';
   document.getElementById('au-toggle').textContent=su?'لدي حساب — تسجيل الدخول':'ليس لدي حساب — إنشاء حساب';
   document.getElementById('au-go').textContent=su?'إنشاء حساب':'دخول';
   document.getElementById('au-title').textContent=su?'📝 إنشاء حساب':'🔐 سجّل دخولك أولاً';
@@ -469,15 +491,17 @@ async function doAuth(){
   if(!email||pass.length<8){toast('أدخل البريد وكلمة مرور 8 أحرف على الأقل',true);return;}
   let r;
   if(authMode==='signup'){
+    const phone=document.getElementById('au-phone').value.trim();
     if(!name){toast('أدخل الاسم الكامل',true);return;}
-    r=await db.auth.signUp({email,password:pass,options:{data:{full_name:name,role:'customer'}}});
+    if(phone.replace(/\D/g,'').length<10){toast('أدخل رقم موبايل صحيح',true);return;}
+    r=await db.auth.signUp({email,password:pass,options:{data:{full_name:name,phone,account_type:'tenant',role:'customer'}}});
     if(!r.error&&!r.data.session){toast('تم إرسال رابط تأكيد على بريدك. أكّده ثم سجّل دخولك');return;}
   } else {
     r=await db.auth.signInWithPassword({email,password:pass});
   }
   if(r.error){toast(r.error.message==='Invalid login credentials'?'بيانات غير صحيحة':r.error.message,true);return;}
   closeOv('ov-auth');
-  if(pendingReq){const u=r.data.user.user_metadata||{};showRequest(...pendingReq, u.full_name||u.name||name||'');}
+  if(pendingReq){const u=r.data.user.user_metadata||{},pf=await myProf(r.data.user.id);showRequest(...pendingReq, pf.full_name||u.full_name||u.name||name||'', pf.phone||u.phone||'');}
 }
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));

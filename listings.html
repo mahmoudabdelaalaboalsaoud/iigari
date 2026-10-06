@@ -11,8 +11,8 @@
 body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:100vh}
 
 /* HEADER */
-.header{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(79,70,229,.3)}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.header{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:0 16px}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:54px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .logo-icon{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:800}
 .logo-name{font-size:20px;font-weight:800;color:#fff}
@@ -21,7 +21,7 @@ body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:
 .btn-login:hover{background:rgba(255,255,255,.25)}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:48px 24px;text-align:center;color:#fff}
+.hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:0 16px 14px;text-align:center;color:#fff}
 .hero h1{font-size:32px;font-weight:800;margin-bottom:10px}
 .hero p{font-size:16px;opacity:.85;margin-bottom:32px}
 .search-bar-wrap{max-width:600px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap}
@@ -30,7 +30,24 @@ body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1a202c;min-height:
 .search-input:focus{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.6)}
 
 /* FILTERS */
-.filters{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;position:sticky;top:64px;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.chips{background:#fff;border-bottom:1px solid #e2e8f0;padding:8px 12px;position:sticky;top:0;z-index:40;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;direction:rtl}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;background:#f0f2f5;border:1.5px solid transparent;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;color:#1a202c;cursor:pointer}
+.chip.on{background:#eef2ff;border-color:#4f46e5;color:#4f46e5}
+.chip-clear{background:#fee2e2;color:#b91c1c}
+.rline{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 16px;background:#f7f9fb}
+.sheet{position:fixed;inset:0;z-index:9000;background:rgba(15,23,42,.5);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.sheet-card{width:100%;max-width:480px;background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:80vh;overflow:auto}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:16px}
+.sheet-h button{border:0;background:#f0f2f5;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer}
+.sec{display:none}.sec.on{display:block}
+.sec label{display:block;font-size:12px;color:#718096;font-weight:700;margin:6px 0 4px}
+.sec select{width:100%;padding:12px;font-size:14px;margin-bottom:6px}
+.sheet-f{display:flex;gap:10px;margin-top:14px}
+.sheet-f button{flex:1;border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer}
+.b-apply{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}
+.b-clear{background:#f0f2f5;color:#1a202c;flex:0 0 35%!important}
 .filters-inner{max-width:1200px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .filter-lbl{font-size:12px;font-weight:700;color:#4a5568}
 .fsel{background:#f7f9fb;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;font-size:13px;font-family:'Cairo',sans-serif;color:#1a202c;outline:none;cursor:pointer}
@@ -109,13 +126,9 @@ textarea{resize:vertical;min-height:80px}
 
 /* RESPONSIVE */
 @media(max-width:640px){
-  .hero h1{font-size:24px}
-  .hero p{font-size:14px}
   .listings-grid{grid-template-columns:1fr}
-  .header-links .btn-login span{display:none}
   .filters-inner{gap:8px}
-  .search-bar-wrap{flex-direction:column}
-  .search-input{width:100%}
+  .search-input{width:100%;padding:10px 14px}
 }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -148,18 +161,33 @@ textarea{resize:vertical;min-height:80px}
 
 <!-- HERO -->
 <div class="hero">
-  <h1>🏠 عقارات متاحة للإيجار</h1>
-  <p>ابحث عن بيتك المناسب وسجل طلبك مباشرة</p>
   <div class="search-bar-wrap">
     <input class="search-input" id="search" placeholder="🔍 ابحث بالاسم أو المنطقة..." oninput="applyFilters()">
   </div>
 </div>
 
-<!-- FILTERS -->
-<div class="filters">
-  <div class="filters-inner">
-    <div class="filter-lbl">فلتر:</div>
-    <select class="fsel" id="f-type" onchange="applyFilters()">
+<!-- FILTERS (chips + bottom sheet) -->
+<div class="chips" id="chips">
+  <button class="chip" id="ch-place" onclick="openSheet('place')">📍 المكان</button>
+  <button class="chip" id="ch-price" onclick="openSheet('price')">💰 السعر</button>
+  <button class="chip" id="ch-type" onclick="openSheet('type')">🏠 النوع</button>
+  <button class="chip" id="btn-near" onclick="nearMe()">📍 القريب مني</button>
+  <button class="chip" id="btn-map" onclick="toggleMap()">🗺️ الخريطة</button>
+  <button class="chip chip-clear" id="ch-clear" onclick="clearFilters()" style="display:none">✕ مسح الفلاتر</button>
+</div>
+<div class="rline"><div class="results-count" id="results-count" style="margin:0"></div><select class="fsel" id="f-rad" onchange="applyFilters()" style="display:none"><option value="">أي مسافة</option><option value="5">5 كم</option><option value="10">10 كم</option><option value="25">25 كم</option><option value="50">50 كم</option></select></div>
+<div class="sheet" id="fsheet" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet-card">
+    <div class="sheet-h"><b id="sh-title"></b><button onclick="closeSheet()">✕</button></div>
+    <div class="sec" id="sec-place"><label>المحافظة</label><select class="fsel" id="f-gov" onchange="geoChg('gov')"></select><label>المدينة / المنطقة</label><select class="fsel" id="f-city" onchange="geoChg('city')"></select><label>الحي</label><select class="fsel" id="f-dist" onchange="applyFilters()"></select></div>
+    <div class="sec" id="sec-price"><label>السعر الشهري</label><select class="fsel" id="f-price" onchange="applyFilters()">
+      <option value="">كل الأسعار</option>
+      <option value="0-2000">أقل من 2,000 ج</option>
+      <option value="2000-5000">2,000 — 5,000 ج</option>
+      <option value="5000-10000">5,000 — 10,000 ج</option>
+      <option value="10000-99999">أكثر من 10,000 ج</option>
+    </select></div>
+    <div class="sec" id="sec-type"><label>نوع العقار</label><select class="fsel" id="f-type" onchange="applyFilters()">
       <option value="">كل الأنواع</option>
       <option value="apartment">🏢 عمارة</option>
       <option value="house">🏠 بيت</option>
@@ -168,21 +196,8 @@ textarea{resize:vertical;min-height:80px}
       <option value="shop">🏪 محل</option>
       <option value="office">🏦 مكتب</option>
       <option value="other">📦 أخرى</option>
-    </select>
-    <select class="fsel" id="f-price" onchange="applyFilters()">
-      <option value="">كل الأسعار</option>
-      <option value="0-2000">أقل من 2,000 ج</option>
-      <option value="2000-5000">2,000 — 5,000 ج</option>
-      <option value="5000-10000">5,000 — 10,000 ج</option>
-      <option value="10000-99999">أكثر من 10,000 ج</option>
-    </select>
-    <select class="fsel" id="f-gov" onchange="geoChg('gov')"></select>
-    <select class="fsel" id="f-city" onchange="geoChg('city')"></select>
-    <select class="fsel" id="f-dist" onchange="applyFilters()"></select>
-    <button class="fsel" id="btn-near" onclick="nearMe()">📍 القريب مني</button>
-    <select class="fsel" id="f-rad" onchange="applyFilters()" style="display:none"><option value="">أي مسافة</option><option value="5">5 كم</option><option value="10">10 كم</option><option value="25">25 كم</option><option value="50">50 كم</option></select>
-    <button class="fsel" id="btn-map" onclick="toggleMap()">🗺️ الخريطة</button>
-    <div class="results-count" id="results-count"></div>
+    </select></div>
+    <div class="sheet-f"><button class="b-clear" onclick="clearSec()">مسح</button><button class="b-apply" onclick="closeSheet()">عرض النتائج</button></div>
   </div>
 </div>
 
@@ -249,6 +264,7 @@ const typeEmoji={apartment:'🏢',house:'🏠',flat:'🛏️',villa:'🏡',shop:
 
 window.addEventListener('load', async()=>{
   loadSite(dbPub);
+  ownerBtn();
   await loadListings();
 });
 
@@ -287,7 +303,7 @@ function nearMe(){
   const btn=document.getElementById('btn-near'),rad=document.getElementById('f-rad');
   if(NEAR){NEAR=null;btn.textContent='📍 القريب مني';rad.style.display='none';rad.value='';applyFilters();return;}
   if(!navigator.geolocation){toast('المتصفح لا يدعم تحديد الموقع',true);return;}
-  navigator.geolocation.getCurrentPosition(p=>{NEAR={lat:p.coords.latitude,lng:p.coords.longitude};btn.textContent='✅ القريب مني (إلغاء)';rad.style.display='inline-block';applyFilters();},()=>toast('اسمح للمتصفح بتحديد موقعك',true),{enableHighAccuracy:true});
+  navigator.geolocation.getCurrentPosition(p=>{NEAR={lat:p.coords.latitude,lng:p.coords.longitude};btn.textContent='✅ القريب مني';rad.style.display='inline-block';applyFilters();},()=>toast('اسمح للمتصفح بتحديد موقعك',true),{enableHighAccuracy:true});
 }
 function locLine(u){
   const p=u.properties,t=[p.governorate,p.city,p.district].filter(Boolean).join(' — ');
@@ -309,6 +325,40 @@ function drawMap(){
     L.marker([p.lat,p.lng]).addTo(LLAYER).bindPopup(`<b>${escL(p.name)}</b><br>وحدة ${escL(u.unit_number)}${price?'<br>'+Number(price).toLocaleString('ar-EG')+' ج / شهريًا':''}`);pts.push([p.lat,p.lng]);});
   if(NEAR){L.circleMarker([NEAR.lat,NEAR.lng],{radius:8,color:'#2563eb'}).addTo(LLAYER).bindPopup('موقعك');pts.push([NEAR.lat,NEAR.lng]);}
   if(pts.length)LMAP.fitBounds(pts,{padding:[30,30],maxZoom:15});
+}
+
+// ── CHIPS / SHEET ──
+let SHEET='';
+function openSheet(k){
+  SHEET=k;
+  document.getElementById('sh-title').textContent={place:'📍 المكان',price:'💰 السعر',type:'🏠 نوع العقار'}[k];
+  document.querySelectorAll('.sec').forEach(e=>e.classList.toggle('on',e.id==='sec-'+k));
+  document.getElementById('fsheet').classList.add('open');
+}
+function closeSheet(){document.getElementById('fsheet').classList.remove('open');}
+function clearSec(){
+  if(SHEET==='place'){document.getElementById('f-gov').value='';geoChg('gov');}
+  else{document.getElementById(SHEET==='price'?'f-price':'f-type').value='';applyFilters();}
+}
+function clearFilters(){['f-gov','f-price','f-type','search'].forEach(id=>document.getElementById(id).value='');geoChg('gov');}
+function setChip(id,t,on){const e=document.getElementById(id);e.textContent=t;e.classList.toggle('on',on);}
+function updateChips(){
+  const g=document.getElementById('f-gov').value,c=document.getElementById('f-city').value,d=document.getElementById('f-dist').value;
+  const pl=d||c||g; setChip('ch-place',pl?'📍 '+pl:'📍 المكان',!!pl);
+  const pr=document.getElementById('f-price'); setChip('ch-price',pr.value?'💰 '+pr.options[pr.selectedIndex].text:'💰 السعر',!!pr.value);
+  const ty=document.getElementById('f-type'); setChip('ch-type',ty.value?ty.options[ty.selectedIndex].text:'🏠 النوع',!!ty.value);
+  document.getElementById('btn-near').classList.toggle('on',!!NEAR);
+  const any=pl||pr.value||ty.value||document.getElementById('search').value;
+  document.getElementById('ch-clear').style.display=any?'inline-block':'none';
+}
+async function ownerBtn(){
+  const{data:{session}}=await db.auth.getSession(); if(!session) return;
+  const cust=(session.user.user_metadata||{}).role==='customer';
+  document.querySelectorAll('a[href="iigari.html"]').forEach(a=>{
+    const inHeader=!!a.closest('.header');
+    if(cust){a.removeAttribute('href');a.style.cursor='pointer';a.onclick=async e=>{e.preventDefault();if(confirm('تسجيل الخروج من حسابك؟')){await db.auth.signOut();location.reload();}};a.innerHTML=inHeader?'👤 <span>خروج</span>':'تسجيل الخروج';}
+    else a.innerHTML=inHeader?'🏢 <span>لوحة العقارات</span>':'لوحة إدارة عقاراتي ←';
+  });
 }
 function applyFilters(){
   const search=document.getElementById('search').value.toLowerCase();
@@ -334,6 +384,7 @@ function applyFilters(){
   });
   if(NEAR) filtered.sort((a,b)=>(a._d??1e9)-(b._d??1e9));
   renderListings(filtered);
+  updateChips();
 }
 
 function renderListings(listings){

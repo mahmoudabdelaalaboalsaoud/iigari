@@ -470,13 +470,13 @@ textarea{resize:vertical;min-height:80px}
       <!-- CONTRACTS -->
       <div class="page" id="pg-contracts">
         <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">العقود 📄</div></div></div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>العقار</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody id="tb-contracts"><tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>الوحدة</th><th>العقار</th><th>الإيجار</th><th>البداية</th><th>النهاية</th><th>المتبقي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tb-contracts"><tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
       </div>
 
       <!-- PAYMENTS -->
       <div class="page" id="pg-payments">
         <div class="pg-hdr"><div><div class="bc">الرئيسية</div><div class="pg-title">التحصيل 💳</div></div><button class="btn btn-p" onclick="openPaymentModal()">+ تسجيل دفعة</button></div>
-        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody id="tb-payments"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="tw"><div class="tw-scroll"><table><thead><tr><th>المستأجر</th><th>عن شهر</th><th>المبلغ</th><th>تاريخ الدفع</th><th>الحالة</th><th>رصيد الشهر</th><th>ملاحظة</th><th>إجراءات</th></tr></thead><tbody id="tb-payments"><tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
       </div>
 
       <!-- SITE SETTINGS -->
@@ -619,12 +619,14 @@ textarea{resize:vertical;min-height:80px}
 <!-- Payment Modal -->
 <div class="ov" id="ov-payment">
   <div class="modal">
-    <div class="modal-ttl">💳 تسجيل دفعة</div>
+    <div class="modal-ttl" id="p-ttl">💳 تسجيل دفعة</div>
     <div class="fg">
-      <div class="fgi full"><label>الوحدة *</label><select id="p-unit"><option value="">اختر وحدة مؤجرة...</option></select></div>
-      <div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number"></div>
+      <div class="fgi full"><label>الوحدة *</label><select id="p-unit" onchange="onPayUnit()"><option value="">اختر وحدة مؤجرة...</option></select></div>
+      <div class="fgi full"><label>الدفعة عن أي شهر؟ *</label><input id="p-mo" type="month" onchange="payHint()"></div>
+      <div class="fgi"><label>المبلغ (ج) *</label><input id="p-am" type="number" oninput="payHint()"></div>
       <div class="fgi"><label>تاريخ الدفع *</label><input id="p-dt" type="date"></div>
-      <div class="fgi full"><label>الحالة</label><select id="p-st"><option value="paid">✅ مدفوع</option><option value="pending">⏳ معلق</option><option value="late">🔴 متأخر</option></select></div>
+      <div class="fgi full"><label>الحالة</label><select id="p-st" onchange="payHint()"><option value="paid">✅ مدفوع</option><option value="pending">⏳ معلق</option><option value="late">🔴 متأخر</option></select></div>
+      <div class="fgi full" id="p-hint"></div>
       <div class="fgi full"><label>ملاحظة</label><input id="p-note" placeholder="اختياري..."></div>
     </div>
     <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-payment')">إلغاء</button><button class="btn btn-p" onclick="addPayment()">حفظ</button></div>
@@ -1482,42 +1484,108 @@ async function loadPaymentsData(){
   renderPayments();
 }
 
+let PAY_EDIT=null;
+const fmt=n=>Number(n||0).toLocaleString('ar-EG')+' ج';
+const monthLabel=m=>m?new Date(m+'T00:00:00').toLocaleDateString('ar-EG',{month:'long',year:'numeric'}):'—';
+const unitDue=u=>Number(u?.agreed_rent||u?.rent_price||0);
+const paidFor=(uid,m,ex)=>PAYMENTS.filter(p=>p.unit_id===uid&&p.for_month===m&&p.status==='paid'&&p.id!==ex).reduce((a,p)=>a+Number(p.amount||0),0);
+function balPill(uid,m){
+  const u=ALL_UNITS.find(x=>x.id===uid),due=unitDue(u);
+  if(!m||!due) return '—';
+  const d=due-paidFor(uid,m);
+  return d>0?`<span class="pill p-a">⚠️ متبقي ${fmt(d)}</span>`:d<0?`<span class="pill p-g">🔼 زيادة ${fmt(-d)}</span>`:'<span class="pill p-g">✅ مكتمل</span>';
+}
 function renderPayments(){
   const tb=document.getElementById('tb-payments');
-  if(!PAYMENTS.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">💳</div><div class="et">لا توجد مدفوعات</div></div></td></tr>';return;}
+  if(!PAYMENTS.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">💳</div><div class="et">لا توجد مدفوعات</div></div></td></tr>';return;}
   tb.innerHTML=PAYMENTS.map(p=>{
     const unit=ALL_UNITS.find(u=>u.id===p.unit_id);
-    return`<tr><td class="td-m">${unit?.tenant_name||'—'}</td><td>${p.amount?Number(p.amount).toLocaleString('ar-EG')+' ج':'—'}</td><td>${p.paid_at?new Date(p.paid_at).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(p.status)}</td><td>${p.note||'—'}</td></tr>`;
+    return`<tr><td class="td-m">${escH(unit?.tenant_name||'—')}</td><td>${monthLabel(p.for_month)}</td><td>${p.amount?fmt(p.amount):'—'}</td><td>${p.paid_at?new Date(p.paid_at).toLocaleDateString('ar-EG'):'—'}</td><td>${sl(p.status)}</td><td>${balPill(p.unit_id,p.for_month)}</td><td>${escH(p.note||'—')}</td><td style="white-space:nowrap"><button class="btn btn-g btn-sm" onclick="editPayment('${p.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delPayment('${p.id}')">🗑️</button></td></tr>`;
   }).join('');
 }
-
-function fillPaymentUnits(){
-  const rentedUnits=ALL_UNITS.filter(u=>u.status==='rented');
-  document.getElementById('p-unit').innerHTML='<option value="">اختر وحدة مؤجرة...</option>'+rentedUnits.map(u=>{
+function fillPaymentUnits(extraId){
+  const list=ALL_UNITS.filter(u=>u.status==='rented'||u.id===extraId);
+  document.getElementById('p-unit').innerHTML='<option value="">اختر وحدة مؤجرة...</option>'+list.map(u=>{
     const b=BUILDINGS.find(x=>x.id===u.property_id);
-    return`<option value="${u.id}">${u.tenant_name||'—'} — ${b?.name||''} وحدة ${u.unit_number}</option>`;
+    return`<option value="${u.id}">${escH(u.tenant_name||'—')} — ${escH(b?.name||'')} وحدة ${escH(u.unit_number)}</option>`;
   }).join('');
 }
-
-async function addPayment(){
-  const uid=document.getElementById('p-unit').value,am=document.getElementById('p-am').value,dt=document.getElementById('p-dt').value;
-  if(!uid||!am||!dt){toast('أكمل جميع الحقول',true);return;}
-  const{error}=await db.from('payments').insert({unit_id:uid,amount:am,paid_at:dt,status:document.getElementById('p-st').value,note:document.getElementById('p-note').value||null,user_id:CU.id});
+function nextMonth(ym){const [y,m]=ym.split('-').map(Number);const d=new Date(Date.UTC(y,m,1));return d.toISOString().slice(0,7);}
+function suggestMonth(u){
+  const cur=todayStr().slice(0,7), due=unitDue(u);
+  let m=(u.contract_start||cur).slice(0,7); if(m>cur) m=cur;
+  for(let i=0;i<48&&m<=cur;i++){ if(due&&paidFor(u.id,m+'-01')<due) return m; m=nextMonth(m); }
+  return nextMonth(cur);
+}
+function onPayUnit(){
+  const u=ALL_UNITS.find(x=>x.id===document.getElementById('p-unit').value); if(!u){payHint();return;}
+  if(!PAY_EDIT){
+    const m=suggestMonth(u); document.getElementById('p-mo').value=m;
+    const rem=unitDue(u)-paidFor(u.id,m+'-01'); if(rem>0) document.getElementById('p-am').value=rem;
+  }
+  payHint();
+}
+function payHint(){
+  const el=document.getElementById('p-hint');
+  const uid=document.getElementById('p-unit').value,mo=document.getElementById('p-mo').value,am=+document.getElementById('p-am').value||0;
+  const u=ALL_UNITS.find(x=>x.id===uid); if(!u||!mo){el.innerHTML='';return;}
+  const due=unitDue(u); if(!due){el.innerHTML='<div style="font-size:12px;color:var(--text3)">لا يوجد إيجار شهري محدد لهذه الوحدة</div>';return;}
+  const before=paidFor(uid,mo+'-01',PAY_EDIT), counts=document.getElementById('p-st').value==='paid';
+  const diff=due-(before+(counts?am:0));
+  const [msg,c]=diff>0?[`⚠️ المتبقي لهذا الشهر: <b>${fmt(diff)}</b>`,'#d97706']:diff<0?[`🔼 زيادة <b>${fmt(-diff)}</b> عن إيجار الشهر — سجّلها على الشهر التالي`,'#2563eb']:['✅ الشهر مكتمل','#16a34a'];
+  el.innerHTML=`<div style="font-size:13px;line-height:1.8;padding:10px 12px;border-radius:10px;background:rgba(79,70,229,.06);color:${c}">إيجار ${monthLabel(mo+'-01')}: ${fmt(due)} · مدفوع سابقًا: ${fmt(before)}<br>${msg}</div>`;
+}
+function openPaymentModal(){
+  PAY_EDIT=null; fillPaymentUnits();
+  document.getElementById('p-ttl').textContent='💳 تسجيل دفعة';
+  document.getElementById('p-am').value='';document.getElementById('p-dt').value=todayStr();
+  document.getElementById('p-st').value='paid';document.getElementById('p-note').value='';
+  document.getElementById('p-mo').value=todayStr().slice(0,7);payHint();openOv('ov-payment');
+}
+function editPayment(id){
+  const p=PAYMENTS.find(x=>x.id===id); if(!p) return;
+  PAY_EDIT=id; fillPaymentUnits(p.unit_id);
+  document.getElementById('p-ttl').textContent='✏️ تعديل دفعة';
+  document.getElementById('p-unit').value=p.unit_id||'';
+  document.getElementById('p-mo').value=p.for_month?p.for_month.slice(0,7):'';
+  document.getElementById('p-am').value=p.amount||'';document.getElementById('p-dt').value=p.paid_at||'';
+  document.getElementById('p-st').value=p.status||'paid';document.getElementById('p-note').value=p.note||'';
+  payHint();openOv('ov-payment');
+}
+async function delPayment(id){
+  if(!confirm('حذف هذه الدفعة نهائيًا؟')) return;
+  const{error}=await db.from('payments').delete().eq('id',id);
   if(error){toast('خطأ: '+error.message,true);return;}
-  toast('تم تسجيل الدفعة');closeOv('ov-payment');
+  toast('تم الحذف');await loadPaymentsData();
+}
+async function addPayment(){
+  const uid=document.getElementById('p-unit').value,am=document.getElementById('p-am').value,dt=document.getElementById('p-dt').value,mo=document.getElementById('p-mo').value;
+  if(!uid||!am||!dt||!mo){toast('أكمل جميع الحقول (الوحدة والشهر والمبلغ والتاريخ)',true);return;}
+  const row={unit_id:uid,amount:am,paid_at:dt,for_month:mo+'-01',status:document.getElementById('p-st').value,note:document.getElementById('p-note').value||null};
+  const{error}=PAY_EDIT?await db.from('payments').update(row).eq('id',PAY_EDIT):await db.from('payments').insert({...row,user_id:CU.id});
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast(PAY_EDIT?'تم تعديل الدفعة':'تم تسجيل الدفعة');closeOv('ov-payment');PAY_EDIT=null;
   await loadPaymentsData();
+}
+
+function editContract(id){const u=ALL_UNITS.find(x=>x.id===id);if(!u)return;curBuildingId=u.property_id;editUnit(id);}
+async function endContract(id){
+  if(!confirm('إنهاء العقد؟ ستصبح الوحدة فارغة ويُمسح بيان المستأجر (المدفوعات المسجلة تبقى كما هي).')) return;
+  const{error}=await db.from('units').update({status:'vacant',tenant_name:null,tenant_phone:null,tenant_nid:null,contract_start:null,contract_end:null,agreed_rent:null,has_late:false,late_amount:0}).eq('id',id);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم إنهاء العقد');await loadAll();
 }
 
 // ── CONTRACTS VIEW ──
 function renderContracts(){
   const tb=document.getElementById('tb-contracts');
   const rentedUnits=ALL_UNITS.filter(u=>u.status==='rented'&&u.tenant_name);
-  if(!rentedUnits.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">📄</div><div class="et">لا توجد عقود</div></div></td></tr>';return;}
+  if(!rentedUnits.length){tb.innerHTML='<tr><td colspan="9"><div class="empty"><div class="ei">📄</div><div class="et">لا توجد عقود</div></div></td></tr>';return;}
   tb.innerHTML=rentedUnits.map(u=>{
     const b=BUILDINGS.find(x=>x.id===u.property_id);
     const d=daysLeft(u.contract_end);
     const st=d===null?'—':d<0?`<span class="pill p-r">⏰ منتهي</span>`:d<=30?`<span class="pill p-a">⚠️ ${d} يوم</span>`:`<span class="pill p-g">✅ ${d} يوم</span>`;
-    return`<tr><td class="td-m">${u.tenant_name||'—'}</td><td>وحدة ${u.unit_number}</td><td>${b?.name||'—'}</td><td>${u.agreed_rent?Number(u.agreed_rent).toLocaleString('ar-EG')+' ج':'—'}</td><td>${u.contract_start?new Date(u.contract_start).toLocaleDateString('ar-EG'):'—'}</td><td>${u.contract_end?new Date(u.contract_end).toLocaleDateString('ar-EG'):'—'}</td><td>${st}</td><td>${u.has_late?`<span class="pill p-r">⚠️ ${Number(u.late_amount).toLocaleString('ar-EG')} ج</span>`:'<span class="pill p-g">✅ ملتزم</span>'}</td></tr>`;
+    return`<tr><td class="td-m">${u.tenant_name||'—'}</td><td>وحدة ${u.unit_number}</td><td>${b?.name||'—'}</td><td>${u.agreed_rent?Number(u.agreed_rent).toLocaleString('ar-EG')+' ج':'—'}</td><td>${u.contract_start?new Date(u.contract_start).toLocaleDateString('ar-EG'):'—'}</td><td>${u.contract_end?new Date(u.contract_end).toLocaleDateString('ar-EG'):'—'}</td><td>${st}</td><td>${u.has_late?`<span class="pill p-r">⚠️ ${Number(u.late_amount).toLocaleString('ar-EG')} ج</span>`:'<span class="pill p-g">✅ ملتزم</span>'}</td><td style="white-space:nowrap"><button class="btn btn-g btn-sm" onclick="editContract('${u.id}')">✏️ تعديل</button> <button class="btn btn-red btn-sm" onclick="endContract('${u.id}')">إنهاء</button></td></tr>`;
   }).join('');
 }
 
@@ -1703,7 +1771,7 @@ function renderCharts(rented, vacant, maintenance){
 // Open payment modal with units filled
 document.getElementById('ov-payment').addEventListener('click',()=>{});
 const payBtn=document.querySelector('[onclick="openOv(\'ov-payment\')"]');
-function openPaymentModal(){fillPaymentUnits();openOv('ov-payment');}
+
 </script>
 </body>
 </html>

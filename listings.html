@@ -134,6 +134,34 @@ textarea{resize:vertical;min-height:80px}
   .filters-inner{gap:8px}
   .search-input{width:100%;padding:10px 14px}
 }
+
+.mk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px 12px}
+@media(min-width:700px){.mk-grid{grid-template-columns:repeat(3,1fr);gap:14px;padding:16px 0}}
+@media(min-width:1000px){.mk-grid{grid-template-columns:repeat(4,1fr)}}
+.mk-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,.1);cursor:pointer;transition:transform .15s}
+.mk-card:active{transform:scale(.98)}
+.mk-img{position:relative;aspect-ratio:1/1;background:#eef0f6}
+.mk-img>img{width:100%;height:100%;object-fit:cover;display:block}
+.mk-ph{width:100%;height:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.mk-ph img{position:absolute;width:55%;opacity:.18;border-radius:22%}
+.mk-ph span{font-size:44px;position:relative}
+.mk-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.95);color:#4f46e5;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700}
+.mk-count{position:absolute;bottom:8px;left:8px;background:rgba(15,23,42,.65);color:#fff;border-radius:12px;padding:2px 8px;font-size:11px}
+.mk-body{padding:8px 10px 11px}
+.mk-price{font-weight:800;font-size:16px;color:#4f46e5}
+.mk-price small{font-size:11px;color:#718096;font-weight:600;margin-right:4px}
+.mk-title{font-size:13px;font-weight:700;color:#1a202c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.mk-loc{font-size:12px;color:#718096;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.det{position:fixed;inset:0;z-index:8000;background:rgba(15,23,42,.55);display:none;align-items:flex-end;justify-content:center}
+.det.open{display:flex}
+.det-card{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:#fff;border-radius:20px 20px 0 0;position:relative}
+.det-x{position:absolute;top:12px;left:12px;z-index:3;width:34px;height:34px;border:0;border-radius:50%;background:rgba(15,23,42,.6);color:#fff;font-size:16px;cursor:pointer}
+.det-gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;aspect-ratio:1/1;max-height:62vh;background:#eef0f6}
+.det-gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start}
+.det-title{font-size:18px;font-weight:800;color:#1a202c;margin-top:4px}
+.det-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.det-chip{background:#eef2ff;color:#4f46e5;border-radius:14px;padding:4px 11px;font-size:12px;font-weight:700}
+.det-notes{font-size:13px;color:#4a5568;line-height:1.8;margin-top:6px}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -210,6 +238,8 @@ textarea{resize:vertical;min-height:80px}
   <div id="map-wrap" style="display:none;height:340px;border-radius:14px;overflow:hidden;margin-bottom:14px;border:1px solid #e2e8f0"><div id="lmap" style="height:100%"></div></div>
   <div id="listings-container"><div class="ld"><div class="sp"></div> جاري تحميل العقارات...</div></div>
 </div>
+
+<div class="det" id="ov-detail" onclick="if(event.target===this)closeDetail()"><div class="det-card"><button class="det-x" onclick="closeDetail()">✕</button><div id="det-body"></div></div></div>
 
 <!-- AUTH MODAL -->
 <div class="ov" id="ov-auth">
@@ -377,7 +407,7 @@ function focusFromUrl(){
   const id=new URLSearchParams(location.search).get('u'); if(!id) return;
   const el=document.getElementById('u-'+id);
   if(!el){toast('هذا العقار لم يعد متاحًا',true);return;}
-  el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),4000);
+  el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),4000);openDetail(id);
 }
 function applyFilters(){
   const search=document.getElementById('search').value.toLowerCase();
@@ -422,36 +452,42 @@ function renderListings(listings){
     return;
   }
 
-  container.innerHTML=`<div class="listings-grid">${listings.map(u=>{
-    const prop=u.properties;
-    const type=prop?.type||'other';
-    const emoji=typeEmoji[type]||'🏠';
-    const typeName=typeMap[type]||'عقار';
-    const price=u.listing_price||u.rent_price;
-    return`<div class="listing-card" id="u-${u.id}">
-      <div class="card-img">
-        ${prop.images&&prop.images.length?`<div style="position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory">${prop.images.map(src=>`<img src="${escL(src)}" loading="lazy" style="flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start">`).join('')}</div>`:`<span style="font-size:72px">${emoji}</span>`}
-        <div class="card-badge">${typeName}</div>
+  container.innerHTML=`<div class="mk-grid">${listings.map(u=>{
+    const p=u.properties||{},emoji=typeEmoji[p.type]||'🏠',price=u.listing_price||u.rent_price;
+    const img=p.images&&p.images[0];
+    const d=u._d!=null?(u._d<1?Math.round(u._d*1000)+' م':u._d.toFixed(1)+' كم'):'';
+    const loc=[p.city,p.district].filter(Boolean).join(' — ')||p.governorate||'';
+    return`<div class="mk-card" id="u-${u.id}" onclick="openDetail('${u.id}')">
+      <div class="mk-img">${img?`<img src="${escL(img)}" loading="lazy" alt="">`:`<div class="mk-ph"><img src="icon-192.png" alt=""><span>${emoji}</span></div>`}
+        <span class="mk-badge">${d?'📍 '+d:(typeMap[p.type]||'عقار')}</span>
+        ${p.images&&p.images.length>1?`<span class="mk-count">📷 ${p.images.length}</span>`:''}
       </div>
-      <div class="card-body">
-        <div class="card-title">${escL(prop?.name||'عقار متاح')}</div>
-        <div class="card-addr">📍 ${escL(prop?.address||'العنوان غير محدد')}</div>
-        ${locLine(u)}
-        <div class="card-details">
-          ${u.area_sqm?`<div class="card-detail"><div class="cd-lbl">المساحة</div><div class="cd-val">${u.area_sqm} م²</div></div>`:''}
-          ${u.floor?`<div class="card-detail"><div class="cd-lbl">الطابق</div><div class="cd-val">${u.floor}</div></div>`:''}
-          ${u.unit_number?`<div class="card-detail"><div class="cd-lbl">رقم الوحدة</div><div class="cd-val">${u.unit_number}</div></div>`:''}
-        </div>
-        ${price?`<div class="card-price">${Number(price).toLocaleString('ar-EG')} ج <span>/ شهرياً</span></div>`:'<div class="card-price" style="color:#a0aec0">السعر عند التواصل</div>'}
-        ${u.listing_notes||prop?.notes?`<div style="font-size:12px;color:#718096;margin-bottom:12px;line-height:1.6">${escL(u.listing_notes||prop?.notes)}</div>`:''}
-        <div class="card-footer">
-          <button class="btn-request" onclick="openRequest('${u.id}','${(prop?.name||'').replace(/['"<>`]/g,'')}','${emoji}','${(prop?.address||'').replace(/['"<>`]/g,'')}')">📋 سجل طلبك</button>
-          <button class="btn-share" onclick="shareUnit('${u.id}','${(prop?.name||'').replace(/['"<>`]/g,'')}')">🔗 مشاركة</button>
-        </div>
-      </div>
+      <div class="mk-body"><div class="mk-price">${price?Number(price).toLocaleString('ar-EG')+' ج':'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div><div class="mk-title">${escL(p.name||'عقار متاح')}</div><div class="mk-loc">${escL(loc||p.address||'')}</div></div>
     </div>`;
   }).join('')}</div>`;
 }
+
+function reqFromUnit(id){const u=LAST.find(x=>x.id===id);if(!u)return;const p=u.properties||{};openRequest(u.id,p.name||'',typeEmoji[p.type]||'🏠',p.address||'');}
+function shareFromUnit(id){const u=LAST.find(x=>x.id===id);if(u)shareUnit(id,(u.properties||{}).name||'');}
+function openDetail(id){
+  const u=LAST.find(x=>x.id===id); if(!u) return;
+  const p=u.properties||{},emoji=typeEmoji[p.type]||'🏠',price=u.listing_price||u.rent_price,imgs=p.images||[];
+  const chips=[u.area_sqm?'📐 '+u.area_sqm+' م²':'',u.floor?'🏢 الطابق '+u.floor:'',u.unit_number?'🔑 وحدة '+u.unit_number:'',typeMap[p.type]?emoji+' '+typeMap[p.type]:''].filter(Boolean).map(c=>`<span class="det-chip">${escL(c)}</span>`).join('');
+  const notes=u.listing_notes||p.notes;
+  document.getElementById('det-body').innerHTML=`
+    <div class="det-gal">${imgs.length?imgs.map(src=>`<img src="${escL(src)}" alt="">`).join(''):`<div class="mk-ph" style="flex:0 0 100%;aspect-ratio:1/1"><img src="icon-192.png" alt=""><span style="font-size:72px">${emoji}</span></div>`}</div>
+    <div style="padding:16px 16px 22px">
+      <div class="mk-price" style="font-size:24px">${price?Number(price).toLocaleString('ar-EG')+' ج':'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div>
+      <div class="det-title">${escL(p.name||'عقار متاح')}</div>
+      <div style="font-size:13px;color:#718096;margin-top:2px">📍 ${escL(p.address||'العنوان غير محدد')}</div>
+      ${locLine(u)}
+      <div class="det-chips">${chips}</div>
+      ${notes?`<div class="det-notes">${escL(notes)}</div>`:''}
+      <div class="card-footer" style="margin-top:16px"><button class="btn-request" onclick="closeDetail();reqFromUnit('${u.id}')">📋 سجل طلبك</button><button class="btn-share" onclick="shareFromUnit('${u.id}')">🔗 مشاركة</button></div>
+    </div>`;
+  document.getElementById('ov-detail').classList.add('open');
+}
+function closeDetail(){document.getElementById('ov-detail').classList.remove('open');}
 
 function showRequest(unitId, propName, emoji, addr, uname, uphone){
   currentUnitId=unitId;

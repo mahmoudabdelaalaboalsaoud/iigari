@@ -275,6 +275,24 @@ textarea{resize:vertical;min-height:80px}
   .buildings-grid{grid-template-columns:1fr}
   .units-grid{grid-template-columns:1fr}
 }
+
+button,.bn-item,.ni,.fb,.chip,.btn,.pill,.u-mini,.building-card,.building-cover,.hamburger,.theme-btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input,textarea,select{-webkit-user-select:text;user-select:text}
+.ldr{width:30px;height:30px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spn .8s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+.plc{border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer;background:var(--bg2)}
+.plc.sel{border-color:var(--accent);background:rgba(79,70,229,.07)}
+.plc.cur{opacity:.9}
+.plc .ph{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.plc .pp{font-size:20px;font-weight:800;color:var(--accent)}
+.plc .pp small{font-size:12px;color:var(--text3);font-weight:600}
+.plc ul{list-style:none;margin:8px 0 0;padding:0;font-size:13px;line-height:1.9}
+.plc li:before{content:"✓";color:#16a34a;font-weight:800;margin-left:6px}
+.pltag{background:#16a34a;color:#fff;font-size:11px;border-radius:10px;padding:2px 8px}
+.pay-d{margin-top:12px;font-size:13px;line-height:1.9}
+.wab{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:12px;background:#25d366;color:#fff;font-weight:800;font-size:15px;text-decoration:none;margin-top:12px}
+.wab.alt{background:transparent;color:#16a34a;border:1.5px solid #25d366;margin-top:8px;font-size:14px}
+.wab.off{background:#cbd5e1;pointer-events:none}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -292,7 +310,8 @@ textarea{resize:vertical;min-height:80px}
 <body>
 
 <!-- LOGIN -->
-<div class="screen active" id="s-login">
+<div class="screen active" id="s-load" style="align-items:center;justify-content:center;flex-direction:column;gap:16px;background:linear-gradient(135deg,#4f46e5,#7c3aed)"><img src="icon-192.png" alt="" style="width:88px;height:88px;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.25)"><div class="ldr"></div></div>
+<div class="screen" id="s-login">
   <div class="login-box">
     <div class="l-logo"><div class="l-icon">إ</div><div class="l-name">إيجاري</div></div>
     <div class="l-sub">منصة إدارة العقارات والإيجارات</div>
@@ -546,6 +565,15 @@ textarea{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- Member properties (staff) -->
+<div class="ov" id="ov-member">
+  <div class="modal">
+    <div class="modal-ttl" id="mem-ttl">عقارات العضو</div>
+    <div id="mem-body" style="margin-top:10px"></div>
+    <div class="fa"><button class="btn btn-g" onclick="closeOv('ov-member')">إغلاق</button></div>
+  </div>
+</div>
+
 <!-- Location Modal -->
 <div class="ov" id="ov-loc">
   <div class="modal">
@@ -652,11 +680,12 @@ window.addEventListener('load',async()=>{
   const btn=document.getElementById('theme-btn');
   if(btn) btn.textContent=savedTheme==='dark'?'☀️':'🌙';
   document.getElementById('pg-date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const{data:{session}}=await db.auth.getSession();
-  if(session) await handleUser(session.user);
+  let session=null;
+  try{session=(await db.auth.getSession()).data.session;}catch(e){}
+  if(session) await handleUser(session.user); else showS('login');
   db.auth.onAuthStateChange(async(ev,sess)=>{
     if(ev==='SIGNED_IN'&&sess) await handleUser(sess.user);
-    if(ev==='SIGNED_OUT') showS('login');
+    if(ev==='SIGNED_OUT'){ENTERED=null;showS('login');}
   });
 });
 
@@ -679,7 +708,14 @@ function closeSidebar(){
   document.getElementById('sb-overlay').classList.remove('show');
 }
 
+let ENTERED=null,HANDLING=false;
 async function handleUser(user){
+  if(ENTERED===user.id||HANDLING) return;
+  HANDLING=true;
+  try{await _handleUser(user);}catch(e){console.error(e);showS('login');}
+  finally{HANDLING=false;}
+}
+async function _handleUser(user){
   CU=user;
   const{data:p}=await db.from('user_profiles').select('status,account_type,phone,full_name,role').eq('id',user.id).maybeSingle();
   MYROLE=(p&&p.role)||'user'; isAdm=user.email===ADMIN||MYROLE==='admin'; isMod=isAdm||MYROLE==='moderator';
@@ -713,6 +749,7 @@ function showS(s){
 }
 
 function enterApp(user){
+  ENTERED=user.id;
   showS('app');
   const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email?.split('@')[0]||'مستخدم';
   document.getElementById('u-nm').textContent=name;
@@ -873,15 +910,15 @@ async function setLeadStatus(id,st){
 // ── PLANS ──
 const PLANS={free:{n:'مجانية',max:1,price:0},p3:{n:'باقة 3 عقارات',max:3,price:300},p5:{n:'باقة 5 عقارات',max:5,price:500},pro:{n:'باقة أكثر من 5 عقارات',max:Infinity,price:700}};
 const PAY={name:'محمود',vf:'01015726786',vfLink:'http://vf.eg/vfcash?id=mt&qrId=P1TJGE',ipLink:'https://ipn.eg/S/mahmoudaboalsaoud909/instapay/4P5vxM',wa:'201015726786'};
-let MYPLAN={plan:'free',until:null};
+let MYPLAN={plan:'free',until:null},MYPHONE='';
 const todayStr=()=>new Date().toISOString().slice(0,10);
 function effPlan(){
   if(isAdm) return 'pro';
   return (MYPLAN.plan!=='free'&&MYPLAN.until&&MYPLAN.until>=todayStr())?MYPLAN.plan:'free';
 }
 async function loadMyPlan(){
-  const{data}=await db.from('user_profiles').select('plan,plan_until').eq('id',CU.id).maybeSingle();
-  if(data) MYPLAN={plan:data.plan||'free',until:data.plan_until};
+  const{data}=await db.from('user_profiles').select('plan,plan_until,phone').eq('id',CU.id).maybeSingle();
+  if(data){MYPLAN={plan:data.plan||'free',until:data.plan_until};MYPHONE=data.phone||'';}
   const t=document.getElementById('plan-tag'); if(t) t.textContent=isAdm?'(غير محدودة)':'('+PLANS[effPlan()].n+')';
 }
 function openAddBuilding(){
@@ -896,20 +933,38 @@ function payInfo(){
   return{name:S.pay_name||PAY.name,vf:S.vf_number||PAY.vf,vfLink:S.vf_link||PAY.vfLink,ipLink:S.instapay_link||PAY.ipLink,wa:S.wa_number||PAY.wa,
     note:S.pay_note||'بعد التحويل أرسل سكرين شوت وسيتم تفعيل الباقة، ولو احتجت مساعدة أو تعديل بسيط نعمله لك مجانًا إن شاء الله.'};
 }
-function openPlans(limitHit){
-  const PY=payInfo();
-  const cur=effPlan(), p=PLANS[cur];
-  const used=BUILDINGS.length;
-  document.getElementById('plans-ttl').textContent=limitHit?'🔒 وصلت للحد الأقصى':'📦 باقتي';
-  const rows=Object.keys(PLANS).map(k=>{
-    const x=PLANS[k];
-    return `<div style="display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;${k===cur?'background:rgba(79,70,229,.08);border-color:var(--accent)':''}"><b>${x.n}${k===cur?' ✓':''}</b><span>${x.price?x.price+' جنيه / شهر':'مجانًا'}</span></div>`;
+let SEL_PLAN=null,PLAN_HIT=false;
+function planMsg(k,paid){
+  const x=PLANS[k],nm=(window.SITE&&SITE.site_name)||'إيجاري',cur=effPlan();
+  const who=`👤 الاسم: ${document.getElementById('u-nm').textContent||'—'}\n✉️ الإيميل: ${CU.email}\n📱 الموبايل: ${MYPHONE||'—'}\n🏢 عدد عقاراتي الحالية: ${BUILDINGS.filter(b=>b.user_id===CU.id).length}\n📦 باقتي الحالية: ${PLANS[cur].n}`;
+  return paid
+    ?`السلام عليكم ورحمة الله وبركاته 🌹\nقمت بتحويل مبلغ ${x.price} جنيه لاشتراك *${x.n}* في منصة ${nm}، وهذا إيصال التحويل 👇\n\n${who}`
+    :`السلام عليكم ورحمة الله وبركاته 🌹\nأرغب في ${cur===k?'تجديد':'الاشتراك في'} *${x.n}* بسعر ${x.price} جنيه شهريًا في منصة ${nm}.\n\n${who}\n\nبرجاء إفادتي بخطوات الدفع.`;
+}
+function selPlan(k){SEL_PLAN=k;renderPlans();}
+function renderPlans(){
+  const cur=effPlan(),PY=payInfo(),used=BUILDINGS.filter(b=>b.user_id===CU.id).length;
+  const until=(!isAdm&&cur!=='free'&&MYPLAN.until)?` · تنتهي ${MYPLAN.until}`:'';
+  const cards=Object.keys(PLANS).map(k=>{
+    const x=PLANS[k],isCur=k===cur,canSel=k!=='free',sel=SEL_PLAN===k;
+    const feats=[x.max===Infinity?'عقارات غير محدودة':'حتى '+x.max+(x.max===1?' عقار':' عقارات'),'وحدات غير محدودة','العقود والتحصيل بالأشهر','المعرض العام وطلبات العملاء','صور وخريطة لكل عقار'];
+    return `<div class="plc${sel?' sel':''}${isCur?' cur':''}" ${canSel?`onclick="selPlan('${k}')"`:''} style="${canSel?'':'cursor:default'}"><div class="ph"><b>${escH(x.n)}</b>${isCur?'<span class="pltag">باقتك الحالية</span>':''}<span class="pp">${x.price?x.price+' <small>جنيه / شهر</small>':'<small>مجانًا</small>'}</span></div>${(sel||k==='free')?`<ul>${feats.map(f=>`<li>${f}</li>`).join('')}</ul>`:''}</div>`;
   }).join('');
-  const until=(!isAdm&&cur!=='free'&&MYPLAN.until)?`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">تنتهي في: ${MYPLAN.until}</div>`:'';
+  const act=SEL_PLAN
+    ?`<a class="wab" href="https://wa.me/${PY.wa}?text=${encodeURIComponent(planMsg(SEL_PLAN,false))}" target="_blank" rel="noopener">💬 ${cur===SEL_PLAN?'اطلب تجديد':'اطلب الاشتراك في'} ${escH(PLANS[SEL_PLAN].n)} عبر واتساب</a>
+       <details class="pay-d"><summary style="cursor:pointer;font-weight:700">💳 طرق الدفع (بعد الاتفاق على الباقة)</summary><div style="margin-top:8px">📱 فودافون كاش (باسم ${escH(PY.name)}): <b dir="ltr">${escH(PY.vf)}</b> — <a href="${escH(PY.vfLink)}" target="_blank" rel="noopener">رابط الدفع</a><br>💳 إنستاباي: <a href="${escH(PY.ipLink)}" target="_blank" rel="noopener">رابط الدفع</a><br>${escH(PY.note)}</div></details>
+       <a class="wab alt" href="https://wa.me/${PY.wa}?text=${encodeURIComponent(planMsg(SEL_PLAN,true))}" target="_blank" rel="noopener">📎 أرسل إيصال التحويل</a>`
+    :'<a class="wab off">اختر الباقة المناسبة أولًا</a>';
   document.getElementById('plans-body').innerHTML=
-    (limitHit?`<div style="margin-bottom:10px;color:var(--red);font-weight:700">باقتك الحالية (${p.n}) تسمح بـ ${p.max===Infinity?'عدد غير محدود':p.max} عقار، ولا يمكن إضافة المزيد. رقّ باقتك للإضافة.</div>`:`<div style="margin-bottom:6px">باقتك الحالية: <b>${isAdm?'أدمن — غير محدودة':p.n}</b> · عقاراتك: ${used}${isAdm||p.max===Infinity?'':' / '+p.max}</div>`)+
-    until+rows+
-    `<div style="font-size:13px;margin:10px 0;line-height:1.9"><b>طريقة الدفع (باسم ${PY.name}):</b><br>📱 فودافون كاش: <b dir="ltr">${PY.vf}</b> — <a href="${PY.vfLink}" target="_blank" rel="noopener">رابط الدفع</a><br>💳 إنستاباي: <a href="${PY.ipLink}" target="_blank" rel="noopener">رابط الدفع</a><br>${escH(PY.note)}<br><a class="btn btn-green btn-sm" style="margin-top:8px;display:inline-flex" href="https://wa.me/${PY.wa}?text=${encodeURIComponent('السلام عليكم، قمت بتحويل اشتراك إيجاري وهذا سكرين شوت التحويل. إيميل حسابي: '+(CU?.email||''))}" target="_blank" rel="noopener">💬 أرسل صورة التحويل</a></div>`;
+    (PLAN_HIT?`<div style="margin-bottom:12px;color:var(--red);font-weight:700;line-height:1.7">وصلت للحد الأقصى لباقتك الحالية. اختر باقة أكبر لإضافة المزيد من العقارات.</div>`:'')+
+    `<div style="margin-bottom:12px;font-size:13px;color:var(--text3)">باقتك الحالية: <b style="color:inherit">${isAdm?'أدمن — غير محدودة':escH(PLANS[cur].n)}</b> · عقاراتك: ${used}${isAdm||PLANS[cur].max===Infinity?'':' / '+PLANS[cur].max}${until}</div>`+cards+act;
+}
+function openPlans(limitHit){
+  PLAN_HIT=!!limitHit;
+  const cur=effPlan(),used=BUILDINGS.filter(b=>b.user_id===CU.id).length;
+  SEL_PLAN=limitHit?(Object.keys(PLANS).find(k=>k!=='free'&&PLANS[k].max>used)||'pro'):(cur!=='free'?cur:null);
+  document.getElementById('plans-ttl').textContent=limitHit?'🔒 ارفع باقتك':'📦 باقتي والاشتراكات';
+  renderPlans();
   openOv('ov-plans');
 }
 function planCtl(u){
@@ -926,6 +981,136 @@ async function renewPlan(id){
   const base=(u.plan_until&&u.plan_until>todayStr())?u.plan_until:todayStr();
   await adm('admin_set_plan',{p_uid:id,p_plan:u.plan,p_until:addDays(base,30)},'تم التجديد 30 يوم');
 }
+
+// ── LOCATION (governorate/city/district + map) ──
+const MAPS={}, XV='__x';
+function locBlock(p){
+  const fld=(k,l)=>`<div class="fgi"><label>${l}</label><select id="${p}-${k}" onchange="locChg('${p}','${k}')"></select><input id="${p}-${k}-x" placeholder="اكتب ${l}" style="display:none;margin-top:6px"></div>`;
+  return fld('gov','المحافظة')+fld('city','المدينة / المنطقة')+fld('dist','الحي')+
+  `<div class="fgi full"><label>📍 حدّد الموقع بالظبط (اضغط على الخريطة أو اسحب الدبوس)</label><div id="${p}-map" style="height:240px;border-radius:12px;border:1px solid var(--border)"></div><button type="button" class="btn btn-g btn-sm" style="margin-top:6px" onclick="myLoc('${p}')">📍 موقعي الحالي</button><input type="hidden" id="${p}-lat"><input type="hidden" id="${p}-lng"></div>`;
+}
+function fillSel(id,list,ph){
+  document.getElementById(id).innerHTML=`<option value="">${ph}</option>`+list.map(x=>`<option>${x}</option>`).join('')+`<option value="${XV}">✍️ أخرى (اكتب يدويًا)</option>`;
+}
+function locChg(p,k){
+  const v=document.getElementById(`${p}-${k}`).value;
+  document.getElementById(`${p}-${k}-x`).style.display=v===XV?'block':'none';
+  if(k==='gov'){
+    const g=EG[v]; fillSel(p+'-city',g?Object.keys(g):[],'اختر المدينة');
+    document.getElementById(p+'-city-x').style.display='none';
+    fillSel(p+'-dist',[],'اختر الحي'); document.getElementById(p+'-dist-x').style.display='none';
+  } else if(k==='city'){
+    const g=EG[document.getElementById(p+'-gov').value];
+    fillSel(p+'-dist',(g&&g[v])||[],'اختر الحي'); document.getElementById(p+'-dist-x').style.display='none';
+  }
+}
+function setSel(id,val,list){
+  const el=document.getElementById(id), x=document.getElementById(id+'-x');
+  if(!val){el.value='';x.style.display='none';return;}
+  if(list.includes(val)){el.value=val;x.style.display='none';}
+  else{el.value=XV;x.value=val;x.style.display='block';}
+}
+function setLoc(p,g,c,d){
+  const gl=Object.keys(EG); fillSel(p+'-gov',gl,'اختر المحافظة'); setSel(p+'-gov',g,gl);
+  const gv=document.getElementById(p+'-gov').value, cl=EG[gv]?Object.keys(EG[gv]):[];
+  fillSel(p+'-city',cl,'اختر المدينة'); setSel(p+'-city',c,cl);
+  const cv=document.getElementById(p+'-city').value, dl=(EG[gv]&&EG[gv][cv])||[];
+  fillSel(p+'-dist',dl,'اختر الحي'); setSel(p+'-dist',d,dl);
+}
+function getSel(id){const v=document.getElementById(id).value;return v===XV?(document.getElementById(id+'-x').value.trim()||null):(v||null);}
+function locVals(p){
+  const la=document.getElementById(p+'-lat').value, ln=document.getElementById(p+'-lng').value;
+  return{governorate:getSel(p+'-gov'),city:getSel(p+'-city'),district:getSel(p+'-dist'),lat:la?+la:null,lng:ln?+ln:null};
+}
+function initMap(p,lat,lng){
+  setTimeout(()=>{
+    if(!MAPS[p]){
+      const m=L.map(p+'-map').setView([27,30.5],6);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m);
+      m.on('click',e=>putPin(p,e.latlng.lat,e.latlng.lng));
+      MAPS[p]={m,mk:null};
+    }
+    const o=MAPS[p]; o.m.invalidateSize();
+    if(lat&&lng){putPin(p,lat,lng);o.m.setView([lat,lng],16);} else o.m.setView([27,30.5],6);
+  },300);
+}
+function putPin(p,lat,lng){
+  const o=MAPS[p]; if(!o) return;
+  if(o.mk) o.mk.setLatLng([lat,lng]);
+  else{o.mk=L.marker([lat,lng],{draggable:true}).addTo(o.m);o.mk.on('dragend',()=>{const q=o.mk.getLatLng();putPin(p,q.lat,q.lng);});}
+  document.getElementById(p+'-lat').value=(+lat).toFixed(6); document.getElementById(p+'-lng').value=(+lng).toFixed(6);
+}
+function clearPin(p){
+  document.getElementById(p+'-lat').value='';document.getElementById(p+'-lng').value='';
+  const o=MAPS[p]; if(o&&o.mk){o.m.removeLayer(o.mk);o.mk=null;}
+}
+function resetLoc(p){setLoc(p,'','','');clearPin(p);}
+function myLoc(p){
+  if(!navigator.geolocation){toast('المتصفح لا يدعم تحديد الموقع',true);return;}
+  navigator.geolocation.getCurrentPosition(pos=>{putPin(p,pos.coords.latitude,pos.coords.longitude);MAPS[p].m.setView([pos.coords.latitude,pos.coords.longitude],17);},()=>toast('اسمح للمتصفح بتحديد موقعك',true),{enableHighAccuracy:true});
+}
+let LOCID=null;
+function openLoc(id){
+  const b=BUILDINGS.find(x=>x.id===id); if(!b) return;
+  LOCID=id; setLoc('l',b.governorate,b.city,b.district); clearPin('l');
+  openOv('ov-loc'); initMap('l',b.lat,b.lng);
+}
+async function saveLoc(){
+  const{error}=await db.from('properties').update(locVals('l')).eq('id',LOCID);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم حفظ الموقع');closeOv('ov-loc');await loadBuildings();renderBuildings();
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('b-loc').innerHTML=locBlock('b');
+  document.getElementById('l-loc').innerHTML=locBlock('l');
+  setLoc('b','','','');setLoc('l','','','');
+});
+
+function typeHint(){
+  const t=document.getElementById('b-type').value,h=document.getElementById('b-type-hint');
+  h.textContent=SINGLE_TYPES.includes(t)?'ℹ️ سيتم إنشاء وحدة واحدة لهذا العقار تلقائيًا.':'ℹ️ هذا النوع يتكوّن من وحدات (شقق/محلات/الفيلا كاملة…). بعد الحفظ اضغط «عرض الوحدات» وأضف وحداته؛ التأجير والعقود والعرض في المعرض تتم على الوحدات.';
+}
+window.addEventListener('DOMContentLoaded',typeHint);
+
+// ── SITE SETTINGS (admin) ──
+let ST_LOGO=null;
+function renderStLogo(){
+  const el=document.getElementById('st-logo');
+  el.innerHTML=ST_LOGO?`<img src="${escH(ST_LOGO)}" style="width:100%;height:100%;object-fit:contain">`:'بدون شعار';
+}
+function loadSiteForm(){
+  const S=window.SITE||{};
+  ST_LOGO=S.logo_url||null;renderStLogo();
+  const v=(id,x)=>document.getElementById(id).value=x||'';
+  v('st-name',S.site_name);v('st-slogan',S.slogan);v('st-footer',S.footer_text);v('st-wa',S.wa_number);v('st-vf',S.vf_number);
+  v('st-vfl',S.vf_link);v('st-ipl',S.instapay_link);v('st-pn',S.pay_name);v('st-note',S.pay_note);
+}
+async function upLogo(inp){
+  const f=inp.files[0]; inp.value=''; if(!f) return;
+  toast('جاري رفع الشعار...');
+  try{
+    const bmp=await createImageBitmap(f), k=Math.min(1,512/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    const path='logo-'+Date.now()+'.png';
+    const{error}=await db.storage.from('site-assets').upload(path,blob,{contentType:'image/png'});
+    if(error){toast('تعذر الرفع: '+error.message,true);return;}
+    ST_LOGO=db.storage.from('site-assets').getPublicUrl(path).data.publicUrl;renderStLogo();
+    toast('تم رفع الشعار — اضغط حفظ');
+  }catch(e){toast('تعذر معالجة الصورة',true);}
+}
+function rmLogo(){ST_LOGO=null;renderStLogo();}
+async function saveSite(){
+  const g=id=>document.getElementById(id).value.trim()||null;
+  const row={site_name:g('st-name'),slogan:g('st-slogan'),footer_text:g('st-footer'),logo_url:ST_LOGO,wa_number:g('st-wa'),vf_number:g('st-vf'),vf_link:g('st-vfl'),instapay_link:g('st-ipl'),pay_name:g('st-pn'),pay_note:g('st-note'),updated_at:new Date().toISOString()};
+  const{error}=await db.from('site_settings').update(row).eq('id',1);
+  if(error){toast('خطأ: '+error.message,true);return;}
+  toast('تم حفظ الإعدادات');
+  if(!ST_LOGO){document.querySelectorAll('.l-icon,.tb-icon').forEach(e=>{e.style.background='';e.textContent='إ';});}
+  applySite({...(window.SITE||{}),...row});
+}
+window.addEventListener('DOMContentLoaded',()=>loadSite(db));
 async function loadAll(){
   await loadBuildings();
   await loadUnitsAll();
@@ -937,7 +1122,7 @@ async function loadAll(){
 // ── BUILDINGS ──
 async function loadBuildings(){
   let q=db.from('properties').select('*').order('created_at',{ascending:false});
-  if(!isMod&&CU) q=q.eq('user_id',CU.id);
+  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
   const{data}=await q;
   BUILDINGS=data||[];
   renderBuildings();
@@ -998,7 +1183,7 @@ function renderBuildingsFiltered(list){
         </div>
         <div class="building-header">
           <div class="building-name">${b.name}</div>
-          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>${isMod&&b.user_id!==CU.id?`<div style="font-size:12px;color:var(--accent);margin-top:2px">👤 ${escH((USERS.find(x=>x.id===b.user_id)||{}).full_name||(USERS.find(x=>x.id===b.user_id)||{}).email||'مالك آخر')}</div>`:''}<div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
+          <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>${isAdm&&b.user_id!==CU.id?`<div style="font-size:12px;color:var(--accent);margin-top:2px">👤 ${escH((USERS.find(x=>x.id===b.user_id)||{}).full_name||(USERS.find(x=>x.id===b.user_id)||{}).email||'مالك آخر')}</div>`:''}<div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
         </div>
         <div class="building-stats">
           <div class="bstat"><div class="bstat-val">${sl(unit?.status||'vacant')}</div><div class="bstat-lbl">الحالة</div></div>
@@ -1028,7 +1213,7 @@ function renderBuildingsFiltered(list){
       </div>
       <div class="building-header">
         <div class="building-name">${b.name}</div>
-        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>${isMod&&b.user_id!==CU.id?`<div style="font-size:12px;color:var(--accent);margin-top:2px">👤 ${escH((USERS.find(x=>x.id===b.user_id)||{}).full_name||(USERS.find(x=>x.id===b.user_id)||{}).email||'مالك آخر')}</div>`:''}<div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
+        <div class="building-addr">📍 ${b.address||'العنوان غير محدد'}</div>${isAdm&&b.user_id!==CU.id?`<div style="font-size:12px;color:var(--accent);margin-top:2px">👤 ${escH((USERS.find(x=>x.id===b.user_id)||{}).full_name||(USERS.find(x=>x.id===b.user_id)||{}).email||'مالك آخر')}</div>`:''}<div style="font-size:12px;color:var(--text3);margin-top:2px">${[b.governorate,b.city,b.district].filter(Boolean).join(' — ')}${b.lat?'':` ⚠️ <u style="cursor:pointer;color:var(--amber)" onclick="event.stopPropagation();editBuilding('${b.id}')">لم يُحدد على الخريطة — اضغط للتحديد</u>`}</div>
       </div>
       <div class="building-stats">
         <div class="bstat"><div class="bstat-val">${units.length}</div><div class="bstat-lbl">وحدة</div></div>
@@ -1197,7 +1382,7 @@ function viewBuilding(id,name){
 // ── UNITS ──
 async function loadUnitsAll(){
   let q=db.from('units').select('*').order('created_at',{ascending:false});
-  if(!isMod&&CU) q=q.eq('user_id',CU.id);
+  if(!isAdm&&CU) q=q.eq('user_id',CU.id);
   const{data}=await q;
   ALL_UNITS=data||[];
 }
@@ -1509,8 +1694,28 @@ function renderUsers(users){
   list.innerHTML=users.map(u=>{
     const badge=u.status==='pending'?`<span class="bp bp-p">⏳ انتظار</span>`:u.status==='approved'?`<span class="bp bp-a">✅ موافق</span>`:`<span class="bp bp-r">❌ مرفوض</span>`;
     const acts=u.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">✓ موافقة</button><button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">✕ رفض</button>`:u.status==='approved'?`<button class="btn btn-red btn-sm" onclick="rejectU('${u.id}')">إلغاء</button>`:`<button class="btn btn-green btn-sm" onclick="approveU('${u.id}')">إعادة موافقة</button>`;
-    return`<div class="uc"><div class="uc-av">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name">${escH(u.full_name||'—')} <span style="font-size:11px;color:var(--accent)">${roleBadge(u)}</span></div><div class="uc-email">${u.account_type==='tenant'?'🔎 مستأجر':'🏢 مالك'} · ${escH(u.email||'—')}${u.phone?' · '+escH(u.phone):' · ⚠️ بدون رقم'}</div></div><div class="uc-act">${badge} ${acts}${planCtl(u)}${contactBtns(u)}${staffCtl(u)}</div></div>`;
+    return`<div class="uc"><div class="uc-av">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:(u.full_name||u.email||'م').charAt(0).toUpperCase()}</div><div class="uc-info"><div class="uc-name" style="cursor:pointer;text-decoration:underline" onclick="openMember('${u.id}')">${escH(u.full_name||'—')} <span style="font-size:11px;color:var(--accent)">${roleBadge(u)}</span></div><div class="uc-email" style="cursor:pointer" onclick="openMember('${u.id}')">${u.account_type==='tenant'?'🔎 مستأجر':'🏢 مالك'} · ${escH(u.email||'—')}${u.phone?' · '+escH(u.phone):' · ⚠️ بدون رقم'}</div></div><div class="uc-act">${badge} ${acts}${planCtl(u)}${contactBtns(u)}${staffCtl(u)}</div></div>`;
   }).join('');
+}
+
+async function openMember(uid){
+  const u=USERS.find(x=>x.id===uid); if(!u) return;
+  document.getElementById('mem-ttl').textContent='🏢 عقارات '+(u.full_name||u.email);
+  const el=document.getElementById('mem-body'); el.innerHTML='<div style="padding:12px;color:var(--text3)">جاري التحميل...</div>'; openOv('ov-member');
+  const{data:props,error}=await db.from('properties').select('id,name,type,governorate,city').eq('user_id',uid).order('created_at',{ascending:false});
+  if(error){el.innerHTML='<div style="padding:12px;color:var(--red)">تعذر تحميل العقارات</div>';return;}
+  if(!props.length){el.innerHTML='<div class="empty"><div class="ei">🏢</div><div class="et">لا توجد عقارات لهذا العضو</div></div>';return;}
+  const{data:units}=await db.from('units').select('id,property_id,status').in('property_id',props.map(p=>p.id));
+  el.innerHTML=props.map(p=>{
+    const us=(units||[]).filter(x=>x.property_id===p.id);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;margin-bottom:8px"><div style="min-width:0"><b>${escH(p.name)}</b><div style="font-size:12px;color:var(--text3)">${us.length} وحدة · ${us.filter(x=>x.status==='rented').length} مؤجرة${(p.governorate||p.city)?' · '+escH([p.governorate,p.city].filter(Boolean).join(' — ')):''}</div></div><button class="btn btn-red btn-sm" onclick="delMemberProp('${p.id}','${uid}')">🗑️ حذف</button></div>`;
+  }).join('');
+}
+async function delMemberProp(pid,uid){
+  if(!confirm('حذف هذا العقار نهائيًا بكل وحداته وعقوده ومدفوعاته؟')) return;
+  const{error}=await db.rpc('admin_delete_property',{p_pid:pid});
+  if(error){toast('خطأ: '+(error.message.includes('FORBIDDEN')?'غير مسموح لك بهذا الإجراء':error.message),true);return;}
+  toast('تم حذف العقار');await openMember(uid);
 }
 async function adm(fn,args,okMsg){
   const{error}=await db.rpc(fn,args);

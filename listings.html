@@ -173,6 +173,7 @@ button,.chip,.mk-card,.btn-request,.btn-share,.btn-login,.sheet-card button,.det
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="egypt.js"></script>
 <script src="site.js"></script>
+<script src="assistant.js" defer></script>
 <link rel="manifest" href="manifest-listings.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -397,6 +398,7 @@ function updateChips(){
 async function ownerBtn(){
   const{data:{session}}=await db.auth.getSession(); if(!session) return;
   const cust=(session.user.user_metadata||{}).role==='customer';
+  window.__loggedIn=true;window.__role=cust?'tenant':'owner';
   document.querySelectorAll('a[href="iigari.html"]').forEach(a=>{
     const inHeader=!!a.closest('.header');
     if(cust){a.removeAttribute('href');a.style.cursor='pointer';a.onclick=async e=>{e.preventDefault();if(confirm('تسجيل الخروج من حسابك؟')){await db.auth.signOut();location.reload();}};a.innerHTML=inHeader?'👤 <span>خروج</span>':'تسجيل الخروج';}
@@ -551,6 +553,8 @@ async function doAuth(){
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
+window.ASSIST_DB=db;
+window.assistantCtx=()=>({page:'gallery',loggedIn:!!window.__loggedIn,role:window.__role||'visitor'});
 let SENDING=false;
 async function submitRequest(){
   if(SENDING) return;

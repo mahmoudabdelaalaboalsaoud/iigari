@@ -81,9 +81,17 @@ function chipsFor(c){
   return[['إزاي أدور على عقار؟'],['إزاي أتواصل مع صاحب العقار؟'],['إزاي أثبت التطبيق؟'],['إزاي أعمل حساب؟'],['إيه هو إيجاري؟']];
 }
 function css(){
-  const st=document.createElement('style');
-  st.textContent=`#asst-btn{position:fixed;left:14px;bottom:var(--asst-b,18px);z-index:7000;width:54px;height:54px;border-radius:50%;border:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(79,70,229,.45);cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
-#asst-btn .dot{position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #fff}
+  if(document.getElementById('asst-css')) return;
+  const st=document.createElement('style');st.id='asst-css';
+  st.textContent=`#asst-btn{position:fixed;left:14px;bottom:var(--asst-b,18px);z-index:7000;width:56px;height:56px;border-radius:50%;border:0;padding:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 8px 24px rgba(79,70,229,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;opacity:0;transform:scale(.6);transition:opacity .35s,transform .35s cubic-bezier(.2,.9,.3,1.3)}
+#asst-btn.show{opacity:1;transform:none}
+#asst-btn:active{transform:scale(.92)}
+#asst-btn svg{width:31px;height:31px;position:relative}
+#asst-btn:before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(124,58,237,.6);animation:aspl 2.6s ease-out infinite;pointer-events:none}
+@keyframes aspl{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.65);opacity:0}}
+#asst-btn .dot{position:absolute;top:1px;right:1px;width:13px;height:13px;border-radius:50%;background:#22c55e;border:2.5px solid #fff}
+#asst-tip{position:fixed;left:80px;bottom:calc(var(--asst-b,18px) + 8px);z-index:7000;background:#fff;color:#1a202c;border-radius:16px 16px 16px 4px;padding:9px 14px;font-size:13px;font-weight:700;box-shadow:0 6px 22px rgba(15,23,42,.22);direction:rtl;font-family:inherit;max-width:190px;line-height:1.6;animation:astip .4s ease-out}
+@keyframes astip{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
 #asst{position:fixed;inset:0;z-index:9500;display:none;align-items:flex-end;justify-content:flex-start;background:rgba(15,23,42,.45);direction:rtl;font-family:inherit}
 #asst.open{display:flex}
 #asst .card{width:100%;max-width:420px;height:min(82vh,600px);background:var(--bg2,#fff);color:var(--text,#1a202c);border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.3)}
@@ -222,11 +230,22 @@ async function loadCustom(){
 window.assistantReload=loadCustom;
 function init(){
   if(document.getElementById('asst-btn')) return;
+  css();
   btn=document.createElement('button');btn.id='asst-btn';btn.setAttribute('aria-label','المساعد الآلي');
-  btn.innerHTML='💬<span class="dot"></span>';
-  btn.onclick=open;
+  btn.innerHTML='<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 5C9.4 5 4 9.4 4 14.9c0 2.9 1.5 5.5 3.9 7.3L7 27.5l5.1-2.5c1.2.3 2.5.5 3.9.5 6.6 0 12-4.4 12-9.9S22.6 5 16 5z" fill="#fff"/><circle cx="10.8" cy="15" r="1.7" fill="#6d4ae8"/><circle cx="16" cy="15" r="1.7" fill="#6d4ae8"/><circle cx="21.2" cy="15" r="1.7" fill="#6d4ae8"/><path d="M26 1.5l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#fde68a"/></svg><span class="dot"></span>';
+  btn.onclick=()=>{const t=document.getElementById('asst-tip');if(t)t.remove();open();};
   document.body.appendChild(btn);
-  const c=ctx();if(c.page==='app') btn.style.setProperty('--asst-b','86px');
+  const c=ctx();if(c.page==='app') document.documentElement.style.setProperty('--asst-b','86px');
+  setTimeout(()=>btn.classList.add('show'),1300);
+  let seen=false;try{seen=sessionStorage.getItem('asst_tip');}catch(e){}
+  if(!seen){
+    setTimeout(()=>{
+      if(document.getElementById('asst')&&document.getElementById('asst').classList.contains('open')) return;
+      const t=document.createElement('div');t.id='asst-tip';t.textContent='محتاج مساعدة؟ اسألني 👋';
+      document.body.appendChild(t);try{sessionStorage.setItem('asst_tip','1');}catch(e){}
+      setTimeout(()=>t.remove(),7000);
+    },3200);
+  }
   setTimeout(loadCustom,1200);
 }
 Object.assign(window.__assist,{open,ask,close});

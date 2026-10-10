@@ -330,6 +330,7 @@ input,textarea,select{-webkit-user-select:text;user-select:text}
       <input class="fi" type="email" id="l-e" placeholder="البريد الإلكتروني">
       <input class="fi" type="password" id="l-p" placeholder="كلمة المرور">
       <button class="btn-main" onclick="doLogin()">دخول</button>
+      <div style="text-align:center;margin-top:12px"><a href="#" onclick="showForgot();return false" style="font-size:13px;color:var(--accent);font-weight:700;text-decoration:none">نسيت كلمة المرور؟</a></div>
     </div>
     <div class="panel" id="p-reg">
       <div class="msg err" id="re"></div>
@@ -342,6 +343,31 @@ input,textarea,select{-webkit-user-select:text;user-select:text}
       <button class="btn-main" onclick="doReg()">إنشاء حساب</button>
     </div>
     <div class="note">بتسجيل دخولك توافق على شروط الاستخدام</div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div class="screen" id="s-forgot">
+  <div class="login-box">
+    <div class="l-logo"><div class="l-name" style="font-size:22px">استعادة كلمة المرور</div></div>
+    <div class="l-sub">اكتب إيميلك وهنبعتلك رابط لتعيين كلمة مرور جديدة</div>
+    <div class="msg err" id="fe"></div>
+    <div class="msg ok" id="fok"></div>
+    <input class="fi" type="email" id="f-e" placeholder="البريد الإلكتروني" autocomplete="email">
+    <button class="btn-main" onclick="sendReset()">إرسال رابط الاستعادة</button>
+    <button class="btn-main" style="background:transparent;color:inherit;opacity:.7;margin-top:8px;box-shadow:none" onclick="showS('login')">رجوع لتسجيل الدخول</button>
+  </div>
+</div>
+
+<!-- NEW PASSWORD -->
+<div class="screen" id="s-reset">
+  <div class="login-box">
+    <div class="l-logo"><div class="l-name" style="font-size:22px">كلمة مرور جديدة</div></div>
+    <div class="l-sub">اختار كلمة مرور جديدة (8 أحرف على الأقل)</div>
+    <div class="msg err" id="rse"></div>
+    <input class="fi" type="password" id="np1" placeholder="كلمة المرور الجديدة" autocomplete="new-password">
+    <input class="fi" type="password" id="np2" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
+    <button class="btn-main" onclick="saveNewPass()">حفظ كلمة المرور</button>
   </div>
 </div>
 
@@ -696,9 +722,11 @@ window.addEventListener('load',async()=>{
   document.getElementById('pg-date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   let session=null;
   try{session=(await db.auth.getSession()).data.session;}catch(e){}
-  if(session) await handleUser(session.user); else showS('login');
+  if(RECOVERY&&session) showS('reset');
+  else if(session) await handleUser(session.user); else showS('login');
   db.auth.onAuthStateChange(async(ev,sess)=>{
-    if(ev==='SIGNED_IN'&&sess) await handleUser(sess.user);
+    if(ev==='PASSWORD_RECOVERY'){RECOVERY=true;showS('reset');return;}
+    if(ev==='SIGNED_IN'&&sess&&!RECOVERY) await handleUser(sess.user);
     if(ev==='SIGNED_OUT'){ENTERED=null;showS('login');}
   });
 });
@@ -724,7 +752,7 @@ function closeSidebar(){
 
 window.ASSIST_DB=db;
 window.assistantCtx=()=>({page:'app',loggedIn:ENTERED!==null,role:isAdm?'admin':isMod?'mod':'owner',plan:(typeof effPlan==='function'?effPlan():'free')});
-let ENTERED=null,HANDLING=false;
+let ENTERED=null,HANDLING=false,RECOVERY=/type=recovery/.test(location.hash);
 async function handleUser(user){
   if(ENTERED===user.id||HANDLING) return;
   HANDLING=true;
@@ -798,6 +826,29 @@ async function doLogin(){
   if(!e||!p){err.textContent='أدخل البريد وكلمة المرور';err.classList.add('show');return;}
   const{error}=await db.auth.signInWithPassword({email:e,password:p});
   if(error){err.textContent='بيانات غير صحيحة';err.classList.add('show');}
+}
+
+function showForgot(){document.getElementById('f-e').value=document.getElementById('l-e').value.trim();['fe','fok'].forEach(i=>document.getElementById(i).classList.remove('show'));showS('forgot');}
+async function sendReset(){
+  const e=document.getElementById('f-e').value.trim(),err=document.getElementById('fe'),ok=document.getElementById('fok');
+  err.classList.remove('show');ok.classList.remove('show');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){err.textContent='اكتب إيميل صحيح';err.classList.add('show');return;}
+  const{error}=await db.auth.resetPasswordForEmail(e,{redirectTo:location.origin+'/iigari.html'});
+  if(error){err.textContent=/rate|limit/i.test(error.message)?'تم تجاوز عدد الرسائل المسموح الآن، جرّب بعد قليل أو كلّم الدعم':'تعذر الإرسال، حاول مرة أخرى';err.classList.add('show');return;}
+  ok.textContent='لو الإيميل مسجّل عندنا هيوصلك رابط الاستعادة خلال دقائق ✅ (راجع Spam كمان)';ok.classList.add('show');
+}
+async function saveNewPass(){
+  const a=document.getElementById('np1').value,b=document.getElementById('np2').value,err=document.getElementById('rse');
+  err.classList.remove('show');
+  if(a.length<8){err.textContent='كلمة المرور 8 أحرف على الأقل';err.classList.add('show');return;}
+  if(a!==b){err.textContent='كلمتا المرور غير متطابقتين';err.classList.add('show');return;}
+  const{error}=await db.auth.updateUser({password:a});
+  if(error){err.textContent=/same|different/i.test(error.message)?'اختار كلمة مرور مختلفة عن القديمة':'تعذر الحفظ، افتح رابط الاستعادة من جديد';err.classList.add('show');return;}
+  RECOVERY=false;try{history.replaceState(null,'',location.pathname);}catch(e){}
+  document.getElementById('np1').value='';document.getElementById('np2').value='';
+  toast('تم تغيير كلمة المرور ✅');
+  const{data:{user}}=await db.auth.getUser();
+  if(user) await handleUser(user); else showS('login');
 }
 async function doReg(){
   const name=document.getElementById('r-n').value.trim(),e=document.getElementById('r-e').value.trim(),p=document.getElementById('r-p').value;

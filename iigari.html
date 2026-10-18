@@ -881,6 +881,7 @@ function goPage(pg,el){
   if(pg==='users') loadUsers();
   if(pg==='leads') loadLeads();
   if(pg==='site') loadSiteForm();
+  if(pg==='buildings') renderBuildings();
   if(pg==='contracts') renderContracts();
   if(pg==='payments') renderPayments();
   closeSidebar();
@@ -1212,6 +1213,7 @@ async function delKb(id){
 async function loadAll(){
   await loadBuildings();
   await loadUnitsAll();
+  renderBuildings();
   await loadPaymentsData();
   loadDash();
   loadLeads();

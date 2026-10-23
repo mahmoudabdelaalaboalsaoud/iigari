@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<script>try{if(localStorage.getItem('iigari_view')==='desktop')document.querySelector('meta[name=viewport]').setAttribute('content','width=1100');}catch(e){}</script>
 <title>إيجاري — منصة إدارة العقارات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -11,6 +12,7 @@
 :root{--bg:#f0f4f8;--bg2:#fff;--bg3:#f7f9fb;--border:#e2e8f0;--text:#1a202c;--text2:#4a5568;--text3:#a0aec0;--accent:#4f46e5;--purple:#7c3aed;--green:#16a34a;--red:#dc2626;--amber:#d97706;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.10)}
 [data-theme="dark"]{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3348;--text:#e8edf5;--text2:#8b95a8;--text3:#5a6478;--shadow:0 1px 3px rgba(0,0,0,.3);--shadow2:0 4px 16px rgba(0,0,0,.4)}
 *{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden;max-width:100%}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .screen{display:none;min-height:100vh}.screen.active{display:flex}
 
@@ -427,6 +429,7 @@ input,textarea,select{-webkit-user-select:text;user-select:text}
         <div class="ni" id="ni-site" style="display:none" onclick="goPage('site',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>إعدادات الموقع</div>
         <div class="ni" id="ni-users" style="display:none" onclick="goPage('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span id="ni-users-txt">المستخدمون</span></div>
         <div class="ni" id="ni-assist" onclick="closeSidebar();window.__assist&&window.__assist.open()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/><circle cx="9" cy="12" r=".6" fill="currentColor"/><circle cx="13" cy="12" r=".6" fill="currentColor"/><circle cx="17" cy="12" r=".6" fill="currentColor"/></svg>المساعد الآلي <span style="font-size:11px;color:var(--text3);margin-right:6px">(اسألني)</span></div>
+        <div class="ni" id="ni-view" onclick="toggleView()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span id="ni-view-txt">عرض سطح المكتب</span></div>
       </div>
       <div class="sb-foot">
         <div class="u-card"><div class="u-av" id="u-av">م</div><div class="u-info"><div class="u-name" id="u-nm">...</div><div class="u-role" id="u-rl">عضو</div></div></div>
@@ -716,6 +719,9 @@ const {createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
 let CU=null,isAdm=false,isMod=false,MYROLE='user',BUILDINGS=[],ALL_UNITS=[],CONTRACTS=[],PAYMENTS=[],USERS=[],curBuildingId=null,curF='all',COUNTRY='EG';
 const CUR=()=>COUNTRIES[COUNTRY].cur, DIAL=()=>COUNTRIES[COUNTRY].dial;
+function viewMode(){try{return localStorage.getItem('iigari_view')==='desktop'?'desktop':'mobile';}catch(e){return 'mobile';}}
+function toggleView(){try{localStorage.setItem('iigari_view',viewMode()==='desktop'?'mobile':'desktop');}catch(e){}location.reload();}
+function viewLbl(){const t=document.getElementById('ni-view-txt');if(t)t.textContent=viewMode()==='desktop'?'📱 العودة لعرض الموبايل':'🖥️ عرض سطح المكتب';}
 function switchCountry(c){if(!COUNTRIES[c]||!isAdm)return;saveCountry(c);location.reload();}
 
 // THEME
@@ -811,6 +817,7 @@ function enterApp(user){
   showS('app');
   const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email?.split('@')[0]||'مستخدم';
   document.getElementById('u-nm').textContent=name;
+  viewLbl();
   const csw=document.getElementById('country-sw'); if(csw){csw.innerHTML=countryOptions(COUNTRY); csw.disabled=!isAdm; if(!isAdm) csw.style.appearance='none';}
   const cf=document.getElementById('cur-full'); if(cf) cf.textContent=COUNTRIES[COUNTRY].curFull;
   document.getElementById('u-mini-nm').textContent=name;

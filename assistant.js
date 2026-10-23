@@ -231,6 +231,7 @@ window.assistantReload=loadCustom;
 function init(){
   if(document.getElementById('asst-btn')) return;
   css();
+  if(ctx().page==='app'){setTimeout(loadCustom,1200);return;} // داخل التطبيق: الدخول للمساعد من القائمة فقط، بدون أيقونة عائمة
   btn=document.createElement('button');btn.id='asst-btn';btn.setAttribute('aria-label','المساعد الآلي');
   btn.innerHTML='<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 5C9.4 5 4 9.4 4 14.9c0 2.9 1.5 5.5 3.9 7.3L7 27.5l5.1-2.5c1.2.3 2.5.5 3.9.5 6.6 0 12-4.4 12-9.9S22.6 5 16 5z" fill="#fff"/><circle cx="10.8" cy="15" r="1.7" fill="#6d4ae8"/><circle cx="16" cy="15" r="1.7" fill="#6d4ae8"/><circle cx="21.2" cy="15" r="1.7" fill="#6d4ae8"/><path d="M26 1.5l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#fde68a"/></svg><span class="dot"></span>';
   btn.onclick=()=>{const t=document.getElementById('asst-tip');if(t)t.remove();open();};

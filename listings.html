@@ -172,6 +172,7 @@ button,.chip,.mk-card,.btn-request,.btn-share,.btn-login,.sheet-card button,.det
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="egypt.js"></script>
+<script src="countries.js"></script>
 <script src="site.js"></script>
 <script src="assistant.js" defer></script>
 <link rel="manifest" href="manifest-listings.json">
@@ -193,6 +194,7 @@ button,.chip,.mk-card,.btn-request,.btn-share,.btn-login,.sheet-card button,.det
       <div class="logo-name">إيجاري</div>
     </a>
     <div class="header-links">
+      <select id="country-sw" class="btn-login" style="font-family:inherit;cursor:pointer" onchange="pickCountry(this.value)"></select>
       <a class="btn-login" href="iigari.html">🔐 <span>دخول المالك</span></a>
     </div>
   </div>
@@ -218,7 +220,7 @@ button,.chip,.mk-card,.btn-request,.btn-share,.btn-login,.sheet-card button,.det
 <div class="sheet" id="fsheet" onclick="if(event.target===this)closeSheet()">
   <div class="sheet-card">
     <div class="sheet-h"><b id="sh-title"></b><button onclick="closeSheet()">✕</button></div>
-    <div class="sec" id="sec-place"><label>المحافظة</label><select class="fsel" id="f-gov" onchange="geoChg('gov')"></select><label>المدينة / المنطقة</label><select class="fsel" id="f-city" onchange="geoChg('city')"></select><label>الحي</label><select class="fsel" id="f-dist" onchange="applyFilters()"></select></div>
+    <div class="sec" id="sec-place"><label id="f-gov-lb">المحافظة</label><select class="fsel" id="f-gov" onchange="geoChg('gov')"></select><label>المدينة / المنطقة</label><select class="fsel" id="f-city" onchange="geoChg('city')"></select><label>الحي</label><select class="fsel" id="f-dist" onchange="applyFilters()"></select></div>
     <div class="sec" id="sec-price"><label>السعر الشهري</label><select class="fsel" id="f-price" onchange="applyFilters()">
       <option value="">كل الأسعار</option>
       <option value="0-2000">أقل من 2,000 ج</option>
@@ -272,7 +274,7 @@ button,.chip,.mk-card,.btn-request,.btn-share,.btn-login,.sheet-card button,.det
       <div class="modal-sub">أدخل بياناتك وهنتواصل معاك في أقرب وقت</div>
       <div class="modal-prop" id="modal-prop-info"></div>
       <div class="fgi"><label>الاسم الكامل *</label><input id="req-name" placeholder="محمد أحمد علي" autocomplete="name" maxlength="100"></div>
-      <div class="fgi"><label>رقم الهاتف / واتساب *</label><input id="req-phone" placeholder="01012345678" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="20"></div>
+      <div class="fgi"><label>رقم الهاتف / واتساب *</label><input id="req-phone" placeholder="رقم موبايلك" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="20"></div>
       <div class="fgi"><label>ملاحظات أو أسئلة</label><textarea id="req-notes" maxlength="1000" placeholder="مثال: عايز أعرف أكتر عن العقار، متى ممكن أعمل معاينة..."></textarea></div>
       <div class="fa">
         <button class="btn-cancel" onclick="closeOv('ov-request')">إلغاء</button>
@@ -304,8 +306,31 @@ let currentUnitId=null;
 const typeMap={apartment:'🏢 عمارة',house:'🏠 بيت',flat:'🛏️ شقة',villa:'🏡 فيلا',shop:'🏪 محل',land:'🌿 أرض',office:'🏦 مكتب',warehouse:'🏭 مخزن',commercial:'🏬 مبنى تجاري',other:'📦 أخرى'};
 const typeEmoji={apartment:'🏢',house:'🏠',flat:'🛏️',villa:'🏡',shop:'🏪',land:'🌿',office:'🏦',warehouse:'🏭',commercial:'🏬',other:'📦'};
 
+let COUNTRY=savedCountry();
+const CURL=()=>COUNTRIES[COUNTRY].cur, TREEC=()=>COUNTRIES[COUNTRY].tree;
+const PRICE_STEPS={EG:[2000,5000,10000],SA:[1500,3000,6000],AE:[3000,6000,12000]};
+const ADMIN_EMAIL='mahmoudabdelaalaboalsaoud@gmail.com';
+function pickCountry(c){if(!COUNTRIES[c])return;saveCountry(c);location.reload();}
+async function initCountry(){
+  let locked=false;
+  try{
+    const{data:{session}}=await db.auth.getSession();
+    if(session){
+      const{data:pf}=await db.from('user_profiles').select('country,role').eq('id',session.user.id).maybeSingle();
+      const adm=session.user.email===ADMIN_EMAIL||(pf&&pf.role==='admin');
+      if(pf&&pf.country&&!adm){COUNTRY=pf.country;locked=true;}
+    }
+  }catch(e){}
+  const sw=document.getElementById('country-sw'); sw.innerHTML=countryOptions(COUNTRY); sw.disabled=locked; if(locked) sw.style.appearance='none';
+  const c=COUNTRIES[COUNTRY];
+  document.getElementById('f-gov-lb').textContent=c.gov;
+  const st=PRICE_STEPS[COUNTRY],f=n=>n.toLocaleString('en-US'),cu=c.cur;
+  document.getElementById('f-price').innerHTML=`<option value="">كل الأسعار</option><option value="0-${st[0]}">أقل من ${f(st[0])} ${cu}</option><option value="${st[0]}-${st[1]}">${f(st[0])} — ${f(st[1])} ${cu}</option><option value="${st[1]}-${st[2]}">${f(st[1])} — ${f(st[2])} ${cu}</option><option value="${st[2]}-9999999">أكثر من ${f(st[2])} ${cu}</option>`;
+  fillOpt('f-gov',Object.keys(TREEC()),c.govAll);fillOpt('f-city',[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');
+}
 window.addEventListener('load', async()=>{
   loadSite(dbPub);
+  await initCountry();
   ownerBtn();
   await loadListings();
   focusFromUrl();
@@ -314,7 +339,8 @@ window.addEventListener('load', async()=>{
 async function loadListings(){
   // جلب الوحدات الفارغة أو المدرجة للإيجار
   const{data:units,error}=await dbPub.from('units')
-    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties(name,address,type,notes,governorate,city,district,lat,lng,images)')
+    .select('id,unit_number,floor,area_sqm,rent_price,listing_price,listing_notes,created_at,properties!inner(name,address,type,notes,governorate,city,district,lat,lng,images,country)')
+    .eq('properties.country',COUNTRY)
     .eq('status','vacant')
     .eq('is_listed',true)
     .order('created_at',{ascending:false});
@@ -334,11 +360,10 @@ async function loadListings(){
 let NEAR=null, LMAP=null, LLAYER=null, LAST=[];
 const escL=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fillOpt(id,list,ph){document.getElementById(id).innerHTML=`<option value="">${ph}</option>`+list.map(x=>`<option>${x}</option>`).join('');}
-window.addEventListener('DOMContentLoaded',()=>{fillOpt('f-gov',Object.keys(EG),'كل المحافظات');fillOpt('f-city',[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');});
 function geoChg(k){
   const g=document.getElementById('f-gov').value;
-  if(k==='gov'){fillOpt('f-city',EG[g]?Object.keys(EG[g]):[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');}
-  else{const c=document.getElementById('f-city').value;fillOpt('f-dist',(EG[g]&&EG[g][c])||[],'كل الأحياء');}
+  if(k==='gov'){fillOpt('f-city',TREEC()[g]?Object.keys(TREEC()[g]):[],'كل المدن');fillOpt('f-dist',[],'كل الأحياء');}
+  else{const c=document.getElementById('f-city').value;fillOpt('f-dist',(TREEC()[g]&&TREEC()[g][c])||[],'كل الأحياء');}
   applyFilters();
 }
 function dist(a,b,c,d){const R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r;const h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
@@ -359,14 +384,14 @@ function toggleMap(){
   w.style.display=show?'block':'none';
   document.getElementById('btn-map').textContent=show?'📋 القائمة فقط':'🗺️ الخريطة';
   if(!show) return;
-  if(!LMAP){LMAP=L.map('lmap').setView([27,30.5],6);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LMAP);LLAYER=L.layerGroup().addTo(LMAP);}
+  if(!LMAP){LMAP=L.map('lmap').setView(COUNTRIES[COUNTRY].center,COUNTRIES[COUNTRY].zoom);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LMAP);LLAYER=L.layerGroup().addTo(LMAP);}
   setTimeout(()=>{LMAP.invalidateSize();drawMap();},100);
 }
 function drawMap(){
   if(!LLAYER||!LMAP) return;
   LLAYER.clearLayers();const pts=[];
   LAST.forEach(u=>{const p=u.properties;if(p.lat==null||p.lng==null)return;const price=u.listing_price||u.rent_price;
-    L.marker([p.lat,p.lng]).addTo(LLAYER).bindPopup(`<b>${escL(p.name)}</b><br>وحدة ${escL(u.unit_number)}${price?'<br>'+Number(price).toLocaleString('ar-EG')+' ج / شهريًا':''}`);pts.push([p.lat,p.lng]);});
+    L.marker([p.lat,p.lng]).addTo(LLAYER).bindPopup(`<b>${escL(p.name)}</b><br>وحدة ${escL(u.unit_number)}${price?'<br>'+Number(price).toLocaleString('ar-EG')+' '+CURL()+' / شهريًا':''}`);pts.push([p.lat,p.lng]);});
   if(NEAR){L.circleMarker([NEAR.lat,NEAR.lng],{radius:8,color:'#2563eb'}).addTo(LLAYER).bindPopup('موقعك');pts.push([NEAR.lat,NEAR.lng]);}
   if(pts.length)LMAP.fitBounds(pts,{padding:[30,30],maxZoom:15});
 }
@@ -471,7 +496,7 @@ function renderListings(listings){
         <span class="mk-badge">${d?'📍 '+d:(typeMap[p.type]||'عقار')}</span>
         ${p.images&&p.images.length>1?`<span class="mk-count">📷 ${p.images.length}</span>`:''}
       </div>
-      <div class="mk-body"><div class="mk-price">${price?Number(price).toLocaleString('ar-EG')+' ج':'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div><div class="mk-title">${escL(p.name||'عقار متاح')}</div><div class="mk-loc">${escL(loc||p.address||'')}</div></div>
+      <div class="mk-body"><div class="mk-price">${price?Number(price).toLocaleString('ar-EG')+' '+CURL():'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div><div class="mk-title">${escL(p.name||'عقار متاح')}</div><div class="mk-loc">${escL(loc||p.address||'')}</div></div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -486,7 +511,7 @@ function openDetail(id){
   document.getElementById('det-body').innerHTML=`
     <div class="det-gal">${imgs.length?imgs.map(src=>`<img src="${escL(src)}" alt="">`).join(''):`<div class="mk-ph" style="flex:0 0 100%;aspect-ratio:1/1"><img src="icon-192.png" alt=""><span style="font-size:72px">${emoji}</span></div>`}</div>
     <div style="padding:16px 16px 22px">
-      <div class="mk-price" style="font-size:24px">${price?Number(price).toLocaleString('ar-EG')+' ج':'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div>
+      <div class="mk-price" style="font-size:24px">${price?Number(price).toLocaleString('ar-EG')+' '+CURL():'اتصل للسعر'}${price?'<small>/ شهريًا</small>':''}</div>
       <div class="det-title">${escL(p.name||'عقار متاح')}</div>
       <div style="font-size:13px;color:#718096;margin-top:2px">📍 ${escL(p.address||'العنوان غير محدد')}</div>
       ${locLine(u)}
@@ -541,7 +566,7 @@ async function doAuth(){
     const phone=document.getElementById('au-phone').value.trim();
     if(!name){toast('أدخل الاسم الكامل',true);return;}
     if(phone.replace(/\D/g,'').length<10){toast('أدخل رقم موبايل صحيح',true);return;}
-    r=await db.auth.signUp({email,password:pass,options:{data:{full_name:name,phone,account_type:'tenant',role:'customer'}}});
+    r=await db.auth.signUp({email,password:pass,options:{data:{full_name:name,phone,account_type:'tenant',role:'customer',country:COUNTRY}}});
     if(!r.error&&!r.data.session){toast('تم إرسال رابط تأكيد على بريدك. أكّده ثم سجّل دخولك');return;}
   } else {
     r=await db.auth.signInWithPassword({email,password:pass});
